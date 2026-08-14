@@ -166,7 +166,7 @@
     );
 
     // stagger index for grids
-    [".cards", ".results", ".quotes", ".steps"].forEach((sel) => {
+    [".cards", ".results", ".quotes", ".steps", ".gallery", ".reels"].forEach((sel) => {
       const grid = $(sel);
       if (grid) {
         grid.classList.add("is-stagger");
@@ -416,6 +416,100 @@
   }
 
   /* ---------------------------------------------------------
+     Gallery lightbox
+  --------------------------------------------------------- */
+  function initLightbox() {
+    const lb = $("#lightbox");
+    const tiles = $$(".tile");
+    if (!lb || !tiles.length) return;
+    const imgEl = $("#lbImg");
+    const counter = $("#lbCounter");
+    const sources = tiles.map((t) => t.querySelector("img").getAttribute("src"));
+    let idx = 0;
+
+    const render = () => {
+      imgEl.setAttribute("src", sources[idx]);
+      if (counter) counter.textContent = idx + 1 + " / " + sources.length;
+    };
+    const open = (i) => {
+      idx = i;
+      render();
+      lb.classList.add("is-open");
+      lb.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    };
+    const close = () => {
+      lb.classList.remove("is-open");
+      lb.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    };
+    const step = (d) => {
+      idx = (idx + d + sources.length) % sources.length;
+      render();
+    };
+
+    tiles.forEach((t) =>
+      t.addEventListener("click", () =>
+        open(parseInt(t.dataset.lightbox || "0", 10))
+      )
+    );
+    $("#lbClose").addEventListener("click", close);
+    $("#lbPrev").addEventListener("click", () => step(-1));
+    $("#lbNext").addEventListener("click", () => step(1));
+    lb.addEventListener("click", (e) => {
+      if (e.target === lb) close();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (!lb.classList.contains("is-open")) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") step(-1);
+      else if (e.key === "ArrowRight") step(1);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     Video modal (Showreel)
+  --------------------------------------------------------- */
+  function initVideoModal() {
+    const vm = $("#videoModal");
+    const reels = $$(".reel");
+    if (!vm || !reels.length) return;
+    const stage = $("#vmStage");
+
+    const close = () => {
+      vm.classList.remove("is-open");
+      vm.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      stage.innerHTML = "";
+    };
+    const open = (reel) => {
+      const src = reel.dataset.videoSrc;
+      const poster = reel.querySelector("img").getAttribute("src");
+      if (src) {
+        stage.innerHTML =
+          '<video src="' +
+          src +
+          '" autoplay loop controls playsinline></video>';
+      } else {
+        // Placeholder: the animated SVG poster keeps playing enlarged
+        stage.innerHTML = '<img src="' + poster + '" alt="" />';
+      }
+      vm.classList.add("is-open");
+      vm.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    };
+
+    reels.forEach((r) => r.addEventListener("click", () => open(r)));
+    $("#vmClose").addEventListener("click", close);
+    vm.addEventListener("click", (e) => {
+      if (e.target === vm) close();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (vm.classList.contains("is-open") && e.key === "Escape") close();
+    });
+  }
+
+  /* ---------------------------------------------------------
      Misc
   --------------------------------------------------------- */
   function initMisc() {
@@ -440,6 +534,8 @@
     initParallax();
     initForm();
     initNavActive();
+    initLightbox();
+    initVideoModal();
     initMisc();
   });
 

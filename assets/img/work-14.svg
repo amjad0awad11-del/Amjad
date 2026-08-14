@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="900" viewBox="0 0 800 900">
+  <defs>
+    <linearGradient id="bg13" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0b16"/><stop offset="1" stop-color="#05060c"/>
+    </linearGradient>
+    <radialGradient id="orb13" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ec4899" stop-opacity="0.9"/>
+      <stop offset="0.5" stop-color="#a855f7" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#a855f7" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orb213" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7c3aed" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft13" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="34"/></filter>
+    <filter id="g13"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope="0.06"/></feComponentTransfer><feComposite operator="over" in2="SourceGraphic"/></filter>
+  </defs>
+  <rect width="800" height="900" fill="url(#bg13)"/>
+  <g opacity="0.06"><line x1="0" y1="0" x2="800" y2="0" stroke="#fff" stroke-width="1"/><line x1="0" y1="64" x2="800" y2="64" stroke="#fff" stroke-width="1"/><line x1="0" y1="128" x2="800" y2="128" stroke="#fff" stroke-width="1"/><line x1="0" y1="192" x2="800" y2="192" stroke="#fff" stroke-width="1"/><line x1="0" y1="256" x2="800" y2="256" stroke="#fff" stroke-width="1"/><line x1="0" y1="320" x2="800" y2="320" stroke="#fff" stroke-width="1"/><line x1="0" y1="384" x2="800" y2="384" stroke="#fff" stroke-width="1"/><line x1="0" y1="448" x2="800" y2="448" stroke="#fff" stroke-width="1"/><line x1="0" y1="512" x2="800" y2="512" stroke="#fff" stroke-width="1"/><line x1="0" y1="576" x2="800" y2="576" stroke="#fff" stroke-width="1"/><line x1="0" y1="640" x2="800" y2="640" stroke="#fff" stroke-width="1"/><line x1="0" y1="704" x2="800" y2="704" stroke="#fff" stroke-width="1"/><line x1="0" y1="768" x2="800" y2="768" stroke="#fff" stroke-width="1"/><line x1="0" y1="832" x2="800" y2="832" stroke="#fff" stroke-width="1"/><line x1="0" y1="896" x2="800" y2="896" stroke="#fff" stroke-width="1"/><line x1="0" y1="0" x2="0" y2="900" stroke="#fff" stroke-width="1"/><line x1="64" y1="0" x2="64" y2="900" stroke="#fff" stroke-width="1"/><line x1="128" y1="0" x2="128" y2="900" stroke="#fff" stroke-width="1"/><line x1="192" y1="0" x2="192" y2="900" stroke="#fff" stroke-width="1"/><line x1="256" y1="0" x2="256" y2="900" stroke="#fff" stroke-width="1"/><line x1="320" y1="0" x2="320" y2="900" stroke="#fff" stroke-width="1"/><line x1="384" y1="0" x2="384" y2="900" stroke="#fff" stroke-width="1"/><line x1="448" y1="0" x2="448" y2="900" stroke="#fff" stroke-width="1"/><line x1="512" y1="0" x2="512" y2="900" stroke="#fff" stroke-width="1"/><line x1="576" y1="0" x2="576" y2="900" stroke="#fff" stroke-width="1"/><line x1="640" y1="0" x2="640" y2="900" stroke="#fff" stroke-width="1"/><line x1="704" y1="0" x2="704" y2="900" stroke="#fff" stroke-width="1"/><line x1="768" y1="0" x2="768" y2="900" stroke="#fff" stroke-width="1"/></g>
+  <circle cx="200" cy="225" r="240" fill="url(#orb13)" filter="url(#soft13)"/><circle cx="740" cy="840" r="90" fill="none" stroke="#a855f7" stroke-opacity="0.41000000000000003" stroke-width="1.5"/><circle cx="740" cy="840" r="136" fill="none" stroke="#a855f7" stroke-opacity="0.364" stroke-width="1.5"/><circle cx="740" cy="840" r="182" fill="none" stroke="#a855f7" stroke-opacity="0.318" stroke-width="1.5"/><circle cx="740" cy="840" r="228" fill="none" stroke="#a855f7" stroke-opacity="0.272" stroke-width="1.5"/><circle cx="740" cy="840" r="274" fill="none" stroke="#a855f7" stroke-opacity="0.22599999999999998" stroke-width="1.5"/><circle cx="740" cy="840" r="320" fill="none" stroke="#a855f7" stroke-opacity="0.18" stroke-width="1.5"/><circle cx="740" cy="840" r="366" fill="none" stroke="#a855f7" stroke-opacity="0.134" stroke-width="1.5"/><circle cx="740" cy="840" r="412" fill="none" stroke="#a855f7" stroke-opacity="0.08800000000000002" stroke-width="1.5"/>
+  <rect width="800" height="900" filter="url(#g13)" opacity="0.5"/>
+  <rect width="800" height="900" fill="url(#vig13)"/>
+  <radialGradient id="vig13" cx="0.5" cy="0.45" r="0.75"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.55"/></radialGradient>
+</svg>

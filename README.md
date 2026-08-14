@@ -14,6 +14,8 @@ Build-Schritt — einfach ausliefern.
 | `script.js` | Interaktionen: Preloader, Scroll-Reveal, Count-up, Custom-Cursor, Magnet-Buttons, Tilt, Parallax, Mobile-Menü, FAQ, Formular |
 | `impressum.html` | Impressum (Vorlage) |
 | `datenschutz.html` | Datenschutzerklärung (Vorlage) |
+| `assets/img/work-01…15.svg` | 15 Platzhalter-Bilder für die Galerie „Arbeiten" |
+| `assets/video/reel-01…04.svg` | 4 animierte Platzhalter-Poster für das „Showreel" |
 
 ## Marke & Kontakt
 
@@ -34,6 +36,8 @@ Build-Schritt — einfach ausliefern.
 - Endlos-Marquee der Referenz-Marken
 - Prozess-Fortschrittslinie, animierte Ergebnis-Balken
 - FAQ-Akkordeon, Scroll-Fortschrittsleiste, aktive Navigation
+- Galerie „Arbeiten" mit Hover-Zoom und Lightbox (Pfeiltasten, Zähler)
+- „Showreel" mit animierten Video-Kacheln und Video-Modal
 - Mobiles Fullscreen-Menü mit gestaffelter Einblendung
 
 Alle Animationen respektieren `prefers-reduced-motion`.
@@ -52,8 +56,22 @@ npx serve .
 
 Dann `http://localhost:8000` im Browser öffnen.
 
+## Bilder & Videos (Platzhalter)
+
+Die 15 Galerie-Bilder und 4 Showreel-Videos sind **selbst generierte,
+markenkonforme SVG-Platzhalter** — die echten Fotos/Videos konnten in dieser
+Umgebung nicht abgerufen werden. Der Austausch ist bewusst simpel gehalten:
+
+- **Bilder:** Dateien in `assets/img/` durch echte Fotos ersetzen. Am einfachsten
+  gleiche Dateinamen verwenden (`work-01.jpg` …) und die `src`-Endungen in
+  `index.html` von `.svg` auf `.jpg`/`.webp` anpassen.
+- **Videos:** echte Clips (z. B. `.mp4`) in `assets/video/` ablegen und bei jeder
+  `.reel`-Kachel in `index.html` das Attribut `data-video-src="assets/video/reel-01.mp4"`
+  ergänzen. Das SVG-Poster bleibt als Vorschaubild, das Modal spielt dann den Clip.
+
 ## Vor dem Livegang anpassen
 
+- **Bilder/Videos:** die o. g. Platzhalter durch echtes Material ersetzen.
 - **Impressum & Datenschutz:** Platzhalter (Firmierung, Anschrift, Vertretung,
   Registerdaten, USt-IdNr., eingesetzte Tools) durch echte, rechtsverbindliche
   Angaben ersetzen.
