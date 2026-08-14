@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMW — Performance Marketing & Social Media Ads Agentur</title>
+  <meta name="description" content="AMW ist die Performance-Marketing-Agentur für skalierbares Wachstum. Wir entwickeln datengetriebene Werbekampagnen auf Meta, TikTok & Google, die messbar mehr Umsatz bringen." />
+  <meta name="theme-color" content="#05060c" />
+  <meta property="og:title" content="AMW — Performance Marketing & Social Media Ads" />
+  <meta property="og:description" content="Datengetriebene Ads, die wirklich performen. Mehr Leads, mehr Umsatz, planbares Wachstum." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://amwagence.de/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' font-family='sans-serif' font-weight='bold' fill='%23a855f7'%3EA%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <!-- Preloader -->
+  <div class="preloader" id="preloader">
+    <div class="preloader__inner">
+      <div class="preloader__logo">AMW</div>
+      <div class="preloader__bar"><span></span></div>
+      <div class="preloader__count" id="preloaderCount">0%</div>
+    </div>
+  </div>
+
+  <!-- Animated background layers -->
+  <div class="bg-fx" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <div class="orb orb--1"></div>
+    <div class="orb orb--2"></div>
+    <div class="orb orb--3"></div>
+    <div class="bg-noise"></div>
+  </div>
+
+  <!-- Custom cursor -->
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
+  <!-- Scroll progress -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#top" class="brand" data-magnetic>
+        <span class="brand__mark">A</span>
+        <span class="brand__word">AMW</span>
+      </a>
+      <nav class="nav" id="nav" aria-label="Hauptnavigation">
+        <a href="#leistungen" class="nav__link">Leistungen</a>
+        <a href="#prozess" class="nav__link">Prozess</a>
+        <a href="#ergebnisse" class="nav__link">Ergebnisse</a>
+        <a href="#stimmen" class="nav__link">Stimmen</a>
+        <a href="#faq" class="nav__link">FAQ</a>
+      </nav>
+      <a href="#kontakt" class="btn btn--sm btn--primary header__cta" data-magnetic>
+        <span>Erstgespräch sichern</span>
+      </a>
+      <button class="burger" id="burger" aria-label="Menü öffnen" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <nav class="mobile-menu__nav">
+      <a href="#leistungen" class="mobile-menu__link">Leistungen</a>
+      <a href="#prozess" class="mobile-menu__link">Prozess</a>
+      <a href="#ergebnisse" class="mobile-menu__link">Ergebnisse</a>
+      <a href="#stimmen" class="mobile-menu__link">Stimmen</a>
+      <a href="#faq" class="mobile-menu__link">FAQ</a>
+      <a href="#kontakt" class="btn btn--primary mobile-menu__cta"><span>Erstgespräch sichern</span></a>
+    </nav>
+  </div>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__badge reveal" data-reveal>
+          <span class="pulse-dot"></span>
+          Performance-Marketing-Agentur · Made in Germany
+        </div>
+        <h1 class="hero__title">
+          <span class="line" data-reveal-word>Ads, die</span>
+          <span class="line" data-reveal-word>wirklich <em class="grad-text">performen.</em></span>
+        </h1>
+        <p class="hero__sub reveal" data-reveal>
+          AMW entwickelt und skaliert datengetriebene Werbekampagnen auf
+          <strong>Meta, TikTok &amp; Google</strong> — für mehr Leads, mehr Umsatz
+          und planbares Wachstum. Kreativ gedacht, in Zahlen bewiesen.
+        </p>
+        <div class="hero__cta reveal" data-reveal>
+          <a href="#kontakt" class="btn btn--primary btn--lg" data-magnetic>
+            <span>Kostenloses Erstgespräch</span>
+            <svg viewBox="0 0 24 24" class="btn__arrow" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="#ergebnisse" class="btn btn--ghost btn--lg" data-magnetic>
+            <span>Ergebnisse ansehen</span>
+          </a>
+        </div>
+
+        <div class="hero__stats" id="heroStats">
+          <div class="stat reveal" data-reveal>
+            <div class="stat__num"><span data-count="18" data-suffix=" Mio.€">0</span></div>
+            <div class="stat__label">verwaltetes Werbebudget</div>
+          </div>
+          <div class="stat reveal" data-reveal>
+            <div class="stat__num"><span data-count="4.2" data-decimals="1" data-suffix="×">0</span></div>
+            <div class="stat__label">Ø ROAS unserer Kunden</div>
+          </div>
+          <div class="stat reveal" data-reveal>
+            <div class="stat__num"><span data-count="250" data-suffix="+">0</span></div>
+            <div class="stat__label">skalierte Kampagnen</div>
+          </div>
+          <div class="stat reveal" data-reveal>
+            <div class="stat__num"><span data-count="98" data-suffix="%">0</span></div>
+            <div class="stat__label">Kundenzufriedenheit</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero__scroll" aria-hidden="true">
+        <span>Scroll</span>
+        <div class="hero__scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- Trust marquee -->
+    <section class="trust">
+      <p class="trust__label reveal" data-reveal>Vertraut von wachstumsstarken Marken &amp; Startups</p>
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span>NOVAWEAR</span><span>•</span><span>Lumen Studio</span><span>•</span><span>Kraftwerk Nutrition</span><span>•</span><span>Halcyon</span><span>•</span><span>Fjord &amp; Co.</span><span>•</span><span>Vesper</span><span>•</span><span>Atlas Mobility</span><span>•</span><span>Blüte Kosmetik</span><span>•</span>
+          <span>NOVAWEAR</span><span>•</span><span>Lumen Studio</span><span>•</span><span>Kraftwerk Nutrition</span><span>•</span><span>Halcyon</span><span>•</span><span>Fjord &amp; Co.</span><span>•</span><span>Vesper</span><span>•</span><span>Atlas Mobility</span><span>•</span><span>Blüte Kosmetik</span><span>•</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services / Leistungen -->
+    <section class="section" id="leistungen">
+      <div class="container">
+        <div class="section__head">
+          <span class="eyebrow reveal" data-reveal>01 — Leistungen</span>
+          <h2 class="section__title reveal" data-reveal>Alles, was skaliert.<br /><span class="grad-text">Nichts, was bremst.</span></h2>
+          <p class="section__lead reveal" data-reveal>
+            Full-Funnel-Performance aus einer Hand: von der ersten Strategie
+            über scroll-stoppende Creatives bis zur profitablen Skalierung.
+          </p>
+        </div>
+
+        <div class="cards">
+          <article class="card tilt reveal" data-reveal data-tilt>
+            <div class="card__glow"></div>
+            <div class="card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="1.3" fill="currentColor"/></svg>
+            </div>
+            <h3 class="card__title">Meta Ads</h3>
+            <p class="card__text">Instagram &amp; Facebook Kampagnen, die Aufmerksamkeit in Umsatz verwandeln — vom Prospecting bis zum Retargeting.</p>
+            <span class="card__tag">Instagram · Facebook</span>
+          </article>
+
+          <article class="card tilt reveal" data-reveal data-tilt>
+            <div class="card__glow"></div>
+            <div class="card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v12.5a3.5 3.5 0 1 1-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M9 3c0 3 2 5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <h3 class="card__title">TikTok Ads</h3>
+            <p class="card__text">Native, trendbasierte Creatives für die Plattform mit der höchsten organischen Reichweite. Wir sprechen die Sprache der Feeds.</p>
+            <span class="card__tag">Spark Ads · UGC</span>
+          </article>
+
+          <article class="card tilt reveal" data-reveal data-tilt>
+            <div class="card__glow"></div>
+            <div class="card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <h3 class="card__title">Google Ads</h3>
+            <p class="card__text">Such-, Shopping- &amp; YouTube-Kampagnen mit klarer Kaufabsicht. Wir fangen Nachfrage genau dann ab, wenn sie entsteht.</p>
+            <span class="card__tag">Search · Shopping · PMax</span>
+          </article>
+
+          <article class="card tilt reveal" data-reveal data-tilt>
+            <div class="card__glow"></div>
+            <div class="card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 class="card__title">Performance &amp; Funnel</h3>
+            <p class="card__text">Wir denken in Systemen: Tracking, Attribution und Funnel-Aufbau, damit jeder Euro nachweisbar arbeitet.</p>
+            <span class="card__tag">Tracking · CRO</span>
+          </article>
+
+          <article class="card tilt reveal" data-reveal data-tilt>
+            <div class="card__glow"></div>
+            <div class="card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M7 9l2.5 2.5L14 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <h3 class="card__title">Creative Production</h3>
+            <p class="card__text">Scroll-stoppende Ad-Creatives, Statics &amp; Video im Wochentakt — getestet, iteriert, skaliert. Kreation trifft Daten.</p>
+            <span class="card__tag">Video · Static · UGC</span>
+          </article>
+
+          <article class="card tilt reveal" data-reveal data-tilt>
+            <div class="card__glow"></div>
+            <div class="card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 8h18M7 5.5h.01M10 5.5h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <h3 class="card__title">Webdesign &amp; Landingpages</h3>
+            <p class="card__text">Hochkonvertierende Landingpages &amp; Websites, die Traffic in Kunden verwandeln — schnell, mobil &amp; markenstark.</p>
+            <span class="card__tag">CRO · Speed</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prozess -->
+    <section class="section section--alt" id="prozess">
+      <div class="container">
+        <div class="section__head">
+          <span class="eyebrow reveal" data-reveal>02 — Prozess</span>
+          <h2 class="section__title reveal" data-reveal>In 4 Schritten zu<br /><span class="grad-text">planbarem Wachstum.</span></h2>
+          <p class="section__lead reveal" data-reveal>Kein Blindflug, keine Bauchentscheidungen. Ein klarer, wiederholbarer Prozess, der auf Daten basiert.</p>
+        </div>
+
+        <div class="steps">
+          <div class="steps__line" aria-hidden="true"><span id="stepsProgress"></span></div>
+          <article class="step reveal" data-reveal>
+            <div class="step__num">01</div>
+            <h3 class="step__title">Analyse &amp; Strategie</h3>
+            <p class="step__text">Wir tauchen tief in Marke, Markt &amp; Zahlen ein und bauen eine Roadmap mit klaren KPIs und Umsatzzielen.</p>
+          </article>
+          <article class="step reveal" data-reveal>
+            <div class="step__num">02</div>
+            <h3 class="step__title">Kreation &amp; Setup</h3>
+            <p class="step__text">Tracking, Kampagnen-Architektur und die ersten Creative-Angles — sauber aufgesetzt für maximale Skalierbarkeit.</p>
+          </article>
+          <article class="step reveal" data-reveal>
+            <div class="step__num">03</div>
+            <h3 class="step__title">Launch &amp; Testing</h3>
+            <p class="step__text">Wir testen systematisch Zielgruppen, Hooks &amp; Angebote und finden die Gewinner-Kombinationen datenbasiert.</p>
+          </article>
+          <article class="step reveal" data-reveal>
+            <div class="step__num">04</div>
+            <h3 class="step__title">Skalierung &amp; Optimierung</h3>
+            <p class="step__text">Was funktioniert, skalieren wir profitabel — mit wöchentlicher Optimierung und transparentem Reporting.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ergebnisse / Results -->
+    <section class="section" id="ergebnisse">
+      <div class="container">
+        <div class="section__head">
+          <span class="eyebrow reveal" data-reveal>03 — Ergebnisse</span>
+          <h2 class="section__title reveal" data-reveal>Zahlen, die<br /><span class="grad-text">für sich sprechen.</span></h2>
+          <p class="section__lead reveal" data-reveal>Ausgewählte Ergebnisse aus echten Kundenprojekten. Weil am Ende nur eines zählt: profitables Wachstum.</p>
+        </div>
+
+        <div class="results">
+          <article class="result reveal" data-reveal data-tilt>
+            <div class="result__value"><span data-count="312" data-prefix="+" data-suffix="%">0</span></div>
+            <h3 class="result__title">Umsatz in 90 Tagen</h3>
+            <p class="result__meta">D2C · Fashion &amp; Apparel</p>
+            <div class="result__bar"><span style="--w:92%"></span></div>
+          </article>
+          <article class="result reveal" data-reveal data-tilt>
+            <div class="result__value"><span data-count="5.8" data-decimals="1" data-suffix="×">0</span></div>
+            <h3 class="result__title">Return on Ad Spend</h3>
+            <p class="result__meta">E-Commerce · Beauty</p>
+            <div class="result__bar"><span style="--w:80%"></span></div>
+          </article>
+          <article class="result reveal" data-reveal data-tilt>
+            <div class="result__value"><span data-count="47" data-prefix="−" data-suffix="%">0</span></div>
+            <h3 class="result__title">Cost per Acquisition</h3>
+            <p class="result__meta">Leadgen · B2B SaaS</p>
+            <div class="result__bar"><span style="--w:68%"></span></div>
+          </article>
+          <article class="result reveal" data-reveal data-tilt>
+            <div class="result__value"><span data-count="1.4" data-decimals="1" data-prefix="" data-suffix=" Mio.">0</span></div>
+            <h3 class="result__title">generierte Leads</h3>
+            <p class="result__meta">Performance über 12 Monate</p>
+            <div class="result__bar"><span style="--w:88%"></span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section section--alt" id="stimmen">
+      <div class="container">
+        <div class="section__head">
+          <span class="eyebrow reveal" data-reveal>04 — Kundenstimmen</span>
+          <h2 class="section__title reveal" data-reveal>Was unsere Kunden<br /><span class="grad-text">über AMW sagen.</span></h2>
+        </div>
+
+        <div class="quotes">
+          <figure class="quote reveal" data-reveal>
+            <div class="quote__stars" aria-label="5 von 5 Sternen">★★★★★</div>
+            <blockquote>„AMW hat unsere Ads komplett neu gedacht. Innerhalb von drei Monaten haben wir den Umsatz mehr als verdreifacht — bei besserem ROAS als je zuvor."</blockquote>
+            <figcaption>
+              <span class="quote__avatar">LK</span>
+              <span class="quote__who"><strong>Lena Krause</strong><small>Gründerin · NOVAWEAR</small></span>
+            </figcaption>
+          </figure>
+
+          <figure class="quote reveal" data-reveal>
+            <div class="quote__stars" aria-label="5 von 5 Sternen">★★★★★</div>
+            <blockquote>„Endlich eine Agentur, die Zahlen versteht und trotzdem kreativ bleibt. Transparent, schnell und ehrlich. Absolute Empfehlung."</blockquote>
+            <figcaption>
+              <span class="quote__avatar">MB</span>
+              <span class="quote__who"><strong>Marco Berger</strong><small>CEO · Kraftwerk Nutrition</small></span>
+            </figcaption>
+          </figure>
+
+          <figure class="quote reveal" data-reveal>
+            <div class="quote__stars" aria-label="5 von 5 Sternen">★★★★★</div>
+            <blockquote>„Die Creatives von AMW performen einfach. Wir skalieren seit Monaten profitabel und das Reporting ist glasklar. Ein echter Wachstumspartner."</blockquote>
+            <figcaption>
+              <span class="quote__avatar">SV</span>
+              <span class="quote__who"><strong>Sophie Vogel</strong><small>Head of Growth · Lumen Studio</small></span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="section about" id="ueber-uns">
+      <div class="container about__inner">
+        <div class="about__text">
+          <span class="eyebrow reveal" data-reveal>05 — Warum AMW</span>
+          <h2 class="section__title reveal" data-reveal>Wir sind kein<br />Dienstleister.<br /><span class="grad-text">Wir sind Ihr Wachstumsteam.</span></h2>
+          <p class="reveal" data-reveal>Klassische Agenturen verkaufen Reichweite. Wir verkaufen Ergebnisse. AMW verbindet datengetriebenes Performance-Marketing mit Creatives, die Menschen wirklich stoppen — und macht Wachstum planbar statt zufällig.</p>
+          <ul class="about__list">
+            <li class="reveal" data-reveal><span class="tick" aria-hidden="true">✓</span> Fokus auf profitablen Umsatz, nicht auf Vanity-Metriken</li>
+            <li class="reveal" data-reveal><span class="tick" aria-hidden="true">✓</span> Transparentes Reporting &amp; echte Ansprechpartner</li>
+            <li class="reveal" data-reveal><span class="tick" aria-hidden="true">✓</span> Kreation &amp; Media aus einer Hand — kein Ping-Pong</li>
+            <li class="reveal" data-reveal><span class="tick" aria-hidden="true">✓</span> Monatlich kündbar. Wir überzeugen durch Leistung.</li>
+          </ul>
+        </div>
+        <div class="about__panel reveal" data-reveal data-tilt>
+          <div class="about__panel-glow"></div>
+          <div class="about__metric">
+            <span class="about__metric-num"><span data-count="30" data-suffix=" Tage">0</span></span>
+            <span class="about__metric-label">bis zu den ersten Ergebnissen</span>
+          </div>
+          <div class="about__divider"></div>
+          <div class="about__mini">
+            <div><strong><span data-count="100" data-suffix="%">0</span></strong><span>datengetrieben</span></div>
+            <div><strong><span data-count="7" data-suffix="+">0</span></strong><span>Jahre Erfahrung</span></div>
+            <div><strong>0€</strong><span>Setup-Gebühr</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section section--alt" id="faq">
+      <div class="container faq__inner">
+        <div class="section__head section__head--left">
+          <span class="eyebrow reveal" data-reveal>06 — FAQ</span>
+          <h2 class="section__title reveal" data-reveal>Häufige<br /><span class="grad-text">Fragen.</span></h2>
+          <p class="section__lead reveal" data-reveal>Sie haben eine andere Frage? Schreiben Sie uns einfach — wir antworten in der Regel innerhalb von 24 Stunden.</p>
+        </div>
+        <div class="faq">
+          <details class="faq__item reveal" data-reveal>
+            <summary>Für wen ist AMW geeignet?</summary>
+            <div class="faq__body"><p>Wir arbeiten mit E-Commerce-Marken, D2C-Brands, Startups und wachstumsorientierten Unternehmen, die planbar skalieren möchten — typischerweise ab einem monatlichen Werbebudget von 3.000 €.</p></div>
+          </details>
+          <details class="faq__item reveal" data-reveal>
+            <summary>Wie schnell sehe ich Ergebnisse?</summary>
+            <div class="faq__body"><p>Erste Signale sehen wir meist innerhalb der ersten 2–4 Wochen. Für stabile, skalierbare Ergebnisse planen wir realistisch mit den ersten 30–90 Tagen — abhängig von Budget, Markt und Angebot.</p></div>
+          </details>
+          <details class="faq__item reveal" data-reveal>
+            <summary>Übernehmt ihr auch die Creatives?</summary>
+            <div class="faq__body"><p>Ja. Kreation und Media laufen bei uns Hand in Hand. Wir produzieren Statics, Videos und UGC-Ads im laufenden Testing — genau die Assets, die Ihre Kampagnen brauchen.</p></div>
+          </details>
+          <details class="faq__item reveal" data-reveal>
+            <summary>Gibt es eine Mindestlaufzeit?</summary>
+            <div class="faq__body"><p>Nein. Wir arbeiten monatlich kündbar. Wir sind überzeugt, dass uns unsere Ergebnisse halten — nicht ein langer Vertrag.</p></div>
+          </details>
+          <details class="faq__item reveal" data-reveal>
+            <summary>Was kostet die Zusammenarbeit?</summary>
+            <div class="faq__body"><p>Das hängt von Umfang und Zielen ab. Im kostenlosen Erstgespräch analysieren wir Ihre Situation und machen ein transparentes, faires Angebot — ohne Setup-Gebühr.</p></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA / Kontakt -->
+    <section class="section cta" id="kontakt">
+      <div class="container">
+        <div class="cta__card reveal" data-reveal>
+          <div class="cta__glow"></div>
+          <div class="cta__content">
+            <span class="eyebrow">Kostenloses Erstgespräch</span>
+            <h2 class="cta__title">Bereit für Ads,<br />die <span class="grad-text">performen?</span></h2>
+            <p class="cta__text">Erzählen Sie uns kurz von Ihrem Vorhaben. Wir melden uns innerhalb von 24 Stunden mit einer ehrlichen Einschätzung — unverbindlich und ohne Verkaufsdruck.</p>
+            <ul class="cta__perks">
+              <li><span class="tick">✓</span> Unverbindlich &amp; kostenlos</li>
+              <li><span class="tick">✓</span> Antwort in 24 Std.</li>
+              <li><span class="tick">✓</span> Konkrete Potenzial-Analyse</li>
+            </ul>
+          </div>
+
+          <form class="form" id="contactForm" novalidate>
+            <div class="field">
+              <input type="text" id="name" name="name" required placeholder=" " autocomplete="name" />
+              <label for="name">Name</label>
+            </div>
+            <div class="field">
+              <input type="email" id="email" name="email" required placeholder=" " autocomplete="email" />
+              <label for="email">E-Mail</label>
+            </div>
+            <div class="field">
+              <input type="text" id="company" name="company" placeholder=" " autocomplete="organization" />
+              <label for="company">Unternehmen (optional)</label>
+            </div>
+            <div class="field field--select">
+              <select id="budget" name="budget" required>
+                <option value="" selected disabled></option>
+                <option>3.000 € – 10.000 € / Monat</option>
+                <option>10.000 € – 25.000 € / Monat</option>
+                <option>25.000 € – 50.000 € / Monat</option>
+                <option>50.000 €+ / Monat</option>
+                <option>Noch unklar</option>
+              </select>
+              <label for="budget">Monatliches Werbebudget</label>
+            </div>
+            <div class="field field--full">
+              <textarea id="message" name="message" rows="3" placeholder=" "></textarea>
+              <label for="message">Worum geht's? (optional)</label>
+            </div>
+            <button type="submit" class="btn btn--primary btn--lg form__submit" data-magnetic>
+              <span>Erstgespräch anfragen</span>
+              <svg viewBox="0 0 24 24" class="btn__arrow" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <p class="form__note">Oder direkt per Mail: <a href="mailto:info@amwagence.de">info@amwagence.de</a></p>
+            <p class="form__success" id="formSuccess" hidden>✓ Danke! Ihre Anfrage ist eingegangen — wir melden uns in Kürze.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a href="#top" class="brand brand--footer">
+          <span class="brand__mark">A</span>
+          <span class="brand__word">AMW</span>
+        </a>
+        <p class="footer__tag">Performance Marketing &amp; Social Media Ads.<br />Datengetrieben. Kreativ. Messbar.</p>
+      </div>
+      <nav class="footer__col" aria-label="Seiten">
+        <h4>Agentur</h4>
+        <a href="#leistungen">Leistungen</a>
+        <a href="#prozess">Prozess</a>
+        <a href="#ergebnisse">Ergebnisse</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <nav class="footer__col" aria-label="Rechtliches">
+        <h4>Rechtliches</h4>
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </nav>
+      <div class="footer__col">
+        <h4>Kontakt</h4>
+        <a href="mailto:info@amwagence.de">info@amwagence.de</a>
+        <a href="https://amwagence.de" rel="noopener">amwagence.de</a>
+        <div class="footer__socials">
+          <a href="#" aria-label="Instagram" class="social" data-magnetic><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></a>
+          <a href="#" aria-label="LinkedIn" class="social" data-magnetic><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 10v7M7 7v.01M11 17v-4a2 2 0 0 1 4 0v4M11 10v7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
+          <a href="#" aria-label="TikTok" class="social" data-magnetic><svg viewBox="0 0 24 24"><path d="M9 3v12.5a3.5 3.5 0 1 1-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M9 3c0 3 2 5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer__bottom">
+      <p>© <span id="year">2026</span> AMW · Alle Rechte vorbehalten.</p>
+      <p class="footer__made">Mit <span class="heart">♥</span> in Deutschland gebaut.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
