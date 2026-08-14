@@ -15,7 +15,6 @@ Build-Schritt — einfach ausliefern.
 | `impressum.html` | Impressum (Vorlage) |
 | `datenschutz.html` | Datenschutzerklärung (Vorlage) |
 | `assets/img/work-01…15.svg` | 15 Platzhalter-Bilder für die Galerie „Arbeiten" |
-| `assets/video/reel-01…04.svg` | 4 animierte Platzhalter-Poster für das „Showreel" |
 
 ## Marke & Kontakt
 
@@ -37,7 +36,9 @@ Build-Schritt — einfach ausliefern.
 - Prozess-Fortschrittslinie, animierte Ergebnis-Balken
 - FAQ-Akkordeon, Scroll-Fortschrittsleiste, aktive Navigation
 - Galerie „Arbeiten" mit Hover-Zoom und Lightbox (Pfeiltasten, Zähler)
-- „Showreel" mit animierten Video-Kacheln und Video-Modal
+- „Showreel" mit professionellen Canvas-Animationen in Echtzeit (Liquid-
+  Gradient, Partikel-Netzwerk, fließende Ribbons, treibende Bokeh) — pausieren
+  automatisch außerhalb des Viewports; Video-Modal spielt echte Clips ab
 - Mobiles Fullscreen-Menü mit gestaffelter Einblendung
 
 Alle Animationen respektieren `prefers-reduced-motion`.
@@ -65,9 +66,11 @@ Umgebung nicht abgerufen werden. Der Austausch ist bewusst simpel gehalten:
 - **Bilder:** Dateien in `assets/img/` durch echte Fotos ersetzen. Am einfachsten
   gleiche Dateinamen verwenden (`work-01.jpg` …) und die `src`-Endungen in
   `index.html` von `.svg` auf `.jpg`/`.webp` anpassen.
-- **Videos:** echte Clips (z. B. `.mp4`) in `assets/video/` ablegen und bei jeder
-  `.reel`-Kachel in `index.html` das Attribut `data-video-src="assets/video/reel-01.mp4"`
-  ergänzen. Das SVG-Poster bleibt als Vorschaubild, das Modal spielt dann den Clip.
+- **Videos/Showreel:** Die Kacheln zeigen live gerenderte Canvas-Animationen als
+  professionelle Platzhalter. Für echte Clips (z. B. `.mp4`) die Datei in
+  `assets/video/` ablegen und bei der jeweiligen `.reel`-Kachel in `index.html`
+  das Attribut `data-video-src="assets/video/reel-01.mp4"` setzen — das Modal
+  spielt dann den echten Clip statt der Animation.
 
 ## Vor dem Livegang anpassen
 

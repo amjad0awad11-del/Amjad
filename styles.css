@@ -1275,11 +1275,14 @@ body.cursor-ready button { cursor: none; }
   isolation: isolate;
   transition: transform 0.4s var(--ease), border-color 0.4s, box-shadow 0.4s;
 }
-.reel__poster {
+.reel__poster,
+.reel__canvas {
   width: 100%; height: 100%;
   object-fit: cover;
+  display: block;
   transition: transform 0.7s var(--ease);
 }
+.reel__canvas { background: #06070e; }
 .reel::after {
   content: "";
   position: absolute;
@@ -1371,7 +1374,7 @@ body.cursor-ready button { cursor: none; }
   background: #000;
 }
 .vm.is-open .vm__stage { transform: scale(1); }
-.vm__stage img, .vm__stage video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vm__stage img, .vm__stage video, .vm__stage canvas { width: 100%; height: 100%; object-fit: cover; display: block; }
 .lb__close {
   position: absolute;
   top: 22px; right: 26px;

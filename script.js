@@ -468,31 +468,244 @@
   }
 
   /* ---------------------------------------------------------
-     Video modal (Showreel)
+     Showreel — professional canvas motion engine
+     4 renderers: 0 liquid gradient · 1 particle network
+     · 2 flowing ribbons · 3 drifting bokeh
+  --------------------------------------------------------- */
+  var SR_PAL = {
+    v: [168, 85, 247], c: [34, 211, 238], p: [236, 72, 153],
+    b: [99, 102, 241], i: [124, 58, 237],
+  };
+  var SR_HUES = [
+    [SR_PAL.v, SR_PAL.c, SR_PAL.b],
+    [SR_PAL.c, SR_PAL.b, SR_PAL.v],
+    [SR_PAL.p, SR_PAL.v, SR_PAL.i],
+    [SR_PAL.b, SR_PAL.c, SR_PAL.v],
+  ];
+  function srRgba(c, a) {
+    return "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")";
+  }
+
+  function createAnim(canvas, kind, hues) {
+    var ctx = canvas.getContext("2d");
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+    var w = 0, h = 0, parts = [], raf = null, running = false;
+    var t = Math.random() * 100;
+
+    function resize() {
+      var r = canvas.getBoundingClientRect();
+      w = Math.max(1, Math.round(r.width));
+      h = Math.max(1, Math.round(r.height));
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      seed();
+    }
+    function seed() {
+      parts = [];
+      if (kind === 1) {
+        var n = Math.round(Math.min(70, Math.max(22, w / 11)));
+        for (var i = 0; i < n; i++)
+          parts.push({
+            x: Math.random() * w, y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+          });
+      } else if (kind === 3) {
+        var m = Math.round(Math.min(26, Math.max(12, w / 30)));
+        for (var j = 0; j < m; j++)
+          parts.push({
+            x: Math.random() * w, y: Math.random() * h,
+            r: 10 + Math.random() * 46, s: 0.15 + Math.random() * 0.5,
+            col: hues[j % hues.length], a: 0.12 + Math.random() * 0.18,
+          });
+      }
+    }
+    function bg() {
+      var g = ctx.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, "#0a0b16"); g.addColorStop(1, "#05060c");
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    }
+    function vignette() {
+      ctx.globalCompositeOperation = "source-over";
+      var g = ctx.createRadialGradient(
+        w / 2, h * 0.45, Math.min(w, h) * 0.2,
+        w / 2, h * 0.5, Math.max(w, h) * 0.78
+      );
+      g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, "rgba(0,0,0,0.55)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    }
+    function draw() {
+      bg();
+      var i, col;
+      if (kind === 0) {
+        ctx.globalCompositeOperation = "lighter";
+        var blobs = [[0.32, 0.4], [0.68, 0.6], [0.5, 0.32]];
+        for (i = 0; i < blobs.length; i++) {
+          col = hues[i % hues.length];
+          var cx = w * (blobs[i][0] + 0.15 * Math.sin(t * 0.5 + i * 2.1));
+          var cy = h * (blobs[i][1] + 0.18 * Math.cos(t * 0.42 + i * 1.3));
+          var R = Math.min(w, h) * (0.62 + 0.08 * Math.sin(t * 0.6 + i));
+          var g0 = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+          g0.addColorStop(0, srRgba(col, 0.5));
+          g0.addColorStop(0.45, srRgba(col, 0.12));
+          g0.addColorStop(1, srRgba(col, 0));
+          ctx.fillStyle = g0;
+          ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+        }
+      } else if (kind === 1) {
+        for (i = 0; i < parts.length; i++) {
+          var q = parts[i]; q.x += q.vx; q.y += q.vy;
+          if (q.x < 0) q.x += w; if (q.x > w) q.x -= w;
+          if (q.y < 0) q.y += h; if (q.y > h) q.y -= h;
+        }
+        ctx.globalCompositeOperation = "lighter";
+        var D = Math.min(w, h) * 0.3;
+        for (var a = 0; a < parts.length; a++) {
+          for (var bb = a + 1; bb < parts.length; bb++) {
+            var dx = parts[a].x - parts[bb].x, dy = parts[a].y - parts[bb].y;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < D) {
+              ctx.strokeStyle = srRgba(hues[0], (1 - dist / D) * 0.22);
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(parts[a].x, parts[a].y);
+              ctx.lineTo(parts[bb].x, parts[bb].y);
+              ctx.stroke();
+            }
+          }
+        }
+        for (var d = 0; d < parts.length; d++) {
+          col = hues[d % hues.length];
+          ctx.fillStyle = srRgba(col, 0.9);
+          ctx.shadowColor = srRgba(col, 0.9); ctx.shadowBlur = 8;
+          ctx.beginPath(); ctx.arc(parts[d].x, parts[d].y, 1.6, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.shadowBlur = 0;
+      } else if (kind === 2) {
+        ctx.globalCompositeOperation = "lighter";
+        for (var wv = 0; wv < 3; wv++) {
+          col = hues[wv % hues.length];
+          var base = h * (0.4 + wv * 0.12);
+          var amp = h * (0.12 + wv * 0.03);
+          var grad = ctx.createLinearGradient(0, 0, w, 0);
+          grad.addColorStop(0, srRgba(col, 0));
+          grad.addColorStop(0.5, srRgba(col, 0.7));
+          grad.addColorStop(1, srRgba(col, 0));
+          ctx.strokeStyle = grad; ctx.lineWidth = 2;
+          ctx.shadowColor = srRgba(col, 0.7); ctx.shadowBlur = 12;
+          ctx.beginPath();
+          for (var x = 0; x <= w; x += 6) {
+            var y = base + Math.sin(x * 0.012 + t * (1.1 + wv * 0.4) + wv * 2) *
+              amp * Math.sin(t * 0.3 + wv);
+            if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+        ctx.shadowBlur = 0;
+      } else {
+        ctx.globalCompositeOperation = "lighter";
+        for (var k = 0; k < parts.length; k++) {
+          var o = parts[k]; o.y -= o.s;
+          if (o.y + o.r < 0) { o.y = h + o.r; o.x = Math.random() * w; }
+          var g3 = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+          g3.addColorStop(0, srRgba(o.col, o.a));
+          g3.addColorStop(1, srRgba(o.col, 0));
+          ctx.fillStyle = g3;
+          ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      vignette();
+    }
+    function frame() { t += 0.016; draw(); raf = requestAnimationFrame(frame); }
+
+    return {
+      start: function () {
+        if (running) return;
+        running = true;
+        if (!w) resize();
+        if (prefersReduced) { draw(); return; }
+        raf = requestAnimationFrame(frame);
+      },
+      stop: function () {
+        running = false;
+        if (raf) cancelAnimationFrame(raf);
+        raf = null;
+      },
+      resize: resize,
+      drawOnce: function () { if (!w) resize(); draw(); },
+    };
+  }
+
+  function initShowreelAnims() {
+    var canvases = $$(".reel__canvas");
+    if (!canvases.length) return;
+    var runners = canvases.map(function (cv) {
+      var reel = cv.closest(".reel");
+      var kind = parseInt(reel.dataset.anim || "0", 10);
+      return createAnim(cv, kind, SR_HUES[kind % SR_HUES.length]);
+    });
+
+    if (prefersReduced) {
+      runners.forEach(function (r) { r.drawOnce(); });
+      return;
+    }
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (e) {
+            var idx = canvases.indexOf(e.target);
+            if (idx < 0) return;
+            if (e.isIntersecting) runners[idx].start();
+            else runners[idx].stop();
+          });
+        },
+        { threshold: 0.2 }
+      );
+      canvases.forEach(function (cv) { io.observe(cv); });
+    } else {
+      runners.forEach(function (r) { r.start(); });
+    }
+    var rt;
+    window.addEventListener("resize", function () {
+      clearTimeout(rt);
+      rt = setTimeout(function () {
+        runners.forEach(function (r) { r.resize(); });
+      }, 200);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     Video modal (Showreel) — plays a real clip if provided,
+     otherwise shows the enlarged live animation
   --------------------------------------------------------- */
   function initVideoModal() {
     const vm = $("#videoModal");
     const reels = $$(".reel");
     if (!vm || !reels.length) return;
     const stage = $("#vmStage");
+    let modalRunner = null;
 
     const close = () => {
       vm.classList.remove("is-open");
       vm.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
+      if (modalRunner) { modalRunner.stop(); modalRunner = null; }
       stage.innerHTML = "";
     };
     const open = (reel) => {
       const src = reel.dataset.videoSrc;
-      const poster = reel.querySelector("img").getAttribute("src");
       if (src) {
         stage.innerHTML =
-          '<video src="' +
-          src +
-          '" autoplay loop controls playsinline></video>';
+          '<video src="' + src + '" autoplay loop controls playsinline></video>';
       } else {
-        // Placeholder: the animated SVG poster keeps playing enlarged
-        stage.innerHTML = '<img src="' + poster + '" alt="" />';
+        const kind = parseInt(reel.dataset.anim || "0", 10);
+        const cv = document.createElement("canvas");
+        stage.innerHTML = "";
+        stage.appendChild(cv);
+        modalRunner = createAnim(cv, kind, SR_HUES[kind % SR_HUES.length]);
+        requestAnimationFrame(() => modalRunner && modalRunner.start());
+        setTimeout(() => modalRunner && modalRunner.resize(), 440);
       }
       vm.classList.add("is-open");
       vm.setAttribute("aria-hidden", "false");
@@ -535,6 +748,7 @@
     initForm();
     initNavActive();
     initLightbox();
+    initShowreelAnims();
     initVideoModal();
     initMisc();
   });
