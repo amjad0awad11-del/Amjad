@@ -14,7 +14,7 @@ Build-Schritt — einfach ausliefern.
 | `script.js` | Interaktionen: Preloader, Scroll-Reveal, Count-up, Custom-Cursor, Magnet-Buttons, Tilt, Parallax, Mobile-Menü, FAQ, Formular |
 | `impressum.html` | Impressum (Vorlage) |
 | `datenschutz.html` | Datenschutzerklärung (Vorlage) |
-| `assets/img/work-01…15.svg` | 15 Platzhalter-Bilder für die Galerie „Arbeiten" |
+| `assets/img/*.webp` | Galerie-Fotos „Arbeiten" (echte Beauty-/Produktkampagnen) |
 
 ## Marke & Kontakt
 
@@ -57,15 +57,16 @@ npx serve .
 
 Dann `http://localhost:8000` im Browser öffnen.
 
-## Bilder & Videos (Platzhalter)
+## Bilder & Videos
 
-Die 15 Galerie-Bilder und 4 Showreel-Videos sind **selbst generierte,
-markenkonforme SVG-Platzhalter** — die echten Fotos/Videos konnten in dieser
-Umgebung nicht abgerufen werden. Der Austausch ist bewusst simpel gehalten:
+Die Galerie „Arbeiten" zeigt **echte Beauty-/Produktkampagnen** (WebP,
+1080 × 1920): AMBRE Eau de Parfum, SABLEMENT Serum, BOTANIQUE Body Balm und
+SOLENE Vitamin C Elixir. Die Dateien liegen in `assets/img/`.
 
-- **Bilder:** Dateien in `assets/img/` durch echte Fotos ersetzen. Am einfachsten
-  gleiche Dateinamen verwenden (`work-01.jpg` …) und die `src`-Endungen in
-  `index.html` von `.svg` auf `.jpg`/`.webp` anpassen.
+- **Weitere Bilder ergänzen:** Foto in `assets/img/` ablegen und in `index.html`
+  in der Galerie eine weitere `.tile`-Kachel anlegen (fortlaufender
+  `data-lightbox`-Index, passender `alt`-Text) — die Lightbox liest die Quellen
+  automatisch aus den Kacheln.
 - **Videos/Showreel:** Die Kacheln zeigen live gerenderte Canvas-Animationen als
   professionelle Platzhalter. Für echte Clips (z. B. `.mp4`) die Datei in
   `assets/video/` ablegen und bei der jeweiligen `.reel`-Kachel in `index.html`
@@ -74,7 +75,7 @@ Umgebung nicht abgerufen werden. Der Austausch ist bewusst simpel gehalten:
 
 ## Vor dem Livegang anpassen
 
-- **Bilder/Videos:** die o. g. Platzhalter durch echtes Material ersetzen.
+- **Videos:** die Showreel-Platzhalter (Canvas-Animationen) durch echte Clips ersetzen. Die Galerie-Fotos sind bereits echtes Material.
 - **Impressum & Datenschutz:** Platzhalter (Firmierung, Anschrift, Vertretung,
   Registerdaten, USt-IdNr., eingesetzte Tools) durch echte, rechtsverbindliche
   Angaben ersetzen.
