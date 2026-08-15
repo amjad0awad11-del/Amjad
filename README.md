@@ -15,6 +15,7 @@ Build-Schritt — einfach ausliefern.
 | `impressum.html` | Impressum (Vorlage) |
 | `datenschutz.html` | Datenschutzerklärung (Vorlage) |
 | `assets/img/*.webp` | Galerie-Fotos „Arbeiten" (echte Beauty-/Produktkampagnen) |
+| `assets/video/reel-0*.mp4` | Showreel-Videos (echte Clips, vertikal, H.264/AAC) |
 
 ## Marke & Kontakt
 
@@ -59,23 +60,27 @@ Dann `http://localhost:8000` im Browser öffnen.
 
 ## Bilder & Videos
 
-Die Galerie „Arbeiten" zeigt **echte Beauty-/Produktkampagnen** (WebP,
-1080 × 1920): AMBRE Eau de Parfum, SABLEMENT Serum, BOTANIQUE Body Balm und
-SOLENE Vitamin C Elixir. Die Dateien liegen in `assets/img/`.
+Die Galerie „Arbeiten" zeigt **9 echte Beauty-/Produktkampagnen** (WebP,
+1080 × 1920): AMBRE Eau de Parfum, SABLEMENT Serum, BOTANIQUE Body Balm,
+SOLENE Vitamin C Elixir, AMBRE Editorial, DORE Eye Cream, ARGILE Clay Mask,
+ROSEE Rose Mist und ARGILE Naturals. Die Dateien liegen in `assets/img/`.
+
+Das „Showreel" zeigt **5 echte, vertikale Video-Clips** (`assets/video/reel-01…05.mp4`,
+H.264/AAC). Die Kacheln spielen die Clips stummgeschaltet in Endlosschleife,
+während sie im Sichtbereich sind (pausieren außerhalb); ein Klick öffnet den Clip
+groß im Modal mit Ton und Steuerung.
 
 - **Weitere Bilder ergänzen:** Foto in `assets/img/` ablegen und in `index.html`
   in der Galerie eine weitere `.tile`-Kachel anlegen (fortlaufender
   `data-lightbox`-Index, passender `alt`-Text) — die Lightbox liest die Quellen
   automatisch aus den Kacheln.
-- **Videos/Showreel:** Die Kacheln zeigen live gerenderte Canvas-Animationen als
-  professionelle Platzhalter. Für echte Clips (z. B. `.mp4`) die Datei in
-  `assets/video/` ablegen und bei der jeweiligen `.reel`-Kachel in `index.html`
-  das Attribut `data-video-src="assets/video/reel-01.mp4"` setzen — das Modal
-  spielt dann den echten Clip statt der Animation.
+- **Weitere Videos ergänzen:** Clip in `assets/video/` ablegen und in `index.html`
+  eine weitere `.reel`-Kachel mit `<video class="reel__video" …>` und passendem
+  `data-video-src` anlegen — Vorschau-Autoplay und Modal funktionieren automatisch.
 
 ## Vor dem Livegang anpassen
 
-- **Videos:** die Showreel-Platzhalter (Canvas-Animationen) durch echte Clips ersetzen. Die Galerie-Fotos sind bereits echtes Material.
+- **Bilder/Videos:** Galerie-Fotos und Showreel-Clips sind bereits echtes Material.
 - **Impressum & Datenschutz:** Platzhalter (Firmierung, Anschrift, Vertretung,
   Registerdaten, USt-IdNr., eingesetzte Tools) durch echte, rechtsverbindliche
   Angaben ersetzen.

@@ -1259,8 +1259,8 @@ body.cursor-ready button { cursor: none; }
    ========================================================= */
 .reels {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
 }
 .reel {
   position: relative;
@@ -1271,15 +1271,17 @@ body.cursor-ready button { cursor: none; }
   border-radius: 18px;
   overflow: hidden;
   cursor: pointer;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 9 / 16;
   isolation: isolate;
   transition: transform 0.4s var(--ease), border-color 0.4s, box-shadow 0.4s;
 }
 .reel__poster,
+.reel__video,
 .reel__canvas {
   width: 100%; height: 100%;
   object-fit: cover;
   display: block;
+  background: #06070e;
   transition: transform 0.7s var(--ease);
 }
 .reel__canvas { background: #06070e; }
@@ -1325,7 +1327,8 @@ body.cursor-ready button { cursor: none; }
 }
 .reel__play svg { width: 24px; height: 24px; margin-left: 3px; }
 .reel:hover { transform: translateY(-4px); border-color: rgba(168, 85, 247, 0.5); box-shadow: 0 26px 60px rgba(0,0,0,0.45); }
-.reel:hover .reel__poster { transform: scale(1.05); }
+.reel:hover .reel__poster,
+.reel:hover .reel__video { transform: scale(1.05); }
 .reel:hover .reel__play { transform: translate(-50%, -50%) scale(1.1); background: rgba(168, 85, 247, 0.4); }
 .reel:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 @keyframes playPulse {
@@ -1364,8 +1367,10 @@ body.cursor-ready button { cursor: none; }
   box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
 }
 .vm__stage {
-  width: min(90vw, 1100px);
-  aspect-ratio: 16 / 9;
+  height: min(84vh, 820px);
+  max-width: 92vw;
+  aspect-ratio: 9 / 16;
+  background: #06070e;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6);
@@ -1484,6 +1489,7 @@ body.cursor-ready button { cursor: none; }
   .section__head--left { text-align: center; }
   .cta__card { grid-template-columns: 1fr; gap: 36px; padding: 40px 30px; }
   .gallery { columns: 2; }
+  .reels { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 760px) {
@@ -1492,7 +1498,7 @@ body.cursor-ready button { cursor: none; }
   .hero { padding: 150px 0 70px; }
   .hero__stats { grid-template-columns: repeat(2, 1fr); gap: 30px 16px; }
   .cards, .results, .quotes { grid-template-columns: 1fr; }
-  .reels { grid-template-columns: 1fr; }
+  .reels { grid-template-columns: repeat(2, 1fr); }
   .section { padding: 72px 0; }
   .lb__prev { left: 12px; }
   .lb__next { right: 12px; }

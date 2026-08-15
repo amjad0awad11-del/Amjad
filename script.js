@@ -676,6 +676,34 @@
   }
 
   /* ---------------------------------------------------------
+     Showreel reel previews — muted, looping clips that play
+     while in view and pause when scrolled away
+  --------------------------------------------------------- */
+  function initReelVideos() {
+    var vids = $$(".reel__video");
+    if (!vids.length) return;
+    if (prefersReduced) return; // keep the static first frame
+    var play = function (v) {
+      var p = v.play();
+      if (p && p.catch) p.catch(function () {});
+    };
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) play(e.target);
+            else e.target.pause();
+          });
+        },
+        { threshold: 0.25 }
+      );
+      vids.forEach(function (v) { io.observe(v); });
+    } else {
+      vids.forEach(play);
+    }
+  }
+
+  /* ---------------------------------------------------------
      Video modal (Showreel) — plays a real clip if provided,
      otherwise shows the enlarged live animation
   --------------------------------------------------------- */
@@ -749,6 +777,7 @@
     initNavActive();
     initLightbox();
     initShowreelAnims();
+    initReelVideos();
     initVideoModal();
     initMisc();
   });
