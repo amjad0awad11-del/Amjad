@@ -1198,21 +1198,23 @@ body.cursor-ready button { cursor: none; }
 /* =========================================================
    Gallery (Arbeiten)
    ========================================================= */
+/* 10 Motive — Spaltenzahl muss die Anzahl teilen, damit keine
+   Lücke am Ende entsteht (10 = 5×2 = 2×5 = 1×10). */
 .gallery {
-  columns: 3;
-  column-gap: 18px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
 }
 .tile {
   position: relative;
   display: block;
   width: 100%;
-  margin: 0 0 18px;
+  margin: 0;
   padding: 0;
   border: 0;
   background: none;
   border-radius: 16px;
   overflow: hidden;
-  break-inside: avoid;
   cursor: pointer;
   isolation: isolate;
 }
@@ -1262,7 +1264,7 @@ body.cursor-ready button { cursor: none; }
    ========================================================= */
 .reels {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 18px;
 }
 .reel {
@@ -1491,7 +1493,7 @@ body.cursor-ready button { cursor: none; }
   .faq__inner { grid-template-columns: 1fr; gap: 32px; }
   .section__head--left { text-align: center; }
   .cta__card { grid-template-columns: 1fr; gap: 36px; padding: 40px 30px; }
-  .gallery { columns: 2; }
+  .gallery { grid-template-columns: repeat(2, 1fr); }
   .reels { grid-template-columns: repeat(3, 1fr); }
 }
 
@@ -1517,7 +1519,7 @@ body.cursor-ready button { cursor: none; }
   .footer__inner { grid-template-columns: 1fr; }
   .cta__card { padding: 32px 22px; }
   .about__mini { grid-template-columns: 1fr; gap: 12px; }
-  .gallery { columns: 1; }
+  .gallery { grid-template-columns: 1fr; }
 }
 
 /* =========================================================

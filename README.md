@@ -15,7 +15,7 @@ Build-Schritt — einfach ausliefern.
 | `impressum.html` | Impressum (Vorlage) |
 | `datenschutz.html` | Datenschutzerklärung (Vorlage) |
 | `assets/img/*.webp` | Galerie-Fotos „Arbeiten" (echte Beauty-/Produktkampagnen) |
-| `assets/video/reel-0*.mp4` | Showreel-Videos (echte Clips, vertikal, H.264/AAC) |
+| `assets/video/reel-0*.mp4` | Showreel-Videos (6 echte Clips, vertikal, H.264/AAC) |
 | `assets/js/consent.js` | Consent-Banner + Meta Pixel (lädt erst nach Einwilligung) |
 
 ## Marke & Kontakt
@@ -61,15 +61,20 @@ Dann `http://localhost:8000` im Browser öffnen.
 
 ## Bilder & Videos
 
-Die Galerie „Arbeiten" zeigt **9 echte Beauty-/Produktkampagnen** (WebP,
+Die Galerie „Arbeiten" zeigt **10 echte Beauty-/Produktkampagnen** (WebP,
 1080 × 1920): AMBRE Eau de Parfum, SABLEMENT Serum, BOTANIQUE Body Balm,
 SOLENE Vitamin C Elixir, AMBRE Editorial, DORE Eye Cream, ARGILE Clay Mask,
-ROSEE Rose Mist und ARGILE Naturals. Die Dateien liegen in `assets/img/`.
+ROSEE Rose Mist, ARGILE Naturals und AURIVA Cream. Die Dateien liegen in `assets/img/`.
 
-Das „Showreel" zeigt **5 echte, vertikale Video-Clips** (`assets/video/reel-01…05.mp4`,
+Das „Showreel" zeigt **6 echte, vertikale Video-Clips** (`assets/video/reel-01…06.mp4`,
 H.264/AAC). Die Kacheln spielen die Clips stummgeschaltet in Endlosschleife,
 während sie im Sichtbereich sind (pausieren außerhalb); ein Klick öffnet den Clip
 groß im Modal mit Ton und Steuerung.
+
+> **Raster ohne Lücken:** Die Spaltenzahl teilt jeweils die Anzahl der Elemente,
+> damit keine leere Zelle am Ende entsteht — Galerie (10): 5 / 2 / 1 Spalten,
+> Showreel (6): 6 / 3 / 2 Spalten. Beim Hinzufügen weiterer Motive oder Clips
+> die Spaltenzahl in `styles.css` entsprechend anpassen.
 
 - **Weitere Bilder ergänzen:** Foto in `assets/img/` ablegen und in `index.html`
   in der Galerie eine weitere `.tile`-Kachel anlegen (fortlaufender
