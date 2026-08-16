@@ -16,6 +16,7 @@ Build-Schritt — einfach ausliefern.
 | `datenschutz.html` | Datenschutzerklärung (Vorlage) |
 | `assets/img/*.webp` | Galerie-Fotos „Arbeiten" (echte Beauty-/Produktkampagnen) |
 | `assets/video/reel-0*.mp4` | Showreel-Videos (echte Clips, vertikal, H.264/AAC) |
+| `assets/js/consent.js` | Consent-Banner + Meta Pixel (lädt erst nach Einwilligung) |
 
 ## Marke & Kontakt
 
@@ -77,6 +78,27 @@ groß im Modal mit Ton und Steuerung.
 - **Weitere Videos ergänzen:** Clip in `assets/video/` ablegen und in `index.html`
   eine weitere `.reel`-Kachel mit `<video class="reel__video" …>` und passendem
   `data-video-src` anlegen — Vorschau-Autoplay und Modal funktionieren automatisch.
+
+## Tracking: Meta Pixel & Einwilligung
+
+Der Meta Pixel (ID `1381478497268708`) liegt in `assets/js/consent.js` und wird
+auf allen Seiten eingebunden. Er lädt **ausschließlich nach ausdrücklicher
+Einwilligung** — entsprechend § 5/§ 6 der Datenschutzerklärung
+(Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TTDSG).
+
+- **Ohne Entscheidung:** Banner wird angezeigt, es wird **kein** Meta-Skript
+  geladen und kein Marketing-Cookie gesetzt.
+- **„Akzeptieren":** Pixel wird geladen, `PageView` wird ausgelöst, Auswahl wird
+  in `localStorage` (`amw-consent`) gespeichert.
+- **„Ablehnen":** Es wird nichts geladen; die Ablehnung wird gespeichert.
+- **Widerruf:** `amwResetConsent()` in der Browser-Konsole aufrufen — der Banner
+  erscheint erneut. Für einen Link im Footer diese Funktion anbinden.
+
+Bewusst **ohne** `<noscript>`-Fallback: Der Bild-Pixel im `<noscript>`-Tag würde
+ohne JavaScript ungefragt feuern und damit die Einwilligungspflicht umgehen.
+
+Weitere Events (z. B. `Lead` beim Absenden des Kontaktformulars) sind derzeit
+nicht eingebunden.
 
 ## Vor dem Livegang anpassen
 
