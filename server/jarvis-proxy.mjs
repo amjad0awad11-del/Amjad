@@ -18,11 +18,88 @@
 
 import './env.mjs';   // muss zuerst stehen — lädt server/.env
 import { createServer } from 'node:http';
+import { createReadStream } from 'node:fs';
+import { stat } from 'node:fs/promises';
 import { Readable } from 'node:stream';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { runAgent, resolvePermission, stopRun, WORKSPACE } from './agent.mjs';
 
 const PORT = Number(process.env.PORT || 8787);
+
+// Nur der eigene Rechner. Sonst wäre der Agent — der Befehle ausführen darf —
+// für jedes Gerät im selben Netz erreichbar.
+const HOST = process.env.JARVIS_HOST || '127.0.0.1';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.mjs': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.gif': 'image/gif',
+  '.ico': 'image/x-icon',
+  '.woff2': 'font/woff2',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+  '.txt': 'text/plain; charset=utf-8',
+};
+
+/**
+ * Liefert die Oberfläche gleich mit aus, damit nur ein Dienst zu starten ist.
+ * Nur Dateien unterhalb der Projektwurzel und nur bekannte Dateitypen.
+ */
+async function serveStatic(res, url) {
+  let rel;
+  try {
+    rel = decodeURIComponent(url.pathname);
+  } catch {
+    res.writeHead(400).end('bad path');
+    return;
+  }
+  if (rel === '/' || rel === '') rel = '/jarvis.html';
+
+  const target = path.resolve(ROOT, '.' + rel);
+  if (target !== ROOT && !target.startsWith(ROOT + path.sep)) {
+    res.writeHead(403).end('forbidden');
+    return;
+  }
+
+  // Nur die Oberfläche gehört ins Netz — nicht der Dienst, nicht Git,
+  // nicht irgendeine Punktdatei wie server/.env.
+  const parts = path.relative(ROOT, target).split(path.sep);
+  if (parts.some((part) => part.startsWith('.') || part === 'server' || part === 'node_modules')) {
+    res.writeHead(404).end('not found');
+    return;
+  }
+
+  const type = MIME[path.extname(target).toLowerCase()];
+  if (!type) {
+    res.writeHead(404).end('not found');
+    return;
+  }
+
+  try {
+    const info = await stat(target);
+    if (!info.isFile()) throw new Error('kein File');
+    res.writeHead(200, {
+      'content-type': type,
+      'content-length': info.size,
+      'cache-control': 'no-cache',
+    });
+    createReadStream(target).pipe(res);
+  } catch {
+    res.writeHead(404).end('not found');
+  }
+}
 const MAX_BODY_BYTES = 256 * 1024;
 const MAX_TOKENS_CAP = 2048;
 const MAX_MESSAGES = 40;
@@ -247,6 +324,12 @@ export function createJarvisServer(deps = {}) {
     return;
   }
 
+  // Alles, was keine Schnittstelle ist, kommt aus dem Projektordner.
+  if (req.method === 'GET' && !url.pathname.startsWith('/api/')) {
+    await serveStatic(res, url);
+    return;
+  }
+
   if (req.method !== 'POST' || url.pathname !== '/api/chat') {
     res.writeHead(404, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ error: 'not found' }));
@@ -313,17 +396,22 @@ if (process.env.JARVIS_NO_AUTOSTART !== '1') {
   const { query } = await import('@anthropic-ai/claude-agent-sdk');
   const server = createJarvisServer({ agentQuery: query });
 
-  server.listen(PORT, () => {
-    console.log('J.A.R.V.I.S.');
-    console.log(`  KI      → http://localhost:${PORT}/api/chat`);
-    console.log(`  Stimme  → http://localhost:${PORT}/api/speak`);
-    console.log(`  Agent   → http://localhost:${PORT}/api/agent`);
-    console.log(`  Ordner  → ${WORKSPACE}`);
+  server.listen(PORT, HOST, () => {
+    console.log('');
+    console.log('  J.A.R.V.I.S. läuft.');
+    console.log('');
+    console.log(`  Im Browser öffnen:  http://localhost:${PORT}/`);
+    console.log('');
+    console.log(`  Arbeitsordner des Agenten: ${WORKSPACE}`);
     if (!process.env.ANTHROPIC_API_KEY) {
-      console.log('Hinweis: ANTHROPIC_API_KEY ist nicht gesetzt — KI-Modus und Agent brauchen ihn.');
+      console.log('  ! ANTHROPIC_API_KEY fehlt — KI-Modus und Agent bleiben aus.');
+      console.log('    Schlüssel in server/.env eintragen (Vorlage: server/.env.example).');
     }
     if (!ELEVEN_KEY) {
-      console.log('Hinweis: ELEVENLABS_API_KEY ist nicht gesetzt — die eigene Stimme bleibt aus.');
+      console.log('  · ELEVENLABS_API_KEY fehlt — es spricht die Systemstimme.');
     }
+    console.log('');
+    console.log('  Beenden mit Strg+C');
+    console.log('');
   });
 }

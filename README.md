@@ -21,6 +21,7 @@ Build-Schritt — einfach ausliefern.
 | `server/jarvis-proxy.mjs` | Lokaler Dienst: Claude-Proxy, Sprachausgabe, Agent |
 | `server/agent.mjs` | Agent-Logik: Arbeitsordner, Rückfragen, Obergrenzen |
 | `server/.env.example` | Vorlage für die Schlüssel — Kopie als `server/.env` |
+| `start.sh` / `start.bat` | Ein-Befehl-Start für macOS/Linux bzw. Windows |
 
 ## J.A.R.V.I.S. — Sprachassistent
 
@@ -37,13 +38,16 @@ dabei nur in einem eigenen Ordner und fragt vor jeder Änderung nach; ein
 gesprochenes „ja" genügt.
 
 ```bash
-python3 -m http.server 8000
-# → http://localhost:8000/jarvis.html
+./start.sh          # Windows: start.bat doppelklicken
+# → http://localhost:8787/
 ```
 
-Das Mikrofon geben Browser nur auf `localhost` oder `https://` frei. Alle
-Befehle, die Einrichtung des KI-Modus und die Datenschutz-Übersicht stehen in
-**[JARVIS.md](JARVIS.md)**.
+Das Startskript installiert beim ersten Mal alles Nötige, legt die
+Schlüsseldatei an, startet den Dienst und öffnet den Browser. Gebraucht wird nur
+[Node.js](https://nodejs.org) ab Version 20.
+
+Alle Befehle, die Einrichtung von Agent, KI-Modus und Stimme sowie die
+Datenschutz-Übersicht stehen in **[JARVIS.md](JARVIS.md)**.
 
 ## Marke & Kontakt
 

@@ -9,18 +9,51 @@ optionale KI-Modus brauchen Internet.
 
 ## Starten
 
-Das Mikrofon geben Browser nur auf `https://` oder `http://localhost` frei — ein
-Doppelklick auf die Datei (`file://`) reicht für die Texteingabe, nicht für die
-Spracherkennung.
+Gebraucht wird nur [Node.js](https://nodejs.org) ab Version 20. Danach ein Befehl:
+
+**macOS / Linux**
 
 ```bash
-python3 -m http.server 8000
-# dann http://localhost:8000/jarvis.html öffnen
+git clone -b claude/jarvis-assistant-2428an https://github.com/amjad0awad11-del/Amjad.git jarvis
+cd jarvis
+./start.sh
 ```
+
+**Windows** — dasselbe in PowerShell, dann Doppelklick auf `start.bat`:
+
+```powershell
+git clone -b claude/jarvis-assistant-2428an https://github.com/amjad0awad11-del/Amjad.git jarvis
+cd jarvis
+.\start.bat
+```
+
+Das Startskript installiert beim ersten Mal die Abhängigkeiten, legt
+`server/.env` an, startet den Dienst und öffnet den Browser auf
+**http://localhost:8787/**. Beenden mit `Strg+C`.
+
+Oberfläche, Sprachausgabe und Agent laufen über denselben Dienst und dieselbe
+Adresse — es ist also nur ein Fenster offen zu halten. Der Dienst lauscht
+ausschließlich auf `127.0.0.1`; aus dem Netzwerk ist er nicht erreichbar.
 
 Beim ersten Start läuft eine kurze Startsequenz. Der Klick auf **System starten**
 ist die Nutzergeste, die Audio und Sprachausgabe freischaltet — ohne sie darf
 keine Website Töne abspielen.
+
+### Ohne Schlüssel
+
+Zeit, Datum, Timer, Erinnerungen, Aufgaben, Notizen, Rechnen, Umrechnen,
+Würfeln und Witze laufen sofort — dafür braucht es nichts weiter. Wetter und
+Wikipedia brauchen nur Internet. Erst KI-Modus, Agent und die eigene Stimme
+brauchen Schlüssel (siehe unten).
+
+### Von Hand starten
+
+```bash
+npm install --prefix server
+node server/jarvis-proxy.mjs
+```
+
+Ein anderer Port geht mit `PORT=9000 ./start.sh`.
 
 ### Bedienung
 
