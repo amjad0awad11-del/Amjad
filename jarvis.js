@@ -176,6 +176,8 @@
       remoteNotice: 'Diese Seite läuft im Netz, nicht auf deinem Rechner. Alles Eingebaute funktioniert hier — Zeit, Timer, Aufgaben, Notizen, Rechnen, Umrechnen. KI-Modus, Agent und die eigene Stimme brauchen den Dienst auf deinem Rechner und lassen sich hier nicht einschalten.',
       remoteUnknown: 'Dafür habe ich keinen eingebauten Befehl — und freie Fragen kann ich auf dieser Seite nicht beantworten, dafür fehlt der Dienst auf deinem Rechner. Was hier geht: „Wie spät ist es?", „Timer 10 Minuten", „Was ist 17 mal 23?", „Füge Aufgabe … hinzu", „Notiere …", „10 km in Meilen". Die ganze Liste zeigt „Hilfe".',
       remoteSetting: 'Auf dieser Online-Seite nicht verfügbar — dafür läuft der Dienst auf dem eigenen Rechner.',
+      notPossibleHere: 'hier nicht möglich',
+      switchToDirect: 'Auf dieser Seite geht nur der direkte Weg. Trag deinen API-Schlüssel ein und speichere — dann beantworte ich freie Fragen.',
       hearingHowTo: 'Getippt verstehe ich dich einwandfrei. Zum Sprechen: tippe auf den leuchtenden Kreis in der Mitte — der Browser fragt dann einmal nach dem Mikrofon, das bitte erlauben. Danach wird der Kreis grün und du kannst einfach reden.',
       setWake: 'Wortwächter', setWakeHint: 'Dauerhaft zuhören und nur auf „Jarvis“ reagieren',
       setSpeak: 'Sprachausgabe', setSpeakHint: 'Antworten laut vorlesen',
@@ -264,6 +266,8 @@
       remoteNotice: 'This page runs on the web, not on your computer. Everything built in works here — time, timers, tasks, notes, maths, conversions. AI mode, the agent and the custom voice need the service on your machine and cannot be switched on here.',
       remoteUnknown: 'I have no built-in command for that, and I cannot answer open questions on this page — that needs the service on your computer. What works here: “What time is it?”, “Set a timer for 10 minutes”, “What is 17 times 23?”, “Add task …”, “Note that …”, “10 km in miles”. Say “help” for the full list.',
       remoteSetting: 'Not available on this online page — it needs the service running on your own computer.',
+      notPossibleHere: 'not possible here',
+      switchToDirect: 'Only the direct route works on this page. Enter your API key and save — then I will answer open questions.',
       hearingHowTo: 'In writing I understand you perfectly. To talk: tap the glowing circle in the middle — your browser will ask for the microphone once, allow it. The circle turns green and you can simply speak.',
       setWake: 'Wake word', setWakeHint: 'Keep listening and only react to “Jarvis”',
       setSpeak: 'Speech output', setSpeakHint: 'Read answers out loud',
@@ -2819,6 +2823,12 @@
       $$('.seg__btn').forEach((b) => b.classList.toggle('is-active', b.dataset.lang === settings.lang));
       el.bootEnter.textContent = t('bootEnter');
 
+      // Die Beschriftungen wurden gerade überschrieben — Zusätze neu setzen.
+      for (const option of [...el.setAiMode.options, ...el.setVoiceMode.options]) {
+        delete option.dataset.marked;
+      }
+      this.markUnavailable();
+
       this.renderChips();
       this.renderHelp();
       this.renderTasks();
@@ -2905,12 +2915,30 @@
         if (select) select.dataset.remote = '1';
       }
 
-      // Proxy-Optionen deutlich machen, ohne sie zu verstecken.
+      // Den Weg über den lokalen Proxy gar nicht erst anbieten …
       for (const option of [...el.setAiMode.options, ...el.setVoiceMode.options]) {
-        if (option.value === 'proxy' && !option.dataset.marked) {
+        if (option.value !== 'proxy') continue;
+        option.disabled = true;
+        if (!option.dataset.marked) {
           option.dataset.marked = '1';
-          option.textContent += ' — hier nicht möglich';
+          option.textContent += ` — ${t('notPossibleHere')}`;
         }
+      }
+
+      // … und wer noch darauf steht, landet beim einzigen, der hier geht.
+      if (el.setAiMode.value === 'proxy') {
+        el.setAiMode.value = 'direct';
+        this.toggleAiFields();
+        if (!el.fieldKey.querySelector('.switch-note')) {
+          const note = document.createElement('p');
+          note.className = 'warn switch-note';
+          note.textContent = t('switchToDirect');
+          el.fieldKey.appendChild(note);
+        }
+      }
+      if (el.setVoiceMode.value === 'proxy') {
+        el.setVoiceMode.value = 'direct';
+        this.toggleVoiceFields();
       }
     },
 
