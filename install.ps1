@@ -9,6 +9,12 @@
 
 $ErrorActionPreference = 'Stop'
 
+# Alles mitschreiben. Geht etwas schief, liegt der vollstaendige Verlauf als
+# Datei auf dem Schreibtisch und kann einfach weitergegeben werden — besser
+# als eine Fehlermeldung aus einem Fenster abzutippen.
+$LogFile = Join-Path ([Environment]::GetFolderPath('Desktop')) 'jarvis-log.txt'
+try { Start-Transcript -Path $LogFile -Force | Out-Null } catch { $LogFile = $null }
+
 $Repo    = 'amjad0awad11-del/Amjad'
 $Branch  = 'claude/jarvis-assistant-2428an'
 $Target  = Join-Path $HOME 'jarvis'
@@ -17,6 +23,15 @@ $ZipUrl  = "https://github.com/$Repo/archive/refs/heads/$Branch.zip"
 function Say($text)  { Write-Host "  $text" }
 function Good($text) { Write-Host "  $text" -ForegroundColor Green }
 function Bad($text)  { Write-Host "  $text" -ForegroundColor Red }
+function Bye {
+  if ($LogFile) {
+    Write-Host ''
+    Write-Host "  Der vollstaendige Verlauf liegt hier:" -ForegroundColor Yellow
+    Write-Host "  $LogFile" -ForegroundColor Yellow
+    Write-Host '  Diese Datei genuegt, um den Fehler zu finden.'
+    try { Stop-Transcript | Out-Null } catch { }
+  }
+}
 
 Write-Host ''
 Write-Host '  ================================' -ForegroundColor Cyan
@@ -51,6 +66,7 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
   Say '2. Den grossen Knopf "LTS" herunterladen und installieren'
   Say '3. PowerShell schliessen, neu oeffnen und diesen Befehl erneut einfuegen'
   Write-Host ''
+  Bye
   return
 }
 
@@ -66,6 +82,7 @@ try {
 } catch {
   Bad "Download fehlgeschlagen: $($_.Exception.Message)"
   Say 'Internetverbindung pruefen und den Befehl erneut einfuegen.'
+  Bye
   return
 }
 
@@ -76,6 +93,7 @@ Remove-Item $tmpZip -Force
 $inner = Get-ChildItem -Path $tmpDir -Directory | Select-Object -First 1
 if (-not $inner) {
   Bad 'Das Archiv sah anders aus als erwartet.'
+  Bye
   return
 }
 
@@ -107,6 +125,7 @@ try {
   Pop-Location
   Bad "Die Installation ist fehlgeschlagen: $($_.Exception.Message)"
   Say 'Meist blockiert eine Firewall npm. Danach den Befehl erneut einfuegen.'
+  Bye
   return
 }
 Good 'Bausteine installiert.'
@@ -137,6 +156,8 @@ Start-Process powershell -WindowStyle Hidden -ArgumentList @(
   '-NoProfile', '-Command',
   'Start-Sleep -Seconds 5; Start-Process "http://localhost:8787/"'
 ) -ErrorAction SilentlyContinue
+
+if ($LogFile) { try { Stop-Transcript | Out-Null } catch { } }
 
 & node (Join-Path $Target 'server\jarvis-proxy.mjs')
 Pop-Location
