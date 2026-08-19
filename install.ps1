@@ -117,14 +117,24 @@ try {
   # der Rückgabewert ausgewertet.
   $prevEAP = $ErrorActionPreference
   $ErrorActionPreference = 'Continue'
-  & npm install --prefix server --no-audit --no-fund | Out-Null
+  # Ausdruecklich npm.cmd statt npm: "npm" landet in PowerShell bei npm.ps1,
+  # und Skripte sind auf vielen Windows-Rechnern gesperrt (Execution Policy).
+  # Die .cmd-Fassung ist davon nicht betroffen - so muss an den
+  # Sicherheitseinstellungen des Rechners nichts geaendert werden.
+  $npmCmd = Get-Command npm.cmd -ErrorAction SilentlyContinue
+  if ($npmCmd) {
+    & $npmCmd.Source install --prefix server --no-audit --no-fund | Out-Null
+  } else {
+    & cmd /c "npm install --prefix server --no-audit --no-fund" | Out-Null
+  }
   $npmCode = $LASTEXITCODE
   $ErrorActionPreference = $prevEAP
   if ($npmCode -ne 0) { throw "npm install endete mit Code $npmCode" }
 } catch {
   Pop-Location
   Bad "Die Installation ist fehlgeschlagen: $($_.Exception.Message)"
-  Say 'Meist blockiert eine Firewall npm. Danach den Befehl erneut einfuegen.'
+  Say 'Falls es an gesperrten Skripten liegt: den Ordner jarvis oeffnen und'
+  Say 'dort START-WINDOWS.bat doppelklicken - das umgeht die Sperre.'
   Bye
   return
 }
