@@ -91,6 +91,7 @@
     wantListen: false,    // Nutzer möchte zuhören (Auto-Neustart)
     booted: false,
     micAllowed: null,     // null = unbekannt
+    micError: '',         // letzte Fehlermeldung des Mikrofons
     voices: [],
     lastReply: '',
     ignoreUntil: 0,       // Rückkopplung vermeiden
@@ -175,6 +176,7 @@
       remoteNotice: 'Diese Seite läuft im Netz, nicht auf deinem Rechner. Alles Eingebaute funktioniert hier — Zeit, Timer, Aufgaben, Notizen, Rechnen, Umrechnen. KI-Modus, Agent und die eigene Stimme brauchen den Dienst auf deinem Rechner und lassen sich hier nicht einschalten.',
       remoteUnknown: 'Dafür habe ich keinen eingebauten Befehl — und freie Fragen kann ich auf dieser Seite nicht beantworten, dafür fehlt der Dienst auf deinem Rechner. Was hier geht: „Wie spät ist es?", „Timer 10 Minuten", „Was ist 17 mal 23?", „Füge Aufgabe … hinzu", „Notiere …", „10 km in Meilen". Die ganze Liste zeigt „Hilfe".',
       remoteSetting: 'Auf dieser Online-Seite nicht verfügbar — dafür läuft der Dienst auf dem eigenen Rechner.',
+      hearingHowTo: 'Getippt verstehe ich dich einwandfrei. Zum Sprechen: tippe auf den leuchtenden Kreis in der Mitte — der Browser fragt dann einmal nach dem Mikrofon, das bitte erlauben. Danach wird der Kreis grün und du kannst einfach reden.',
       setWake: 'Wortwächter', setWakeHint: 'Dauerhaft zuhören und nur auf „Jarvis“ reagieren',
       setSpeak: 'Sprachausgabe', setSpeakHint: 'Antworten laut vorlesen',
       setSfx: 'Signaltöne', setSfxHint: 'Kurze Töne bei Start, Ende und Alarm',
@@ -262,6 +264,7 @@
       remoteNotice: 'This page runs on the web, not on your computer. Everything built in works here — time, timers, tasks, notes, maths, conversions. AI mode, the agent and the custom voice need the service on your machine and cannot be switched on here.',
       remoteUnknown: 'I have no built-in command for that, and I cannot answer open questions on this page — that needs the service on your computer. What works here: “What time is it?”, “Set a timer for 10 minutes”, “What is 17 times 23?”, “Add task …”, “Note that …”, “10 km in miles”. Say “help” for the full list.',
       remoteSetting: 'Not available on this online page — it needs the service running on your own computer.',
+      hearingHowTo: 'In writing I understand you perfectly. To talk: tap the glowing circle in the middle — your browser will ask for the microphone once, allow it. The circle turns green and you can simply speak.',
       setWake: 'Wake word', setWakeHint: 'Keep listening and only react to “Jarvis”',
       setSpeak: 'Speech output', setSpeakHint: 'Read answers out loud',
       setSfx: 'Sound cues', setSfxHint: 'Short tones on start, end and alarms',
@@ -699,6 +702,7 @@
       rec.onstart = () => {
         state.listening = true;
         state.micAllowed = true;
+        state.micError = '';
         UI.setState('listening');
         UI.setMicLive(true);
         UI.updateSystemCard();
@@ -723,12 +727,16 @@
         if (err === 'not-allowed' || err === 'service-not-allowed') {
           state.micAllowed = false;
           state.wantListen = false;
-          UI.systemMsg(t(EMBEDDED ? 'micEmbedded' : !SECURE ? 'micInsecure' : 'micDenied'), EMBEDDED ? 'system' : 'error');
+          state.micError = t(EMBEDDED ? 'micEmbedded' : !SECURE ? 'micInsecure' : 'micDenied');
+          UI.systemMsg(state.micError, EMBEDDED ? 'system' : 'error');
           UI.setState('error');
         } else if (err === 'audio-capture') {
           state.micAllowed = false;
           state.wantListen = false;
-          UI.systemMsg(isDE() ? 'Kein Mikrofon gefunden.' : 'No microphone found.', 'error');
+          state.micError = isDE()
+            ? 'Der Browser findet kein Mikrofon an diesem Gerät.'
+            : 'The browser finds no microphone on this device.';
+          UI.systemMsg(state.micError, 'error');
         }
         // 'no-speech' und 'aborted' sind normal — onend startet neu.
         UI.updateSystemCard();
@@ -1319,6 +1327,33 @@
         const yes = /^(ja|jawohl|jep|klar|erlaube|erlauben|freigeben|freigabe|mach das|mache das|leg los|okay|ok|yes|yep|sure|approve|allow|go ahead|do it)$/i.test(norm(text));
         Agent.answerLatest(yes);
         return { text: yes ? t('agentAllowed') : t('agentDenied'), silent: true };
+      },
+    },
+
+    /* ---- „Hörst du mich?" — die übliche Probe aufs Mikrofon ---- */
+    {
+      id: 'hearing',
+      re: /(kannst du mich (jetzt )?h(ö|oe)ren|h(ö|oe)rst du mich|h(ö|oe)rst du (mich )?(jetzt|gerade)|verstehst du mich|can you hear me|do you hear me|are you listening|kannst du mich verstehen)/i,
+      run(_m, _text, source) {
+        // Kam es übers Mikrofon, ist die Frage damit schon beantwortet.
+        if (source === 'voice') {
+          return isDE()
+            ? 'Ja — ich höre dich, laut und deutlich.'
+            : 'Yes — I hear you, loud and clear.';
+        }
+        if (state.wantListen) {
+          return isDE()
+            ? 'Das Mikrofon läuft bereits. Sprich einfach los, ich höre zu.'
+            : 'The microphone is already on. Just start talking, I am listening.';
+        }
+        const blocked = STT.blockedReason();
+        if (blocked) return t(blocked);
+        if (state.micError) {
+          return state.micError + (isDE()
+            ? ' Getippt verstehe ich dich aber weiterhin einwandfrei.'
+            : ' I still understand you perfectly in writing, though.');
+        }
+        return t('hearingHowTo');
       },
     },
 
@@ -2221,7 +2256,7 @@
         try {
           const m = text.match(skill.re) || n.match(skill.re);
           UI.setState('thinking');
-          result = await skill.run(m, text);
+          result = await skill.run(m, text, source);
         } catch (err) {
           UI.errorMsg(`${t('netError')} — ${err.message}`);
           UI.setState(state.listening ? 'listening' : 'idle');
