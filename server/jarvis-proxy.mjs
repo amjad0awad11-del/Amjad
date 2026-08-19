@@ -25,6 +25,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { runAgent, resolvePermission, stopRun, WORKSPACE } from './agent.mjs';
+import { humanError } from './errors.mjs';
 
 const PORT = Number(process.env.PORT || 8787);
 
@@ -95,9 +96,12 @@ async function serveStatic(res, url) {
       'content-length': info.size,
       'cache-control': 'no-cache',
     });
-    createReadStream(target).pipe(res);
+    const file = createReadStream(target);
+    file.on('error', () => res.destroy());   // sonst stirbt der ganze Dienst
+    file.pipe(res);
   } catch {
-    res.writeHead(404).end('not found');
+    if (!res.headersSent) res.writeHead(404).end('not found');
+    else res.destroy();
   }
 }
 const MAX_BODY_BYTES = 256 * 1024;
@@ -113,7 +117,21 @@ const ALLOWED = (process.env.JARVIS_ALLOWED_ORIGINS || '')
   .map((s) => s.trim())
   .filter(Boolean);
 
-const client = new Anthropic();   // liest ANTHROPIC_API_KEY bzw. das `ant`-Profil
+// Erst bei Bedarf erzeugen: ohne Schlüssel soll der Dienst trotzdem starten,
+// damit die eingebauten Befehle laufen.
+let anthropic = null;
+const claudeClient = () => (anthropic ??= new Anthropic());
+
+// Der Agent-Einstieg wird nachgeladen, damit Tests einen eigenen einsetzen
+// können und der Start nicht auf dem SDK wartet.
+let agentQueryCached = null;
+async function resolveAgentQuery(deps) {
+  if (typeof deps.agentQuery === 'function') return deps.agentQuery;
+  if (!agentQueryCached) {
+    ({ query: agentQueryCached } = await import('@anthropic-ai/claude-agent-sdk'));
+  }
+  return agentQueryCached;
+}
 
 /** Effort gibt es nur auf den aktuellen Modellen — Haiku 4.5 lehnt es ab. */
 const supportsEffort = (model) => /^claude-(opus-5|sonnet-5|fable-5|opus-4-[678])/.test(model);
@@ -227,15 +245,23 @@ export function createJarvisServer(deps = {}) {
       connection: 'keep-alive',
     });
 
+    let runId = null;
     const write = (event) => {
+      if (event?.type === 'start') runId = event.runId;
       if (!res.writableEnded) res.write(`data: ${JSON.stringify(event)}\n\n`);
     };
+
+    // Schließt der Browser den Tab, soll der Agent nicht weiterarbeiten —
+    // er würde sonst unbeaufsichtigt Schritte tun und Guthaben verbrauchen.
+    req.on('close', () => {
+      if (runId) stopRun(runId);
+    });
 
     await runAgent({
       prompt,
       sessionId: typeof ask.sessionId === 'string' && ask.sessionId ? ask.sessionId : undefined,
       write,
-      queryFn: deps.agentQuery,
+      queryFn: await resolveAgentQuery(deps).catch(() => null),
     });
 
     if (!res.writableEnded) {
@@ -315,7 +341,14 @@ export function createJarvisServer(deps = {}) {
         'content-type': upstream.headers.get('content-type') || 'audio/mpeg',
         'cache-control': 'no-store',
       });
-      Readable.fromWeb(upstream.body).pipe(res);
+      // Ohne eigenen Fehler-Zweig würde ein Abbruch des Browsers den ganzen
+      // Dienst mit einem unbehandelten Stream-Fehler beenden.
+      const audio = Readable.fromWeb(upstream.body);
+      audio.on('error', (streamErr) => {
+        console.error('[jarvis] speak-stream', streamErr?.message || streamErr);
+        res.destroy();
+      });
+      audio.pipe(res);
     } catch (err) {
       console.error('[jarvis-proxy] speak', err?.message || err);
       res.writeHead(502, { 'content-type': 'application/json' });
@@ -351,7 +384,9 @@ export function createJarvisServer(deps = {}) {
     connection: 'keep-alive',
   });
 
-  const write = (event) => res.write(`data: ${JSON.stringify(event)}\n\n`);
+  const write = (event) => {
+    if (!res.writableEnded) res.write(`data: ${JSON.stringify(event)}\n\n`);
+  };
 
   try {
     const params = {
@@ -363,7 +398,7 @@ export function createJarvisServer(deps = {}) {
       ...(supportsEffort(request.model) ? { output_config: { effort: 'low' } } : {}),
     };
 
-    const stream = client.messages.stream(params);
+    const stream = claudeClient().messages.stream(params);
 
     req.on('close', () => {
       try { stream.abort(); } catch { /* schon beendet */ }
@@ -380,21 +415,24 @@ export function createJarvisServer(deps = {}) {
       write({ type: 'content_block_delta', delta: { type: 'text_delta', text: '\n[Die Anfrage wurde abgelehnt.]' } });
     }
 
-    res.write('data: [DONE]\n\n');
-    res.end();
+    if (!res.writableEnded) {
+      res.write('data: [DONE]\n\n');
+      res.end();
+    }
   } catch (err) {
-    console.error('[jarvis-proxy]', err?.message || err);
-    const status = err?.status ? ` (HTTP ${err.status})` : '';
-    write({ type: 'error', error: { message: `${err?.message || 'request failed'}${status}` } });
-    res.end();
+    console.error('[jarvis]', err?.message || err);
+    write({ type: 'error', error: { message: humanError(err) } });
+    if (!res.writableEnded) res.end();
   }
   });
 }
 
 /** Nur starten, wenn die Datei direkt aufgerufen wurde — Tests importieren sie. */
 if (process.env.JARVIS_NO_AUTOSTART !== '1') {
-  const { query } = await import('@anthropic-ai/claude-agent-sdk');
-  const server = createJarvisServer({ agentQuery: query });
+  // Das Agent-SDK wird bewusst nicht hier geladen: der Import dauert mehrere
+  // Sekunden, in denen sonst niemand die Seite bekäme. resolveAgentQuery holt
+  // es beim ersten Auftrag nach.
+  const server = createJarvisServer();
 
   server.listen(PORT, HOST, () => {
     console.log('');

@@ -75,6 +75,46 @@ verarbeitet, solange das Mikrofon aktiv ist.
 
 ---
 
+## Wenn etwas nicht läuft
+
+**„Diese Seite ist nicht erreichbar" auf http://localhost:8787/**
+Diese Adresse ist kein Server im Internet, sondern dein eigener Rechner. Sie
+antwortet nur, solange der Dienst läuft. Im Terminal muss „J.A.R.V.I.S. läuft"
+stehen. Steht dort nichts mehr, wurde er beendet — einfach neu starten.
+
+**Das Fenster schließt sich sofort wieder (Windows)**
+Dann zeigt es eine Fehlermeldung zu schnell zum Lesen. PowerShell öffnen, in den
+Ordner wechseln und `.\start.bat` von dort starten — dann bleibt die Meldung stehen.
+
+**`command not found: node`**
+Node.js fehlt. Von [nodejs.org](https://nodejs.org) installieren, Version 20 oder
+neuer, dann erneut starten.
+
+**`permission denied`**
+`bash start.sh` statt `./start.sh`.
+
+**`EADDRINUSE` / „address already in use"**
+Der Port ist belegt. `PORT=9000 bash start.sh`, dann
+`http://localhost:9000/` öffnen.
+
+**Die Seite lädt, aber der Agent sagt „nicht erreichbar"**
+Die Adresse in den Einstellungen muss zum Port passen, auf dem der Dienst läuft.
+Bei einem anderen Port dort ebenfalls anpassen.
+
+**Der Agent antwortet, tut aber nichts**
+Dann fehlt der Zugang. Der Dienst sagt es beim Start („ANTHROPIC_API_KEY fehlt")
+und der Agent meldet es im Protokoll. Schlüssel in `server/.env` eintragen und
+den Dienst neu starten — die Datei wird nur beim Start gelesen.
+
+**Zum Nachsehen, was der Dienst überhaupt hat**
+
+```bash
+curl http://localhost:8787/health
+```
+
+Antwortet mit `claudeKey`, `elevenKey` und dem Arbeitsordner — damit ist klar,
+welcher Schlüssel angekommen ist und welcher nicht.
+
 ## Schlüssel besorgen
 
 Die eingebauten Befehle brauchen keinen Schlüssel. Nur drei Dinge kosten etwas:

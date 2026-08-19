@@ -13,6 +13,6 @@
     "@anthropic-ai/sdk": "^0.118.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20.12"
   }
 }

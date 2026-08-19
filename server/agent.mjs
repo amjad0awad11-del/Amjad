@@ -16,6 +16,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { humanError } from './errors.mjs';
 
 export const WORKSPACE = process.env.JARVIS_WORKSPACE
   || path.join(os.homedir(), 'jarvis-workspace');
@@ -100,7 +101,17 @@ export function activeRuns() {
  * @param {Function} opts.queryFn    Agent-Einstieg (für Tests austauschbar)
  */
 export async function runAgent({ prompt, sessionId, write, queryFn }) {
-  await mkdir(WORKSPACE, { recursive: true });
+  if (typeof queryFn !== 'function') {
+    write({ type: 'error', message: 'Der Agent ist nicht eingerichtet (kein Einstiegspunkt übergeben).' });
+    return;
+  }
+
+  try {
+    await mkdir(WORKSPACE, { recursive: true });
+  } catch (err) {
+    write({ type: 'error', message: `Der Arbeitsordner ${WORKSPACE} lässt sich nicht anlegen: ${err?.message || err}` });
+    return;
+  }
 
   const runId = randomUUID();
   const session = sessionId || randomUUID();
@@ -109,35 +120,45 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
 
   write({ type: 'start', runId, sessionId: session, workspace: WORKSPACE });
 
-  const canUseTool = async (request, options) => {
-    if (READ_ONLY.has(request.toolName)) {
-      write({ type: 'tool', name: request.toolName, detail: describeTool(request.toolName, request.toolUse?.input), auto: true });
-      return { approved: true, reason: 'nur lesend' };
+  /**
+   * Rückfrage an den Browser.
+   *
+   * Signatur und Rückgabewert stammen aus den Typdefinitionen des SDK
+   * (`CanUseTool` in sdk.d.ts): (toolName, input, { signal }) und
+   * { behavior: 'allow' } bzw. { behavior: 'deny', message }.
+   */
+  const canUseTool = async (toolName, input, options) => {
+    const detail = describeTool(toolName, input);
+
+    if (READ_ONLY.has(toolName)) {
+      write({ type: 'tool', name: toolName, detail, auto: true });
+      return { behavior: 'allow' };
     }
 
     const id = randomUUID();
-    write({
-      type: 'permission',
-      id,
-      tool: request.toolName,
-      detail: describeTool(request.toolName, request.toolUse?.input),
-    });
+    write({ type: 'permission', id, tool: toolName, detail });
 
     return new Promise((resolve) => {
-      const finish = (answer) => {
-        if (!pending.has(id)) return;
+      // Eigenes Merkmal statt eines Blicks in `pending`: resolvePermission
+      // räumt den Eintrag bereits vor dem Auflösen weg.
+      let settled = false;
+      let timer = null;
+
+      const finish = (allowed, reason) => {
+        if (settled) return;
+        settled = true;
         pending.delete(id);
-        resolve(answer);
+        clearTimeout(timer);
+        resolve(allowed ? { behavior: 'allow' } : { behavior: 'deny', message: reason });
       };
-      const timer = setTimeout(
-        () => finish({ approved: false, reason: 'keine Antwort — abgelehnt' }),
+
+      timer = setTimeout(
+        () => finish(false, 'Keine Antwort innerhalb der Wartezeit — abgelehnt.'),
         PERMISSION_TIMEOUT_MS,
       );
-      pending.set(id, { resolve, timer });
-      options?.signal?.addEventListener('abort', () => {
-        clearTimeout(timer);
-        finish({ approved: false, reason: 'abgebrochen' });
-      }, { once: true });
+
+      pending.set(id, { resolve: (answer) => finish(answer.approved, answer.reason), timer });
+      options?.signal?.addEventListener('abort', () => finish(false, 'Abgebrochen.'), { once: true });
     });
   };
 
@@ -165,47 +186,83 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
 
   let text = '';
   let cost = 0;
+  let liveSession = session;
+  let sawSomething = false;
+  let failure = null;
 
   try {
     for await (const message of queryFn({ prompt, options })) {
       if (ctrl.signal.aborted) break;
 
       switch (message.type) {
+        // Der Inhalt liegt unter message.message.content — wie bei der
+        // Messages-API, nicht direkt am Ereignis.
         case 'assistant': {
-          for (const block of message.content || []) {
+          for (const block of message.message?.content || []) {
             if (block.type === 'text' && block.text) {
+              sawSomething = true;
               text += block.text;
               write({ type: 'text', text: block.text });
             } else if (block.type === 'tool_use') {
+              sawSomething = true;
               write({ type: 'tool', name: block.name, detail: describeTool(block.name, block.input) });
+            }
+          }
+          if (message.error) failure = String(message.error?.message || message.error);
+          break;
+        }
+
+        // Werkzeugergebnisse kommen als user-Nachricht zurück.
+        case 'user': {
+          for (const block of message.message?.content || []) {
+            if (block.type === 'tool_result' && block.is_error) {
+              const body = typeof block.content === 'string' ? block.content : JSON.stringify(block.content ?? '');
+              write({ type: 'tool_error', detail: String(body).slice(0, 300) });
             }
           }
           break;
         }
-        case 'tool_result': {
-          const content = message.tool_result?.content;
-          if (message.tool_result?.is_error) {
-            write({ type: 'tool_error', detail: String(typeof content === 'string' ? content : JSON.stringify(content ?? '')).slice(0, 300) });
+
+        case 'system': {
+          if (message.subtype === 'init' && message.session_id) liveSession = message.session_id;
+          break;
+        }
+
+        // Abschluss des Laufs — hier stehen Kosten, Sitzung und Endtext.
+        case 'result': {
+          cost = message.total_cost_usd ?? cost;
+          if (message.session_id) liveSession = message.session_id;
+          if (message.result && !text) {
+            text = String(message.result);
+            sawSomething = true;
+            write({ type: 'text', text });
+          }
+          if (message.is_error || message.subtype !== 'success') {
+            failure = String(message.result || message.subtype || 'Der Auftrag ist fehlgeschlagen.');
           }
           break;
         }
-        case 'task_progress': {
-          if (message.summary) write({ type: 'progress', detail: String(message.summary).slice(0, 200) });
-          break;
-        }
-        case 'cost': {
-          cost = message.total_cost_usd ?? cost;
-          break;
-        }
+
         default:
-          break;   // system/control/hooks interessieren die Oberfläche nicht
+          break;   // Statusereignisse interessieren die Oberfläche nicht
       }
     }
 
-    write({ type: 'done', sessionId: session, text: text.trim(), costUsd: cost });
+    if (failure) {
+      write({ type: 'error', message: humanError(new Error(failure)) });
+    } else if (!sawSomething) {
+      // Kein Text, kein Werkzeug: fast immer fehlt der Zugang. Das als
+      // „erledigt" zu melden wäre eine Lüge.
+      write({
+        type: 'error',
+        message: 'Der Agent hat nichts ausgeführt. Meist fehlt der Zugang: ANTHROPIC_API_KEY in server/.env eintragen und den Dienst neu starten.',
+      });
+    } else {
+      write({ type: 'done', sessionId: liveSession, text: text.trim(), costUsd: cost });
+    }
   } catch (err) {
     if (ctrl.signal.aborted) write({ type: 'stopped' });
-    else write({ type: 'error', message: String(err?.message || err) });
+    else write({ type: 'error', message: humanError(err) });
   } finally {
     runs.delete(runId);
     // Offene Rückfragen dieses Laufs nicht hängen lassen.
