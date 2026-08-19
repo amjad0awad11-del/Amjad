@@ -2796,17 +2796,29 @@
         : state.micAllowed === false ? (isDE() ? 'gesperrt' : 'blocked')
         : state.wantListen ? (isDE() ? 'aktiv' : 'live')
         : (isDE() ? 'bereit' : 'ready');
-      el.wAI.textContent = settings.ai.mode === 'off'
-        ? (isDE() ? 'aus' : 'off')
-        : settings.ai.mode === 'proxy' ? 'proxy' : 'direct';
+      // Nicht nur den Modus zeigen, sondern ob er auch benutzbar ist —
+      // „direct" ohne Schlüssel sieht sonst nach „läuft" aus.
+      el.wAI.textContent = (() => {
+        if (settings.ai.mode === 'off') return isDE() ? 'aus' : 'off';
+        if (settings.ai.mode === 'direct') {
+          return settings.ai.apiKey
+            ? 'direct'
+            : (isDE() ? 'Schlüssel fehlt' : 'key missing');
+        }
+        return LOCAL_OK ? 'proxy' : (isDE() ? 'hier nicht möglich' : 'not possible here');
+      })();
       el.wAgent.textContent = !settings.agent.enabled
         ? (isDE() ? 'aus' : 'off')
         : Agent.busy() ? (isDE() ? 'arbeitet' : 'working') : (isDE() ? 'bereit' : 'ready');
-      el.wVoice.textContent = !settings.speak
-        ? (isDE() ? 'stumm' : 'muted')
-        : settings.voice.engine === 'elevenlabs'
-          ? (TTS.failures >= 2 ? (isDE() ? 'System (Rückfall)' : 'system (fallback)') : 'ElevenLabs')
-          : (isDE() ? 'System' : 'system');
+      el.wVoice.textContent = (() => {
+        if (!settings.speak) return isDE() ? 'stumm' : 'muted';
+        if (settings.voice.engine !== 'elevenlabs') return isDE() ? 'System' : 'system';
+        if (TTS.failures >= 2) return isDE() ? 'System (Rückfall)' : 'system (fallback)';
+        const usable = settings.voice.mode === 'direct'
+          ? Boolean(settings.voice.apiKey)
+          : LOCAL_OK && Boolean(settings.voice.proxyUrl);
+        return usable ? 'ElevenLabs' : (isDE() ? 'Schlüssel fehlt' : 'key missing');
+      })();
 
       if (navigator.getBattery) {
         try {
