@@ -38,8 +38,18 @@ if not exist "server\.env" (
   echo.
 )
 
-REM ---- Browser oeffnen, dann Dienst starten ----
-start "" http://localhost:%PORT%/
+REM ---- Browser erst oeffnen, wenn der Dienst antwortet ----
+REM  Ohne die Wartezeit zeigt der Browser "Seite nicht erreichbar",
+REM  weil er schneller da ist als der Dienst.
+start "" /b cmd /c "timeout /t 4 /nobreak >nul & start "" http://localhost:%PORT%/"
+
+echo.
+echo   Starte J.A.R.V.I.S. ... der Browser oeffnet sich gleich von selbst.
+echo   Falls nicht: http://localhost:%PORT%/ von Hand oeffnen.
+echo.
+
 node server\jarvis-proxy.mjs
 
+echo.
+echo   J.A.R.V.I.S. wurde beendet.
 pause
