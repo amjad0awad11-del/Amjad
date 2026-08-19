@@ -110,6 +110,51 @@ Witz", „Sprich langsamer", „Sei still", „Sprich Englisch", „Protokoll le
 
 ---
 
+## Stimme
+
+Voreingestellt ist die ElevenLabs-Stimme **`L1aJrPa7pLJEyYlh3Ilq`**. Dafür braucht
+es einen ElevenLabs-Schlüssel — ohne ihn spricht J.A.R.V.I.S. mit der
+Systemstimme des Browsers weiter und sagt einmal im Protokoll, warum.
+
+### Über den Proxy (empfohlen)
+
+Der Schlüssel bleibt auf dem Rechner:
+
+```bash
+export ELEVENLABS_API_KEY="sk_..."
+node server/jarvis-proxy.mjs
+```
+
+In den Einstellungen dann **Sprachausgabe über: ElevenLabs**, Verbindung
+**Lokaler Proxy**, Adresse `http://localhost:8787/api/speak`. Mit **Stimme
+testen** ist das Ergebnis sofort zu hören.
+
+### Direkt aus dem Browser
+
+Verbindung auf **Direkt** stellen und den Schlüssel eintragen. Er liegt dann im
+`localStorage` dieses Geräts und geht direkt an `api.elevenlabs.io`. Nur für
+die private Nutzung am eigenen Rechner.
+
+### Modelle
+
+| Modell | Wofür |
+|---|---|
+| `eleven_multilingual_v2` | Voreinstellung - ausgewogen, Deutsch und Englisch |
+| `eleven_flash_v2_5` | niedrigste Latenz, gut für schnelles Hin und Her |
+| `eleven_turbo_v2_5` | schnell bei guter Qualität |
+| `eleven_v3` | ausdrucksstärkste Wiedergabe |
+
+### Rückfall
+
+Schlägt die Stimme zweimal fehl - falscher Schlüssel, Proxy aus, kein Guthaben -,
+wechselt J.A.R.V.I.S. für diese Sitzung auf die Systemstimme, meldet den Grund
+einmal im Protokoll und zeigt den Rückfall in der Systemübersicht. Ein Speichern
+der Einstellungen setzt den Zähler zurück. Der Tempo-Regler wirkt auch auf die
+ElevenLabs-Ausgabe.
+
+Wer ganz ohne externen Dienst arbeiten will, stellt **Sprachausgabe über** auf
+**Systemstimme des Browsers** - dann bleibt alles auf dem Gerät.
+
 ## KI-Modus (optional)
 
 Ohne KI-Modus antwortet J.A.R.V.I.S. auf alles, was oben steht, und sagt bei
@@ -121,10 +166,12 @@ Fragen an die **Claude Messages API**. Es gibt zwei Wege.
 Der API-Schlüssel bleibt auf dem Rechner und taucht nie im Browser auf.
 
 ```bash
-export ANTHROPIC_API_KEY="sk-ant-…"
+export ANTHROPIC_API_KEY="sk-ant-..."
+export ELEVENLABS_API_KEY="sk_..."        # optional, für die eigene Stimme
 npm install --prefix server
 node server/jarvis-proxy.mjs
-# → J.A.R.V.I.S. proxy → http://localhost:8787/api/chat
+#   KI      -> http://localhost:8787/api/chat
+#   Stimme  -> http://localhost:8787/api/speak
 ```
 
 Dann in den Einstellungen **KI-Modus → Lokaler Proxy** wählen und die Adresse
@@ -166,6 +213,7 @@ Datum, Uhrzeit und die offenen Aufgaben.
 | Wetter | Koordinaten bzw. Ortsname an `open-meteo.com` |
 | Wissensfragen | Suchbegriff an `wikipedia.org` |
 | KI-Modus | Frage plus Verlauf an den eigenen Proxy bzw. `api.anthropic.com` |
+| Eigene Stimme | Antworttext an den eigenen Proxy bzw. `api.elevenlabs.io` |
 
 „Alles zurücksetzen" in den Einstellungen löscht sämtliche gespeicherten Daten.
 

@@ -26,7 +26,8 @@ Zusätzlich zur Website liegt ein eigenständiger Sprachassistent im Projekt:
 `jarvis.html`. Er versteht gesprochene und getippte Befehle — Zeit, Wetter,
 Timer, Erinnerungen, Aufgaben, Notizen, Rechnen, Einheiten, Wikipedia und
 Websuche —, spricht Deutsch und Englisch und läuft ohne Konto und ohne
-Build-Schritt. Freie Fragen kann er optional über die Claude-API beantworten.
+Build-Schritt. Freie Fragen kann er optional über die Claude-API beantworten,
+und für die Sprachausgabe lässt sich eine eigene ElevenLabs-Stimme hinterlegen.
 
 ```bash
 python3 -m http.server 8000

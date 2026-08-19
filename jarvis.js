@@ -30,6 +30,14 @@
     wake: false,
     speak: true,
     sfx: true,
+    voice: {
+      engine: 'elevenlabs',                           // browser | elevenlabs
+      mode: 'proxy',                                  // proxy | direct
+      proxyUrl: 'http://localhost:8787/api/speak',
+      apiKey: '',
+      voiceId: 'L1aJrPa7pLJEyYlh3Ilq',
+      model: 'eleven_multilingual_v2',
+    },
     ai: {
       mode: 'off',                                    // off | proxy | direct
       proxyUrl: 'http://localhost:8787/api/chat',
@@ -68,6 +76,7 @@
 
   const settings = store.read(KEY.settings, DEFAULT_SETTINGS);
   settings.ai = Object.assign({}, DEFAULT_SETTINGS.ai, settings.ai || {});
+  settings.voice = Object.assign({}, DEFAULT_SETTINGS.voice, settings.voice || {});
   const memory = store.read(KEY.memory, DEFAULT_MEMORY);
 
   const state = {
@@ -118,7 +127,11 @@
       timersEmpty: 'Nichts geplant. Sag: „Timer 5 Minuten“',
       weatherAsk: 'Frag: „Wie ist das Wetter?“',
       composerPh: 'Befehl eingeben … z. B. „Wie spät ist es?“',
-      setLang: 'Sprache', setVoice: 'Stimme', setRate: 'Tempo', setPitch: 'Tonhöhe',
+      setLang: 'Sprache', setVoice: 'Systemstimme', setRate: 'Tempo', setPitch: 'Tonhöhe',
+      voiceEngine: 'Sprachausgabe über', voiceBrowser: 'Systemstimme des Browsers',
+      voiceEleven: 'ElevenLabs (eigene Stimme)', voiceKey: 'ElevenLabs-Schlüssel',
+      voiceId: 'Stimm-ID', voiceModel: 'Stimm-Modell', voiceTest: 'Stimme testen',
+      voiceSample: 'Systeme bereit. So klinge ich ab jetzt.', sysVoice: 'Stimme',
       setWake: 'Wortwächter', setWakeHint: 'Dauerhaft zuhören und nur auf „Jarvis“ reagieren',
       setSpeak: 'Sprachausgabe', setSpeakHint: 'Antworten laut vorlesen',
       setSfx: 'Signaltöne', setSfxHint: 'Kurze Töne bei Start, Ende und Alarm',
@@ -186,7 +199,11 @@
       timersEmpty: 'Nothing scheduled. Say: “Set a timer for 5 minutes”',
       weatherAsk: 'Ask: “What’s the weather?”',
       composerPh: 'Type a command … e.g. “What time is it?”',
-      setLang: 'Language', setVoice: 'Voice', setRate: 'Rate', setPitch: 'Pitch',
+      setLang: 'Language', setVoice: 'System voice', setRate: 'Rate', setPitch: 'Pitch',
+      voiceEngine: 'Speech output via', voiceBrowser: 'Browser system voice',
+      voiceEleven: 'ElevenLabs (custom voice)', voiceKey: 'ElevenLabs key',
+      voiceId: 'Voice ID', voiceModel: 'Voice model', voiceTest: 'Test voice',
+      voiceSample: 'Systems ready. This is how I sound from now on.', sysVoice: 'Voice',
       setWake: 'Wake word', setWakeHint: 'Keep listening and only react to “Jarvis”',
       setSpeak: 'Speech output', setSpeakHint: 'Read answers out loud',
       setSfx: 'Sound cues', setSfxHint: 'Short tones on start, end and alarms',
@@ -444,11 +461,111 @@
         .trim();
     },
 
-    speak(text) {
-      if (!settings.speak || !this.supported || !text) return;
-      const clean = this.clean(text);
-      if (!clean) return;
+    /* ---- gemeinsamer Ein-/Ausstieg ---- */
 
+    began() {
+      state.speaking = true;
+      UI.setState('speaking');
+    },
+
+    ended() {
+      state.speaking = false;
+      // Kurze Sperre, damit die eigene Stimme nicht als Eingabe zurückkommt.
+      state.ignoreUntil = Date.now() + 400;
+      UI.setState(state.listening ? 'listening' : 'idle');
+    },
+
+    /* ---- ElevenLabs ---- */
+
+    audio: null,
+    audioUrl: '',
+    failures: 0,          // nach zwei Fehlschlägen bleibt es bei der Systemstimme
+    warned: false,
+
+    /** Ist die gewählte Stimme gerade nutzbar? */
+    useEleven() {
+      const v = settings.voice;
+      if (v.engine !== 'elevenlabs' || !v.voiceId) return false;
+      if (this.failures >= 2) return false;
+      return v.mode === 'direct' ? Boolean(v.apiKey) : Boolean(v.proxyUrl);
+    },
+
+    /** Einmaliger Hinweis, warum gerade die Systemstimme spricht. */
+    warnOnce(reason) {
+      if (this.warned) return;
+      this.warned = true;
+      UI.systemMsg(isDE()
+        ? `Die eingestellte Stimme ist nicht erreichbar (${reason}). Ich spreche mit der Systemstimme weiter — Einstellungen → Stimme.`
+        : `The configured voice is unreachable (${reason}). I will keep using the system voice — Settings → Voice.`);
+    },
+
+    async speakEleven(text) {
+      const v = settings.voice;
+      const direct = v.mode === 'direct';
+
+      const url = direct
+        ? `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(v.voiceId)}?output_format=mp3_44100_128`
+        : v.proxyUrl;
+
+      const headers = { 'content-type': 'application/json' };
+      if (direct) headers['xi-api-key'] = v.apiKey;
+
+      const body = { text, model_id: v.model };
+      if (!direct) {
+        body.voice_id = v.voiceId;
+        body.output_format = 'mp3_44100_128';
+      }
+
+      const ctrl = new AbortController();
+      this.abort = ctrl;
+      const timer = setTimeout(() => ctrl.abort(), 20000);
+
+      let blob;
+      try {
+        const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal: ctrl.signal });
+        if (!res.ok) {
+          let detail = '';
+          try { detail = (await res.text()).slice(0, 200); } catch { /* egal */ }
+          throw new Error(`HTTP ${res.status}${detail ? ` — ${detail}` : ''}`);
+        }
+        blob = await res.blob();
+      } finally {
+        clearTimeout(timer);
+        if (this.abort === ctrl) this.abort = null;
+      }
+
+      if (!blob || blob.size < 128) throw new Error('leere Audioantwort');
+
+      this.releaseAudio();
+      this.audioUrl = URL.createObjectURL(blob);
+      const audio = new Audio(this.audioUrl);
+      this.audio = audio;
+      audio.playbackRate = clamp(settings.rate, 0.5, 2);
+
+      audio.onplay = () => this.began();
+      audio.onended = () => { this.ended(); this.releaseAudio(); };
+      audio.onerror = () => { this.ended(); this.releaseAudio(); };
+
+      await audio.play();
+      this.failures = 0;
+    },
+
+    releaseAudio() {
+      if (this.audio) {
+        try { this.audio.pause(); } catch { /* egal */ }
+        this.audio.onplay = this.audio.onended = this.audio.onerror = null;
+        this.audio = null;
+      }
+      if (this.audioUrl) {
+        URL.revokeObjectURL(this.audioUrl);
+        this.audioUrl = '';
+      }
+    },
+
+    /* ---- Systemstimme ---- */
+
+    speakBrowser(clean) {
+      if (!this.supported) return;
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(clean);
       const voice = this.pickVoice();
@@ -456,24 +573,44 @@
       u.lang = voice?.lang || settings.lang;
       u.rate = clamp(settings.rate, 0.5, 2);
       u.pitch = clamp(settings.pitch, 0.4, 2);
-
-      u.onstart = () => {
-        state.speaking = true;
-        UI.setState('speaking');
-      };
-      u.onend = u.onerror = () => {
-        state.speaking = false;
-        // Kurze Sperre, damit die eigene Stimme nicht als Eingabe zurückkommt.
-        state.ignoreUntil = Date.now() + 400;
-        UI.setState(state.listening ? 'listening' : 'idle');
-      };
-
+      u.onstart = () => this.began();
+      u.onend = u.onerror = () => this.ended();
       window.speechSynthesis.speak(u);
     },
 
+    /* ---- öffentlicher Einstieg ---- */
+
+    speak(text) {
+      if (!settings.speak || !text) return;
+      const clean = this.clean(text);
+      if (!clean) return;
+
+      this.stop();
+
+      if (this.useEleven()) {
+        this.speakEleven(clean).catch((err) => {
+          if (err?.name === 'AbortError') return;   // absichtlich abgebrochen
+          this.failures += 1;
+          this.warnOnce(err.message || 'Fehler');
+          UI.updateSystemCard();
+          this.speakBrowser(clean);
+        });
+        return;
+      }
+
+      if (settings.voice.engine === 'elevenlabs') {
+        this.warnOnce(isDE() ? 'kein Zugang hinterlegt' : 'no access configured');
+      }
+      this.speakBrowser(clean);
+    },
+
     stop() {
-      if (!this.supported) return;
-      window.speechSynthesis.cancel();
+      if (this.abort) {
+        try { this.abort.abort(); } catch { /* egal */ }
+        this.abort = null;
+      }
+      this.releaseAudio();
+      if (this.supported) window.speechSynthesis.cancel();
       state.speaking = false;
       UI.setState(state.listening ? 'listening' : 'idle');
     },
@@ -1979,7 +2116,9 @@
         'input', 'btnSend', 'btnStop', 'modalSettings', 'modalHelp', 'helpBody', 'toast',
         'setLang', 'setVoice', 'setRate', 'setPitch', 'outRate', 'outPitch', 'setWake', 'setSpeak',
         'setSfx', 'setAiMode', 'setProxyUrl', 'setApiKey', 'setModel', 'setPersona', 'fieldProxy',
-        'fieldKey', 'btnSaveSettings', 'btnReset'];
+        'fieldKey', 'btnSaveSettings', 'btnReset', 'setVoiceEngine', 'setVoiceMode', 'setVoiceProxy',
+        'setVoiceKey', 'setVoiceId', 'setVoiceModel', 'btnVoiceTest', 'voiceBlock', 'fieldVoiceProxy',
+        'fieldVoiceKey', 'fieldBrowserVoice', 'wVoice'];
       for (const id of ids) el[id] = document.getElementById(id);
     },
 
@@ -2129,6 +2268,11 @@
       el.wAI.textContent = settings.ai.mode === 'off'
         ? (isDE() ? 'aus' : 'off')
         : settings.ai.mode === 'proxy' ? 'proxy' : 'direct';
+      el.wVoice.textContent = !settings.speak
+        ? (isDE() ? 'stumm' : 'muted')
+        : settings.voice.engine === 'elevenlabs'
+          ? (TTS.failures >= 2 ? (isDE() ? 'System (Rückfall)' : 'system (fallback)') : 'ElevenLabs')
+          : (isDE() ? 'System' : 'system');
 
       if (navigator.getBattery) {
         try {
@@ -2210,8 +2354,36 @@
       el.setModel.value = settings.ai.model;
       el.setPersona.value = settings.ai.persona;
       el.setPersona.placeholder = AI.defaultPersona();
+      el.setVoiceEngine.value = settings.voice.engine;
+      el.setVoiceMode.value = settings.voice.mode;
+      el.setVoiceProxy.value = settings.voice.proxyUrl;
+      el.setVoiceKey.value = settings.voice.apiKey;
+      el.setVoiceId.value = settings.voice.voiceId;
+      el.setVoiceModel.value = settings.voice.model;
       this.toggleAiFields();
+      this.toggleVoiceFields();
       this.fillVoices();
+    },
+
+    toggleVoiceFields() {
+      const eleven = el.setVoiceEngine.value === 'elevenlabs';
+      el.voiceBlock.hidden = !eleven;
+      el.fieldBrowserVoice.hidden = eleven;
+      const direct = el.setVoiceMode.value === 'direct';
+      el.fieldVoiceProxy.hidden = direct;
+      el.fieldVoiceKey.hidden = !direct;
+    },
+
+    /** Formularwerte übernehmen, ohne das Fenster zu schließen (für den Test). */
+    readVoiceForm() {
+      settings.voice.engine = el.setVoiceEngine.value;
+      settings.voice.mode = el.setVoiceMode.value;
+      settings.voice.proxyUrl = el.setVoiceProxy.value.trim();
+      settings.voice.apiKey = el.setVoiceKey.value.trim();
+      settings.voice.voiceId = el.setVoiceId.value.trim();
+      settings.voice.model = el.setVoiceModel.value;
+      TTS.failures = 0;
+      TTS.warned = false;
     },
 
     toggleAiFields() {
@@ -2409,6 +2581,16 @@
 
     // Einstellungen
     el.setAiMode.addEventListener('change', () => UI.toggleAiFields());
+    el.setVoiceEngine.addEventListener('change', () => UI.toggleVoiceFields());
+    el.setVoiceMode.addEventListener('change', () => UI.toggleVoiceFields());
+    el.btnVoiceTest.addEventListener('click', () => {
+      UI.readVoiceForm();
+      const before = settings.speak;
+      settings.speak = true;
+      TTS.speak(t('voiceSample'));
+      settings.speak = before;
+      UI.updateSystemCard();
+    });
     el.setRate.addEventListener('input', () => { el.outRate.textContent = Number(el.setRate.value).toFixed(2); });
     el.setPitch.addEventListener('input', () => { el.outPitch.textContent = Number(el.setPitch.value).toFixed(2); });
 
@@ -2426,6 +2608,7 @@
       settings.ai.apiKey = el.setApiKey.value.trim();
       settings.ai.model = el.setModel.value;
       settings.ai.persona = el.setPersona.value.trim();
+      UI.readVoiceForm();
       saveSettings();
 
       UI.applyLanguage();

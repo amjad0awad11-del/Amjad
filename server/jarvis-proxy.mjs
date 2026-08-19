@@ -14,12 +14,15 @@
  */
 
 import { createServer } from 'node:http';
+import { Readable } from 'node:stream';
 import Anthropic from '@anthropic-ai/sdk';
 
 const PORT = Number(process.env.PORT || 8787);
 const MAX_BODY_BYTES = 256 * 1024;
 const MAX_TOKENS_CAP = 2048;
 const MAX_MESSAGES = 40;
+const MAX_SPEAK_CHARS = 2000;
+const ELEVEN_KEY = process.env.ELEVENLABS_API_KEY || '';
 
 // Standardmäßig nur lokale Seiten — sonst könnte jede beliebige Website
 // diesen Proxy und damit das Guthaben des Schlüssels benutzen.
@@ -108,7 +111,70 @@ const server = createServer(async (req, res) => {
 
   if (url.pathname === '/health') {
     res.writeHead(200, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ ok: true, keyPresent: Boolean(process.env.ANTHROPIC_API_KEY) }));
+    res.end(JSON.stringify({
+      ok: true,
+      claudeKey: Boolean(process.env.ANTHROPIC_API_KEY),
+      elevenKey: Boolean(ELEVEN_KEY),
+    }));
+    return;
+  }
+
+  /* ---- Sprachausgabe: ElevenLabs, Schlüssel bleibt hier ---- */
+  if (req.method === 'POST' && url.pathname === '/api/speak') {
+    if (!ELEVEN_KEY) {
+      res.writeHead(503, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: 'ELEVENLABS_API_KEY ist auf dem Server nicht gesetzt' }));
+      return;
+    }
+
+    let ask;
+    try {
+      ask = JSON.parse(await readBody(req));
+    } catch (err) {
+      res.writeHead(400, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: String(err.message || err) }));
+      return;
+    }
+
+    const text = String(ask.text || '').slice(0, MAX_SPEAK_CHARS).trim();
+    const voiceId = String(ask.voice_id || '').trim();
+    const modelId = String(ask.model_id || 'eleven_multilingual_v2').trim();
+    const format = /^[a-z0-9_]+$/.test(String(ask.output_format || '')) ? ask.output_format : 'mp3_44100_128';
+
+    if (!text || !/^[A-Za-z0-9]{8,40}$/.test(voiceId) || !/^[a-z0-9_]{3,40}$/.test(modelId)) {
+      res.writeHead(400, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: 'text, voice_id oder model_id fehlt bzw. ist ungültig' }));
+      return;
+    }
+
+    try {
+      const upstream = await fetch(
+        `https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}?output_format=${encodeURIComponent(format)}`,
+        {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'xi-api-key': ELEVEN_KEY },
+          body: JSON.stringify({ text, model_id: modelId }),
+        },
+      );
+
+      if (!upstream.ok) {
+        const detail = (await upstream.text()).slice(0, 400);
+        console.error('[jarvis-proxy] elevenlabs', upstream.status, detail);
+        res.writeHead(upstream.status, { 'content-type': 'application/json' });
+        res.end(JSON.stringify({ error: `ElevenLabs HTTP ${upstream.status}`, detail }));
+        return;
+      }
+
+      res.writeHead(200, {
+        'content-type': upstream.headers.get('content-type') || 'audio/mpeg',
+        'cache-control': 'no-store',
+      });
+      Readable.fromWeb(upstream.body).pipe(res);
+    } catch (err) {
+      console.error('[jarvis-proxy] speak', err?.message || err);
+      res.writeHead(502, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: String(err?.message || 'speak failed') }));
+    }
     return;
   }
 
@@ -173,8 +239,13 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`J.A.R.V.I.S. proxy → http://localhost:${PORT}/api/chat`);
+  console.log(`J.A.R.V.I.S. proxy`);
+  console.log(`  KI      → http://localhost:${PORT}/api/chat`);
+  console.log(`  Stimme  → http://localhost:${PORT}/api/speak`);
   if (!process.env.ANTHROPIC_API_KEY) {
     console.log('Hinweis: ANTHROPIC_API_KEY ist nicht gesetzt — das SDK versucht ein `ant auth login`-Profil.');
+  }
+  if (!ELEVEN_KEY) {
+    console.log('Hinweis: ELEVENLABS_API_KEY ist nicht gesetzt — die eigene Stimme bleibt aus.');
   }
 });

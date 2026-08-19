@@ -133,6 +133,7 @@
         <div class="card__row"><span data-i18n="sysBattery">Akku</span><b id="wBat">—</b></div>
         <div class="card__row"><span data-i18n="sysMic">Mikrofon</span><b id="wMic">—</b></div>
         <div class="card__row"><span data-i18n="sysAI">KI-Modus</span><b id="wAI">—</b></div>
+        <div class="card__row"><span data-i18n="sysVoice">Stimme</span><b id="wVoice">—</b></div>
       </article>
 
       <article class="card card--list">
@@ -202,9 +203,55 @@
         </select>
       </div>
 
-      <div class="field">
-        <label for="setVoice" data-i18n="setVoice">Stimme</label>
+      <div class="field" id="fieldBrowserVoice">
+        <label for="setVoice" data-i18n="setVoice">Systemstimme</label>
         <select id="setVoice"></select>
+      </div>
+
+      <div class="field">
+        <label for="setVoiceEngine" data-i18n="voiceEngine">Sprachausgabe über</label>
+        <select id="setVoiceEngine">
+          <option value="browser" data-i18n="voiceBrowser">Systemstimme des Browsers</option>
+          <option value="elevenlabs" data-i18n="voiceEleven">ElevenLabs (eigene Stimme)</option>
+        </select>
+      </div>
+
+      <div class="voice-block" id="voiceBlock">
+        <div class="field">
+          <label for="setVoiceMode" data-i18n="aiConn">Verbindung</label>
+          <select id="setVoiceMode">
+            <option value="proxy" data-i18n="aiProxy">Lokaler Proxy (empfohlen)</option>
+            <option value="direct" data-i18n="aiDirect">Direkt aus dem Browser (Schlüssel sichtbar)</option>
+          </select>
+        </div>
+
+        <div class="field" id="fieldVoiceProxy">
+          <label for="setVoiceProxy" data-i18n="aiProxyUrl">Proxy-Adresse</label>
+          <input type="text" id="setVoiceProxy" placeholder="http://localhost:8787/api/speak" />
+        </div>
+
+        <div class="field" id="fieldVoiceKey" hidden>
+          <label for="setVoiceKey" data-i18n="voiceKey">ElevenLabs-Schlüssel</label>
+          <input type="password" id="setVoiceKey" autocomplete="off" placeholder="sk_…" />
+          <p class="warn" data-i18n="aiKeyWarn">Achtung: Der Schlüssel liegt dann im Browser-Speicher dieses Geräts.</p>
+        </div>
+
+        <div class="field">
+          <label for="setVoiceId" data-i18n="voiceId">Stimm-ID</label>
+          <input type="text" id="setVoiceId" spellcheck="false" placeholder="L1aJrPa7pLJEyYlh3Ilq" />
+        </div>
+
+        <div class="field">
+          <label for="setVoiceModel" data-i18n="voiceModel">Stimm-Modell</label>
+          <select id="setVoiceModel">
+            <option value="eleven_multilingual_v2">eleven_multilingual_v2 — ausgewogen</option>
+            <option value="eleven_flash_v2_5">eleven_flash_v2_5 — schnellste Antwort</option>
+            <option value="eleven_turbo_v2_5">eleven_turbo_v2_5 — schnell</option>
+            <option value="eleven_v3">eleven_v3 — ausdrucksstärkste</option>
+          </select>
+        </div>
+
+        <button class="btn voice-test" id="btnVoiceTest" type="button" data-i18n="voiceTest">Stimme testen</button>
       </div>
 
       <div class="field field--row">
