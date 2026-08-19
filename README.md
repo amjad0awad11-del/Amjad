@@ -15,6 +15,27 @@ Build-Schritt — einfach ausliefern.
 | `impressum.html` | Impressum (Vorlage) |
 | `datenschutz.html` | Datenschutzerklärung (Vorlage) |
 | `assets/img/work-01…15.svg` | 15 Platzhalter-Bilder für die Galerie „Arbeiten" |
+| `jarvis.html` | J.A.R.V.I.S. — Sprachassistent (eigenständige Seite) |
+| `jarvis.css` | Oberfläche des Assistenten (HUD-Look) |
+| `jarvis.js` | Assistent: Spracherkennung, Sprachausgabe, Befehle, KI-Modus |
+| `server/jarvis-proxy.mjs` | Optionaler lokaler Claude-Proxy für den KI-Modus |
+
+## J.A.R.V.I.S. — Sprachassistent
+
+Zusätzlich zur Website liegt ein eigenständiger Sprachassistent im Projekt:
+`jarvis.html`. Er versteht gesprochene und getippte Befehle — Zeit, Wetter,
+Timer, Erinnerungen, Aufgaben, Notizen, Rechnen, Einheiten, Wikipedia und
+Websuche —, spricht Deutsch und Englisch und läuft ohne Konto und ohne
+Build-Schritt. Freie Fragen kann er optional über die Claude-API beantworten.
+
+```bash
+python3 -m http.server 8000
+# → http://localhost:8000/jarvis.html
+```
+
+Das Mikrofon geben Browser nur auf `localhost` oder `https://` frei. Alle
+Befehle, die Einrichtung des KI-Modus und die Datenschutz-Übersicht stehen in
+**[JARVIS.md](JARVIS.md)**.
 
 ## Marke & Kontakt
 

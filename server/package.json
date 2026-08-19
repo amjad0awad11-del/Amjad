@@ -1,0 +1,17 @@
+{
+  "name": "jarvis-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Lokaler Claude-Proxy für J.A.R.V.I.S. — hält den API-Schlüssel auf dem Rechner.",
+  "main": "jarvis-proxy.mjs",
+  "scripts": {
+    "start": "node jarvis-proxy.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
