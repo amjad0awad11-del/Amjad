@@ -376,6 +376,40 @@
 
   const online = () => navigator.onLine !== false;
 
+  /**
+   * Übersetzt die Antworten der API in Sätze, mit denen man etwas anfangen
+   * kann. Rohes JSON im Gesprächsfenster hilft niemandem weiter.
+   */
+  function apiError(status, detail) {
+    let message = String(detail || '');
+    try {
+      const parsed = JSON.parse(detail);
+      message = parsed?.error?.message || parsed?.message || message;
+    } catch { /* kein JSON — dann eben der Rohtext */ }
+
+    if (/credit balance is too low|insufficient|billing/i.test(message)) {
+      return isDE()
+        ? 'Auf dem Anthropic-Konto ist kein Guthaben mehr. Unter console.anthropic.com → Billing aufladen (fünf Dollar reichen für sehr viele Fragen); danach die Seite neu laden. Der Schlüssel selbst ist in Ordnung — es fehlt nur das Guthaben.'
+        : 'The Anthropic account has no credit left. Top it up at console.anthropic.com → Billing (five dollars covers a great many questions), then reload the page. The key itself is fine — only the balance is missing.';
+    }
+    if (status === 401 || status === 403 || /authentication|invalid.*api.?key|permission/i.test(message)) {
+      return isDE()
+        ? 'Der Schlüssel wurde abgelehnt. Prüfe ihn in den Einstellungen — vielleicht ist er widerrufen oder unvollständig kopiert.'
+        : 'The key was rejected. Check it in the settings — it may be revoked or incompletely copied.';
+    }
+    if (status === 429 || /rate.?limit/i.test(message)) {
+      return isDE()
+        ? 'Zu viele Anfragen in kurzer Zeit. Kurz warten und noch einmal fragen.'
+        : 'Too many requests in a short time. Wait a moment and ask again.';
+    }
+    if (status === 404 || /model/i.test(message) && /not.?found|does not exist/i.test(message)) {
+      return isDE()
+        ? 'Dieses Modell steht dem Konto nicht zur Verfügung. In den Einstellungen ein anderes wählen.'
+        : 'That model is not available to this account. Pick another one in the settings.';
+    }
+    return message.slice(0, 300) || `HTTP ${status}`;
+  }
+
   /** fetch mit Zeitlimit — hängt nie unbegrenzt. */
   async function fetchJSON(url, options = {}, timeoutMs = 12000) {
     const ctrl = new AbortController();
@@ -589,8 +623,8 @@
         const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal: ctrl.signal });
         if (!res.ok) {
           let detail = '';
-          try { detail = (await res.text()).slice(0, 200); } catch { /* egal */ }
-          throw new Error(`HTTP ${res.status}${detail ? ` — ${detail}` : ''}`);
+          try { detail = (await res.text()).slice(0, 300); } catch { /* egal */ }
+          throw new Error(apiError(res.status, detail));
         }
         blob = await res.blob();
       } finally {
@@ -1977,15 +2011,7 @@
       if (!res.ok) {
         let detail = '';
         try { detail = (await res.text()).slice(0, 400); } catch { /* ignorieren */ }
-        if (res.status === 401 || res.status === 403) {
-          throw new Error(isDE()
-            ? 'Der API-Schlüssel wurde abgelehnt (401/403).'
-            : 'The API key was rejected (401/403).');
-        }
-        if (res.status === 429) {
-          throw new Error(isDE() ? 'Zu viele Anfragen — kurz warten.' : 'Rate limited — please wait a moment.');
-        }
-        throw new Error(`HTTP ${res.status}${detail ? ` — ${detail}` : ''}`);
+        throw new Error(apiError(res.status, detail));
       }
 
       const type = res.headers.get('content-type') || '';
@@ -2536,7 +2562,7 @@
         },
         fail: (message) => {
           wrap.className = 'msg msg--error';
-          body.textContent = `${t('netError')} — ${message}`;
+          body.textContent = message;
         },
       };
     },
