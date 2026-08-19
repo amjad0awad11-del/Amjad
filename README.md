@@ -18,7 +18,8 @@ Build-Schritt — einfach ausliefern.
 | `jarvis.html` | J.A.R.V.I.S. — Sprachassistent (eigenständige Seite) |
 | `jarvis.css` | Oberfläche des Assistenten (HUD-Look) |
 | `jarvis.js` | Assistent: Spracherkennung, Sprachausgabe, Befehle, KI-Modus |
-| `server/jarvis-proxy.mjs` | Optionaler lokaler Claude-Proxy für den KI-Modus |
+| `server/jarvis-proxy.mjs` | Lokaler Dienst: Claude-Proxy, Sprachausgabe, Agent |
+| `server/agent.mjs` | Agent-Logik: Arbeitsordner, Rückfragen, Obergrenzen |
 
 ## J.A.R.V.I.S. — Sprachassistent
 
@@ -28,6 +29,11 @@ Timer, Erinnerungen, Aufgaben, Notizen, Rechnen, Einheiten, Wikipedia und
 Websuche —, spricht Deutsch und Englisch und läuft ohne Konto und ohne
 Build-Schritt. Freie Fragen kann er optional über die Claude-API beantworten,
 und für die Sprachausgabe lässt sich eine eigene ElevenLabs-Stimme hinterlegen.
+
+Mit eingeschaltetem **Agenten** kann er außerdem wirklich etwas tun — Dateien
+anlegen, Projekte bauen, Befehle ausführen —, und zwar auf Zuruf. Er arbeitet
+dabei nur in einem eigenen Ordner und fragt vor jeder Änderung nach; ein
+gesprochenes „ja" genügt.
 
 ```bash
 python3 -m http.server 8000

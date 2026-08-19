@@ -42,6 +42,55 @@ verarbeitet, solange das Mikrofon aktiv ist.
 
 ---
 
+## Schlüssel besorgen
+
+Die eingebauten Befehle brauchen keinen Schlüssel. Nur drei Dinge kosten etwas:
+der KI-Modus, der Agent und die eigene Stimme.
+
+### Anthropic (KI-Modus und Agent)
+
+1. [console.anthropic.com](https://console.anthropic.com) öffnen und anmelden.
+2. Unter **Billing** Guthaben aufladen — ohne Guthaben antwortet die API nicht.
+3. Unter **API keys** einen Schlüssel erzeugen (`sk-ant-…`) und sofort kopieren;
+   er wird nur einmal angezeigt.
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."
+```
+
+**Wichtig:** Ein Claude-Abo (Pro oder Max) deckt claude.ai und Claude Code ab,
+**nicht** die API. API-Nutzung wird getrennt über das Guthaben in der Console
+abgerechnet. Der Agent zeigt nach jedem Auftrag, was er gekostet hat, und bricht
+bei 2 US-Dollar je Auftrag von selbst ab.
+
+### ElevenLabs (eigene Stimme)
+
+1. [elevenlabs.io](https://elevenlabs.io) öffnen und anmelden.
+2. Oben rechts auf das Profilbild → **API Keys** → neuen Schlüssel erzeugen (`sk_…`).
+
+```bash
+export ELEVENLABS_API_KEY="sk_..."
+```
+
+Der kostenlose Tarif enthält ein monatliches Zeichenkontingent — zum Ausprobieren
+reicht das. Ist es aufgebraucht, fällt J.A.R.V.I.S. auf die Systemstimme zurück
+und sagt einmal, warum.
+
+### Wo die Schlüssel hingehören
+
+Am besten in die Umgebung des lokalen Dienstes, nicht in den Browser:
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."
+export ELEVENLABS_API_KEY="sk_..."
+node server/jarvis-proxy.mjs
+```
+
+Damit bleiben sie auf dem Rechner. Wer sie stattdessen in den Einstellungen der
+Oberfläche einträgt, legt sie im Browser-Speicher ab — das ist bequemer, aber nur
+für das eigene Gerät gedacht. Schlüssel gehören nie in ein öffentliches
+Repository; die Dateien hier enthalten keine.
+
 ## Was er kann
 
 Alle Befehle gibt es auf Deutsch und Englisch. Die Beispiele sind Deutsch; die
@@ -109,6 +158,60 @@ zum Anklicken nach — der Befehl geht nicht verloren.
 Witz", „Sprich langsamer", „Sei still", „Sprich Englisch", „Protokoll leeren".
 
 ---
+
+## Agent — Aufträge wirklich ausführen
+
+Ohne Agent ist J.A.R.V.I.S. eine Website: Er kann reden, rechnen und nachschlagen,
+aber nichts auf dem Rechner tun. Mit Agent kann er es — Dateien anlegen, Projekte
+bauen, Befehle ausführen. Dahinter steckt das Claude Agent SDK, also dieselbe
+Maschinerie wie in Claude Code.
+
+### Einschalten
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."
+npm install --prefix server
+node server/jarvis-proxy.mjs
+```
+
+Dann Einstellungen → **Agent einschalten**, Adresse `http://localhost:8787/api/agent`.
+Ab da genügt: „Baue mir eine Landingpage mit React."
+
+### Was ihn im Zaum hält
+
+Ein Assistent mit Zugriff auf die Konsole ist nur so gut wie seine Grenzen. Vier
+greifen hier, und keine davon lässt sich aus dem Browser aufweichen:
+
+| Grenze | Wirkung |
+|---|---|
+| **Arbeitsordner** | Der Agent arbeitet in `~/jarvis-workspace`, nicht im ganzen Dateisystem. Über `JARVIS_WORKSPACE` änderbar. |
+| **Rückfrage** | Alles, was etwas verändert — schreiben, ausführen, installieren — landet als Frage im Protokoll und passiert erst nach einem Ja. Nur Lesen (`Read`, `Glob`, `Grep`) läuft ohne Nachfrage. |
+| **Obergrenzen** | Höchstens 40 Schritte und 2 US-Dollar je Auftrag (`JARVIS_AGENT_MAX_TURNS`, `JARVIS_AGENT_BUDGET_USD`). |
+| **Gesperrte Befehle** | `sudo`, `shutdown`, `reboot`, `mkfs`, `dd` und rekursives Löschen ab Wurzel sind gar nicht erst erlaubt. |
+
+Bleibt eine Rückfrage zwei Minuten unbeantwortet, gilt sie als abgelehnt
+(`JARVIS_PERMISSION_TIMEOUT_MS`). Ein laufender Auftrag lässt sich jederzeit über
+**Abbrechen** stoppen.
+
+### Freihändig arbeiten
+
+Läuft das Mikrofon, liest J.A.R.V.I.S. die Rückfrage laut vor. Ein gesprochenes
+„ja" gibt frei, „nein" lehnt ab — der ganze Ablauf funktioniert ohne Tastatur.
+
+Damit ein verhörtes „ja" nicht versehentlich einen Auftrag startet, gehen
+einzelne Wörter und Füllwörter nie an den Agenten. Sie beantworten nur eine
+offene Rückfrage — oder werden nachgefragt.
+
+### Agent oder Gespräch?
+
+Sind Agent und KI-Modus beide an, entscheidet der Wortlaut: Aufträge („baue",
+„erstelle", „installiere", „schreib", „repariere" …) gehen an den Agenten,
+alles andere ins Gespräch. Das spart Zeit und Geld. Ist nur der Agent an,
+bekommt er alles.
+
+### Kosten im Blick
+
+Jeder abgeschlossene Auftrag zeigt seine Kosten in der Kopfzeile der Karte.
 
 ## Stimme
 
@@ -214,6 +317,7 @@ Datum, Uhrzeit und die offenen Aufgaben.
 | Wissensfragen | Suchbegriff an `wikipedia.org` |
 | KI-Modus | Frage plus Verlauf an den eigenen Proxy bzw. `api.anthropic.com` |
 | Eigene Stimme | Antworttext an den eigenen Proxy bzw. `api.elevenlabs.io` |
+| Agent | Auftrag, Dateiinhalte und Befehlsausgaben an `api.anthropic.com` — der Agent liest, was er zur Arbeit braucht |
 
 „Alles zurücksetzen" in den Einstellungen löscht sämtliche gespeicherten Daten.
 

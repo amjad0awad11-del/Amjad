@@ -38,6 +38,10 @@
       voiceId: 'L1aJrPa7pLJEyYlh3Ilq',
       model: 'eleven_multilingual_v2',
     },
+    agent: {
+      enabled: false,
+      url: 'http://localhost:8787/api/agent',
+    },
     ai: {
       mode: 'off',                                    // off | proxy | direct
       proxyUrl: 'http://localhost:8787/api/chat',
@@ -77,6 +81,7 @@
   const settings = store.read(KEY.settings, DEFAULT_SETTINGS);
   settings.ai = Object.assign({}, DEFAULT_SETTINGS.ai, settings.ai || {});
   settings.voice = Object.assign({}, DEFAULT_SETTINGS.voice, settings.voice || {});
+  settings.agent = Object.assign({}, DEFAULT_SETTINGS.agent, settings.agent || {});
   const memory = store.read(KEY.memory, DEFAULT_MEMORY);
 
   const state = {
@@ -132,6 +137,16 @@
       voiceEleven: 'ElevenLabs (eigene Stimme)', voiceKey: 'ElevenLabs-Schlüssel',
       voiceId: 'Stimm-ID', voiceModel: 'Stimm-Modell', voiceTest: 'Stimme testen',
       voiceSample: 'Systeme bereit. So klinge ich ab jetzt.', sysVoice: 'Stimme',
+      sysAgent: 'Agent', agentTitle: 'Agent — Aufträge ausführen',
+      agentIntro: 'Mit eingeschaltetem Agenten kann J.A.R.V.I.S. auf diesem Rechner wirklich etwas tun: Dateien anlegen, Projekte bauen, Befehle ausführen. Alles, was etwas verändert, fragt vorher nach.',
+      agentOn: 'Agent einschalten', agentOnHint: 'Braucht den lokalen Dienst — ohne ihn passiert nichts',
+      agentUrl: 'Agent-Adresse', agentRunning: 'Auftrag läuft', agentStop: 'Abbrechen',
+      agentAsk: 'Darf ich das ausführen?', agentAllow: 'Erlauben', agentDeny: 'Ablehnen',
+      agentAllowed: 'Freigegeben.', agentDenied: 'Abgelehnt.', agentStopped: 'Auftrag abgebrochen.',
+      agentAuto: 'gelesen', agentDone: 'Auftrag erledigt.',
+      agentOffline: 'Der Agent ist nicht erreichbar. Läuft der lokale Dienst? (node server/jarvis-proxy.mjs)',
+      agentSpoken: 'Ich frage kurz nach: ',
+      fillerHint: 'Wobei kann ich helfen?',
       setWake: 'Wortwächter', setWakeHint: 'Dauerhaft zuhören und nur auf „Jarvis“ reagieren',
       setSpeak: 'Sprachausgabe', setSpeakHint: 'Antworten laut vorlesen',
       setSfx: 'Signaltöne', setSfxHint: 'Kurze Töne bei Start, Ende und Alarm',
@@ -204,6 +219,16 @@
       voiceEleven: 'ElevenLabs (custom voice)', voiceKey: 'ElevenLabs key',
       voiceId: 'Voice ID', voiceModel: 'Voice model', voiceTest: 'Test voice',
       voiceSample: 'Systems ready. This is how I sound from now on.', sysVoice: 'Voice',
+      sysAgent: 'Agent', agentTitle: 'Agent — carry out tasks',
+      agentIntro: 'With the agent on, J.A.R.V.I.S. can actually do things on this machine: create files, build projects, run commands. Anything that changes something asks first.',
+      agentOn: 'Enable agent', agentOnHint: 'Needs the local service — without it nothing happens',
+      agentUrl: 'Agent address', agentRunning: 'Task running', agentStop: 'Stop',
+      agentAsk: 'May I run this?', agentAllow: 'Allow', agentDeny: 'Deny',
+      agentAllowed: 'Allowed.', agentDenied: 'Denied.', agentStopped: 'Task stopped.',
+      agentAuto: 'read', agentDone: 'Task complete.',
+      agentOffline: 'The agent is unreachable. Is the local service running? (node server/jarvis-proxy.mjs)',
+      agentSpoken: 'Just checking: ',
+      fillerHint: 'What can I help with?',
       setWake: 'Wake word', setWakeHint: 'Keep listening and only react to “Jarvis”',
       setSpeak: 'Speech output', setSpeakHint: 'Read answers out loud',
       setSfx: 'Sound cues', setSfxHint: 'Short tones on start, end and alarms',
@@ -1237,6 +1262,19 @@
   }
 
   const SKILLS = [
+    /* ---- Rückfrage des Agenten beantworten („ja" / „nein") ---- */
+    {
+      id: 'permit',
+      re: /^(ja|jawohl|jep|klar|erlaube|erlauben|freigeben|freigabe|mach das|mache das|leg los|okay|ok|yes|yep|sure|approve|allow|go ahead|do it|nein|nee|ne|nicht|abgelehnt|ablehnen|lass es|stopp|stop|no|nope|deny|cancel)$/i,
+      run(_m, text) {
+        // Nur zuständig, solange der Agent tatsächlich auf eine Antwort wartet.
+        if (!Agent.hasPending()) return null;
+        const yes = /^(ja|jawohl|jep|klar|erlaube|erlauben|freigeben|freigabe|mach das|mache das|leg los|okay|ok|yes|yep|sure|approve|allow|go ahead|do it)$/i.test(norm(text));
+        Agent.answerLatest(yes);
+        return { text: yes ? t('agentAllowed') : t('agentDenied'), silent: true };
+      },
+    },
+
     /* ---- Sprachausgabe stoppen ---- */
     {
       id: 'stop',
@@ -1925,6 +1963,192 @@
   };
 
   /* =======================================================
+     8b. Agent — Aufträge auf diesem Rechner
+     ======================================================= */
+
+  const Agent = {
+    runId: null,
+    sessionId: null,
+    card: null,
+    pending: [],          // offene Rückfragen, neueste zuletzt
+
+    enabled() {
+      return Boolean(settings.agent.enabled && settings.agent.url);
+    },
+
+    base(suffix = '') {
+      return settings.agent.url.replace(/\/+$/, '') + suffix;
+    },
+
+    busy() {
+      return Boolean(this.runId);
+    },
+
+    /** Gibt es eine unbeantwortete Rückfrage? */
+    hasPending() {
+      return this.pending.length > 0;
+    },
+
+    /** Die neueste Rückfrage beantworten — auch per Sprache. */
+    answerLatest(approved) {
+      const entry = this.pending.pop();
+      if (!entry) return false;
+      entry.settle(approved);
+      this.permit(entry.id, approved);
+      return true;
+    },
+
+    async permit(id, approved) {
+      try {
+        await fetch(this.base('/permit'), {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ id, approved }),
+        });
+      } catch { /* Lauf womöglich schon beendet */ }
+    },
+
+    async stop() {
+      if (!this.runId) return;
+      try {
+        await fetch(this.base('/stop'), {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ runId: this.runId }),
+        });
+      } catch { /* egal */ }
+    },
+
+    /** Auftrag senden und den Fortschritt live ins Protokoll schreiben. */
+    async run(prompt) {
+      if (this.busy()) {
+        UI.reply(isDE() ? 'Ich arbeite noch an der letzten Aufgabe.' : 'I am still working on the last task.');
+        return;
+      }
+
+      const card = UI.runCard();
+      this.card = card;
+      this.pending = [];
+      state.thinking = true;
+      UI.setState('thinking');
+
+      let spoken = '';
+
+      try {
+        const res = await fetch(this.base(), {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ prompt, sessionId: this.sessionId || undefined }),
+        });
+
+        if (!res.ok) {
+          let detail = '';
+          try { detail = (await res.text()).slice(0, 200); } catch { /* egal */ }
+          throw new Error(`HTTP ${res.status}${detail ? ` — ${detail}` : ''}`);
+        }
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const chunks = buffer.split('\n\n');
+          buffer = chunks.pop() || '';
+
+          for (const chunk of chunks) {
+            for (const line of chunk.split('\n')) {
+              if (!line.startsWith('data:')) continue;
+              const raw = line.slice(5).trim();
+              if (!raw || raw === '[DONE]') continue;
+              let evt;
+              try { evt = JSON.parse(raw); } catch { continue; }
+              spoken = this.handle(evt, card, spoken);
+            }
+          }
+        }
+
+        card.finish();
+        const say = spoken.trim() || t('agentDone');
+        state.lastReply = say;
+        TTS.speak(say);
+      } catch (err) {
+        const offline = /failed to fetch|networkerror|load failed/i.test(err.message || '');
+        const message = offline ? t('agentOffline') : `${t('netError')} — ${err.message}`;
+        card.fail(message);
+        TTS.speak(offline ? t('agentOffline') : t('netError'));
+      } finally {
+        this.runId = null;
+        this.card = null;
+        this.pending = [];
+        state.thinking = false;
+        UI.setState(state.listening ? 'listening' : 'idle');
+        UI.updateSystemCard();
+      }
+    },
+
+    /** Ein Ereignis des Agenten verarbeiten. */
+    handle(evt, card, spoken) {
+      switch (evt.type) {
+        case 'start':
+          this.runId = evt.runId;
+          this.sessionId = evt.sessionId;
+          card.setWorkspace(evt.workspace);
+          UI.updateSystemCard();
+          return spoken;
+
+        case 'text':
+          card.addText(evt.text);
+          return spoken + evt.text;
+
+        case 'tool':
+          card.addStep(evt.name, evt.detail, evt.auto ? 'auto' : 'run');
+          return spoken;
+
+        case 'progress':
+          card.addStep('', evt.detail, 'note');
+          return spoken;
+
+        case 'tool_error':
+          card.addStep('', evt.detail, 'error');
+          return spoken;
+
+        case 'permission': {
+          const entry = card.addPermission(evt.id, evt.tool, evt.detail, (approved) => {
+            // Klick im Browser — aus der Warteliste nehmen und melden
+            this.pending = this.pending.filter((x) => x.id !== evt.id);
+            this.permit(evt.id, approved);
+          });
+          this.pending.push(entry);
+          // Bei Sprachbedienung laut nachfragen, damit „ja" reicht.
+          if (state.wantListen) {
+            TTS.speak(`${t('agentSpoken')}${evt.tool}. ${t('agentAsk')}`);
+          }
+          return spoken;
+        }
+
+        case 'stopped':
+          card.addStep('', t('agentStopped'), 'note');
+          return spoken;
+
+        case 'error':
+          card.fail(evt.message);
+          return spoken;
+
+        case 'done':
+          if (evt.sessionId) this.sessionId = evt.sessionId;
+          if (evt.costUsd) card.setCost(evt.costUsd);
+          return evt.text ? (spoken || evt.text) : spoken;
+
+        default:
+          return spoken;
+      }
+    },
+  };
+
+  /* =======================================================
      9. Verstand — Befehl zu Fähigkeit zuordnen
      ======================================================= */
 
@@ -1959,13 +2183,40 @@
         return;
       }
 
-      // Nichts gefunden → KI-Modus oder Hinweis
+      // Nichts gefunden → Agent, KI-Modus oder Hinweis
+      const filler = this.isFiller(n);
+
+      if (Agent.enabled() && !filler && (this.looksLikeTask(text) || !AI.enabled())) {
+        await Agent.run(text);
+        return;
+      }
+
       if (AI.enabled()) {
         await this.askAI(text);
         return;
       }
 
-      UI.reply(t('unknownAI'));
+      UI.reply(filler ? t('fillerHint') : t('unknownAI'));
+    },
+
+    /**
+     * Kurze Bestätigungen, Füllwörter und einzelne Wörter sind keine Aufträge.
+     * Ohne diese Bremse würde ein verhörtes „ja" den Agenten loslaufen lassen.
+     */
+    isFiller(n) {
+      if (/^(ja|nein|nee|ne|ok|okay|klar|hm+|äh+|ähm+|hallo|hi|danke|bitte|was|wie|hä|na|so|yes|no|yeah|yep|nope|uh+|um+|what|huh|please|thanks|hey)$/i.test(n)) return true;
+      return n.split(/\s+/).filter(Boolean).length < 2;
+    },
+
+    /**
+     * Auftrag oder Frage? Aufträge gehen an den Agenten, Fragen ans Gespräch —
+     * das spart Zeit und Geld, wenn beides eingeschaltet ist.
+     */
+    looksLikeTask(text) {
+      const de = /\b(bau|baue|bauen|erstell|erstelle|erstellen|schreib|schreibe|leg an|lege an|anlegen|mach mir|mache mir|installier|installiere|richte ein|einrichten|ändere|ändern|repariere|behebe|füge hinzu|starte|führ aus|führe aus|lösche datei|benenne um|verschiebe|kopiere datei|committe|deploye|projekt|ordner|datei|skript|website|app|programm)\b/i;
+      const en = /\b(build|create|make me|write|set up|install|fix|change|add|run|delete file|rename|move|copy file|commit|deploy|refactor|project|folder|file|script|website|app|program)\b/i;
+      const n = norm(text);
+      return de.test(n) || en.test(n);
     },
 
     async askAI(text) {
@@ -2118,7 +2369,7 @@
         'setSfx', 'setAiMode', 'setProxyUrl', 'setApiKey', 'setModel', 'setPersona', 'fieldProxy',
         'fieldKey', 'btnSaveSettings', 'btnReset', 'setVoiceEngine', 'setVoiceMode', 'setVoiceProxy',
         'setVoiceKey', 'setVoiceId', 'setVoiceModel', 'btnVoiceTest', 'voiceBlock', 'fieldVoiceProxy',
-        'fieldVoiceKey', 'fieldBrowserVoice', 'wVoice'];
+        'fieldVoiceKey', 'fieldBrowserVoice', 'wVoice', 'setAgent', 'setAgentUrl', 'fieldAgentUrl', 'wAgent'];
       for (const id of ids) el[id] = document.getElementById(id);
     },
 
@@ -2203,6 +2454,115 @@
       };
     },
 
+    /** Karte, die einen laufenden Auftrag mitschreibt. */
+    runCard() {
+      const wrap = document.createElement('div');
+      wrap.className = 'msg msg--jarvis msg--run';
+      wrap.innerHTML = `
+        <span class="msg__who">${esc(t('me'))}</span>
+        <div class="msg__body run">
+          <div class="run__head">
+            <span class="run__spin"></span>
+            <span class="run__title">${esc(t('agentRunning'))}</span>
+            <button class="run__stop" type="button">${esc(t('agentStop'))}</button>
+          </div>
+          <div class="run__where"></div>
+          <ul class="run__steps"></ul>
+          <div class="run__text"></div>
+        </div>`;
+      el.log.appendChild(wrap);
+
+      const steps = wrap.querySelector('.run__steps');
+      const textBox = wrap.querySelector('.run__text');
+      const where = wrap.querySelector('.run__where');
+      const head = wrap.querySelector('.run__head');
+      wrap.querySelector('.run__stop').addEventListener('click', () => Agent.stop());
+
+      const scroll = () => { el.log.scrollTop = el.log.scrollHeight; };
+
+      return {
+        setWorkspace(dir) {
+          where.textContent = dir || '';
+          scroll();
+        },
+
+        addStep(name, detail, kind = 'run') {
+          const li = document.createElement('li');
+          li.className = `step step--${kind}`;
+          const label = name ? `<b>${esc(name)}</b>` : '';
+          const body = detail ? `<code>${esc(detail)}</code>` : '';
+          const mark = kind === 'auto' ? '·' : kind === 'error' ? '!' : kind === 'note' ? '–' : '▸';
+          li.innerHTML = `<span class="step__mark">${mark}</span><span class="step__body">${label}${label && body ? ' ' : ''}${body}</span>`;
+          steps.appendChild(li);
+          scroll();
+        },
+
+        addText(chunk) {
+          textBox.textContent += chunk;
+          scroll();
+        },
+
+        /** Rückfrage mit zwei Knöpfen; liefert einen Griff für die Sprachantwort. */
+        addPermission(id, tool, detail, onAnswer) {
+          const li = document.createElement('li');
+          li.className = 'step step--ask';
+          li.innerHTML = `
+            <span class="step__mark">?</span>
+            <span class="step__body">
+              <b>${esc(t('agentAsk'))}</b>
+              <span class="ask__tool">${esc(tool)}</span>
+              ${detail ? `<code>${esc(detail)}</code>` : ''}
+              <span class="ask__buttons">
+                <button class="ask__yes" type="button">${esc(t('agentAllow'))}</button>
+                <button class="ask__no" type="button">${esc(t('agentDeny'))}</button>
+              </span>
+            </span>`;
+          steps.appendChild(li);
+          scroll();
+
+          const buttons = li.querySelector('.ask__buttons');
+          let settled = false;
+
+          const settle = (approved) => {
+            if (settled) return;
+            settled = true;
+            li.classList.add(approved ? 'is-allowed' : 'is-denied');
+            buttons.innerHTML = `<span class="ask__verdict">${esc(approved ? t('agentAllowed') : t('agentDenied'))}</span>`;
+          };
+
+          li.querySelector('.ask__yes').addEventListener('click', () => { settle(true); onAnswer(true); });
+          li.querySelector('.ask__no').addEventListener('click', () => { settle(false); onAnswer(false); });
+
+          return { id, settle };
+        },
+
+        setCost(usd) {
+          const tag = document.createElement('span');
+          tag.className = 'run__cost';
+          tag.textContent = `$${usd.toFixed(4)}`;
+          head.appendChild(tag);
+        },
+
+        finish() {
+          wrap.classList.add('is-done');
+          head.querySelector('.run__title').textContent = t('agentDone');
+          scroll();
+        },
+
+        fail(message) {
+          wrap.classList.add('is-failed');
+          wrap.classList.remove('msg--jarvis');
+          wrap.classList.add('msg--error');
+          head.querySelector('.run__title').textContent = t('statusError');
+          const li = document.createElement('li');
+          li.className = 'step step--error';
+          li.innerHTML = `<span class="step__mark">!</span><span class="step__body">${esc(message)}</span>`;
+          steps.appendChild(li);
+          scroll();
+        },
+      };
+    },
+
     clearLog() { el.log.innerHTML = ''; },
 
     toast(text) {
@@ -2268,6 +2628,9 @@
       el.wAI.textContent = settings.ai.mode === 'off'
         ? (isDE() ? 'aus' : 'off')
         : settings.ai.mode === 'proxy' ? 'proxy' : 'direct';
+      el.wAgent.textContent = !settings.agent.enabled
+        ? (isDE() ? 'aus' : 'off')
+        : Agent.busy() ? (isDE() ? 'arbeitet' : 'working') : (isDE() ? 'bereit' : 'ready');
       el.wVoice.textContent = !settings.speak
         ? (isDE() ? 'stumm' : 'muted')
         : settings.voice.engine === 'elevenlabs'
@@ -2360,6 +2723,8 @@
       el.setVoiceKey.value = settings.voice.apiKey;
       el.setVoiceId.value = settings.voice.voiceId;
       el.setVoiceModel.value = settings.voice.model;
+      el.setAgent.checked = settings.agent.enabled;
+      el.setAgentUrl.value = settings.agent.url;
       this.toggleAiFields();
       this.toggleVoiceFields();
       this.fillVoices();
@@ -2384,6 +2749,11 @@
       settings.voice.model = el.setVoiceModel.value;
       TTS.failures = 0;
       TTS.warned = false;
+    },
+
+    readAgentForm() {
+      settings.agent.enabled = el.setAgent.checked;
+      settings.agent.url = el.setAgentUrl.value.trim();
     },
 
     toggleAiFields() {
@@ -2609,6 +2979,7 @@
       settings.ai.model = el.setModel.value;
       settings.ai.persona = el.setPersona.value.trim();
       UI.readVoiceForm();
+      UI.readAgentForm();
       saveSettings();
 
       UI.applyLanguage();

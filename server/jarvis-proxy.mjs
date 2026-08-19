@@ -1,21 +1,23 @@
 /**
- * J.A.R.V.I.S. — lokaler Claude-Proxy
+ * J.A.R.V.I.S. — lokaler Dienst
  *
- * Hält den API-Schlüssel auf dem Rechner statt im Browser. Die Oberfläche
- * schickt ihre Anfragen an diesen Dienst, er spricht mit der Claude-API und
- * gibt die Antwort als Server-Sent-Events zurück.
+ * Hält die Schlüssel auf dem Rechner statt im Browser und stellt drei Dinge
+ * bereit, die eine Website allein nicht kann:
+ *
+ *   /api/chat    Gespräch mit Claude
+ *   /api/speak   Sprachausgabe über ElevenLabs
+ *   /api/agent   Aufträge, die wirklich etwas auf diesem Rechner tun
  *
  *   export ANTHROPIC_API_KEY="sk-ant-…"
+ *   export ELEVENLABS_API_KEY="sk_…"      # optional
  *   npm install --prefix server
  *   node server/jarvis-proxy.mjs
- *
- * Danach in J.A.R.V.I.S. unter Einstellungen → KI-Modus „Lokaler Proxy"
- * wählen und http://localhost:8787/api/chat eintragen.
  */
 
 import { createServer } from 'node:http';
 import { Readable } from 'node:stream';
 import Anthropic from '@anthropic-ai/sdk';
+import { runAgent, resolvePermission, stopRun, WORKSPACE } from './agent.mjs';
 
 const PORT = Number(process.env.PORT || 8787);
 const MAX_BODY_BYTES = 256 * 1024;
@@ -91,7 +93,8 @@ function sanitize(payload) {
   };
 }
 
-const server = createServer(async (req, res) => {
+export function createJarvisServer(deps = {}) {
+  return createServer(async (req, res) => {
   const origin = req.headers.origin;
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
 
@@ -115,7 +118,70 @@ const server = createServer(async (req, res) => {
       ok: true,
       claudeKey: Boolean(process.env.ANTHROPIC_API_KEY),
       elevenKey: Boolean(ELEVEN_KEY),
+      workspace: WORKSPACE,
     }));
+    return;
+  }
+
+  /* ---- Agent: Auftrag ausführen ---- */
+  if (req.method === 'POST' && url.pathname === '/api/agent') {
+    let ask;
+    try {
+      ask = JSON.parse(await readBody(req));
+    } catch (err) {
+      res.writeHead(400, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: String(err.message || err) }));
+      return;
+    }
+
+    const prompt = String(ask.prompt || '').slice(0, 8000).trim();
+    if (!prompt) {
+      res.writeHead(400, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: 'prompt fehlt' }));
+      return;
+    }
+
+    res.writeHead(200, {
+      'content-type': 'text/event-stream; charset=utf-8',
+      'cache-control': 'no-cache, no-transform',
+      connection: 'keep-alive',
+    });
+
+    const write = (event) => {
+      if (!res.writableEnded) res.write(`data: ${JSON.stringify(event)}\n\n`);
+    };
+
+    await runAgent({
+      prompt,
+      sessionId: typeof ask.sessionId === 'string' && ask.sessionId ? ask.sessionId : undefined,
+      write,
+      queryFn: deps.agentQuery,
+    });
+
+    if (!res.writableEnded) {
+      res.write('data: [DONE]\n\n');
+      res.end();
+    }
+    return;
+  }
+
+  /* ---- Agent: Rückfrage beantworten ---- */
+  if (req.method === 'POST' && url.pathname === '/api/agent/permit') {
+    let ask = {};
+    try { ask = JSON.parse(await readBody(req)); } catch { /* als leer behandeln */ }
+    const ok = resolvePermission(String(ask.id || ''), Boolean(ask.approved));
+    res.writeHead(ok ? 200 : 404, { 'content-type': 'application/json' });
+    res.end(JSON.stringify(ok ? { ok: true } : { error: 'Rückfrage nicht gefunden oder abgelaufen' }));
+    return;
+  }
+
+  /* ---- Agent: Lauf abbrechen ---- */
+  if (req.method === 'POST' && url.pathname === '/api/agent/stop') {
+    let ask = {};
+    try { ask = JSON.parse(await readBody(req)); } catch { /* als leer behandeln */ }
+    const ok = stopRun(String(ask.runId || ''));
+    res.writeHead(ok ? 200 : 404, { 'content-type': 'application/json' });
+    res.end(JSON.stringify(ok ? { ok: true } : { error: 'kein solcher Lauf' }));
     return;
   }
 
@@ -236,16 +302,25 @@ const server = createServer(async (req, res) => {
     write({ type: 'error', error: { message: `${err?.message || 'request failed'}${status}` } });
     res.end();
   }
-});
+  });
+}
 
-server.listen(PORT, () => {
-  console.log(`J.A.R.V.I.S. proxy`);
-  console.log(`  KI      → http://localhost:${PORT}/api/chat`);
-  console.log(`  Stimme  → http://localhost:${PORT}/api/speak`);
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.log('Hinweis: ANTHROPIC_API_KEY ist nicht gesetzt — das SDK versucht ein `ant auth login`-Profil.');
-  }
-  if (!ELEVEN_KEY) {
-    console.log('Hinweis: ELEVENLABS_API_KEY ist nicht gesetzt — die eigene Stimme bleibt aus.');
-  }
-});
+/** Nur starten, wenn die Datei direkt aufgerufen wurde — Tests importieren sie. */
+if (process.env.JARVIS_NO_AUTOSTART !== '1') {
+  const { query } = await import('@anthropic-ai/claude-agent-sdk');
+  const server = createJarvisServer({ agentQuery: query });
+
+  server.listen(PORT, () => {
+    console.log('J.A.R.V.I.S.');
+    console.log(`  KI      → http://localhost:${PORT}/api/chat`);
+    console.log(`  Stimme  → http://localhost:${PORT}/api/speak`);
+    console.log(`  Agent   → http://localhost:${PORT}/api/agent`);
+    console.log(`  Ordner  → ${WORKSPACE}`);
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.log('Hinweis: ANTHROPIC_API_KEY ist nicht gesetzt — KI-Modus und Agent brauchen ihn.');
+    }
+    if (!ELEVEN_KEY) {
+      console.log('Hinweis: ELEVENLABS_API_KEY ist nicht gesetzt — die eigene Stimme bleibt aus.');
+    }
+  });
+}

@@ -134,6 +134,7 @@
         <div class="card__row"><span data-i18n="sysMic">Mikrofon</span><b id="wMic">—</b></div>
         <div class="card__row"><span data-i18n="sysAI">KI-Modus</span><b id="wAI">—</b></div>
         <div class="card__row"><span data-i18n="sysVoice">Stimme</span><b id="wVoice">—</b></div>
+        <div class="card__row"><span data-i18n="sysAgent">Agent</span><b id="wAgent">—</b></div>
       </article>
 
       <article class="card card--list">
@@ -279,6 +280,21 @@
       <div class="field field--check">
         <input type="checkbox" id="setSfx" />
         <label for="setSfx"><b data-i18n="setSfx">Signaltöne</b><span data-i18n="setSfxHint">Kurze Töne bei Start, Ende und Alarm</span></label>
+      </div>
+
+      <hr class="rule" />
+
+      <h4 class="sub" data-i18n="agentTitle">Agent — Aufträge ausführen</h4>
+      <p class="hint" data-i18n="agentIntro">Mit eingeschaltetem Agenten kann J.A.R.V.I.S. auf diesem Rechner wirklich etwas tun: Dateien anlegen, Projekte bauen, Befehle ausführen. Alles, was etwas verändert, fragt vorher nach.</p>
+
+      <div class="field field--check">
+        <input type="checkbox" id="setAgent" />
+        <label for="setAgent"><b data-i18n="agentOn">Agent einschalten</b><span data-i18n="agentOnHint">Braucht den lokalen Dienst — ohne ihn passiert nichts</span></label>
+      </div>
+
+      <div class="field" id="fieldAgentUrl">
+        <label for="setAgentUrl" data-i18n="agentUrl">Agent-Adresse</label>
+        <input type="text" id="setAgentUrl" placeholder="http://localhost:8787/api/agent" />
       </div>
 
       <hr class="rule" />
