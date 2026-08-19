@@ -93,8 +93,16 @@ Good "Projekt liegt in $Target"
 Say 'Installiere die Bausteine — das dauert etwa eine Minute ...'
 Push-Location $Target
 try {
-  & npm install --prefix server --no-audit --no-fund 2>&1 | Out-Null
-  if ($LASTEXITCODE -ne 0) { throw "npm install endete mit Code $LASTEXITCODE" }
+  # npm schreibt Warnungen nach stderr. Zusammen mit ErrorActionPreference
+  # 'Stop' würde PowerShell daraus einen echten Abbruch machen, obwohl die
+  # Installation geklappt hat — deshalb hier bewusst abgeschaltet und nur
+  # der Rückgabewert ausgewertet.
+  $prevEAP = $ErrorActionPreference
+  $ErrorActionPreference = 'Continue'
+  & npm install --prefix server --no-audit --no-fund | Out-Null
+  $npmCode = $LASTEXITCODE
+  $ErrorActionPreference = $prevEAP
+  if ($npmCode -ne 0) { throw "npm install endete mit Code $npmCode" }
 } catch {
   Pop-Location
   Bad "Die Installation ist fehlgeschlagen: $($_.Exception.Message)"
@@ -118,14 +126,17 @@ Write-Host ''
 Good 'Fertig. J.A.R.V.I.S. startet jetzt.'
 Write-Host ''
 Say 'Der Browser oeffnet sich gleich auf http://localhost:8787/'
+Say 'Falls nicht: die Adresse http://localhost:8787/ von Hand eingeben.'
 Say 'Dieses Fenster offen lassen — Schliessen beendet J.A.R.V.I.S.'
 Say 'Spaeter erneut starten: START-WINDOWS.bat im Ordner jarvis doppelklicken.'
 Write-Host ''
 
-Start-Job -ScriptBlock {
-  Start-Sleep -Seconds 5
-  Start-Process 'http://localhost:8787/'
-} | Out-Null
+# Eigener Prozess statt Start-Job: der oeffnet den Browser zuverlaessig
+# auch dann, wenn dieses Fenster gleich mit dem Dienst blockiert ist.
+Start-Process powershell -WindowStyle Hidden -ArgumentList @(
+  '-NoProfile', '-Command',
+  'Start-Sleep -Seconds 5; Start-Process "http://localhost:8787/"'
+) -ErrorAction SilentlyContinue
 
 & node (Join-Path $Target 'server\jarvis-proxy.mjs')
 Pop-Location
