@@ -98,6 +98,19 @@
 
   const isDE = () => settings.lang.startsWith('de');
 
+  /**
+   * In einem eingebetteten Rahmen (etwa einer Vorschau) gibt der Browser das
+   * Mikrofon nur frei, wenn die einbettende Seite es ausdrücklich erlaubt.
+   * Tut sie das nicht, hilft keine Einstellung im Browser — deshalb wird das
+   * hier erkannt und anders erklärt.
+   */
+  const EMBEDDED = (() => {
+    try { return window.self !== window.top; } catch { return true; }
+  })();
+
+  /** Mikrofon gibt es nur über https oder auf localhost. */
+  const SECURE = window.isSecureContext !== false;
+
   /* =======================================================
      2. Sprachtexte
      ======================================================= */
@@ -173,7 +186,9 @@
       unknown: 'Das habe ich nicht verstanden. Sag „Hilfe“ für eine Liste der Befehle.',
       unknownAI: 'Dafür habe ich keinen eingebauten Befehl. Schalte den KI-Modus in den Einstellungen ein, dann beantworte ich auch freie Fragen.',
       ok: 'Erledigt.',
-      micDenied: 'Ich habe keinen Zugriff auf das Mikrofon. Bitte erlaube den Zugriff in den Browser-Einstellungen.',
+      micDenied: 'Ich habe keinen Zugriff auf das Mikrofon. Bitte erlaube den Zugriff in den Browser-Einstellungen — meist über das Schloss-Symbol links in der Adresszeile.',
+      micEmbedded: 'Hier ist die Seite in ein anderes Fenster eingebettet, und darin sperrt der Browser das Mikrofon grundsätzlich — daran ändert keine Einstellung etwas. Öffne die Seite in einem eigenen Tab, dann geht das Sprechen. Tippen funktioniert hier aber ganz normal.',
+      micInsecure: 'Das Mikrofon gibt der Browser nur über eine gesicherte Verbindung frei (https oder localhost). Tippen funktioniert trotzdem.',
       micMissing: 'Dieser Browser unterstützt keine Spracherkennung. Nutze am besten Chrome oder Edge — die Texteingabe funktioniert aber überall.',
       ttsMissing: 'Dieser Browser kann nicht sprechen. Ich antworte weiterhin schriftlich.',
       offline: 'Dafür brauche ich eine Internetverbindung.',
@@ -253,7 +268,9 @@
       unknown: 'I did not catch that. Say “help” for a list of commands.',
       unknownAI: 'I have no built-in command for that. Turn on AI mode in the settings and I will answer open questions too.',
       ok: 'Done.',
-      micDenied: 'I have no access to the microphone. Please allow it in your browser settings.',
+      micDenied: 'I have no access to the microphone. Please allow it in your browser settings — usually via the padlock icon in the address bar.',
+      micEmbedded: 'This page is embedded in another window, and browsers always block the microphone there — no setting changes that. Open the page in its own tab to talk. Typing works fine right here.',
+      micInsecure: 'Browsers only allow the microphone over a secure connection (https or localhost). Typing still works.',
       micMissing: 'This browser has no speech recognition. Chrome or Edge work best — typing works everywhere.',
       ttsMissing: 'This browser cannot speak. I will keep answering in writing.',
       offline: 'I need an internet connection for that.',
@@ -687,7 +704,7 @@
         if (err === 'not-allowed' || err === 'service-not-allowed') {
           state.micAllowed = false;
           state.wantListen = false;
-          UI.systemMsg(t('micDenied'), 'error');
+          UI.systemMsg(t(EMBEDDED ? 'micEmbedded' : !SECURE ? 'micInsecure' : 'micDenied'), EMBEDDED ? 'system' : 'error');
           UI.setState('error');
         } else if (err === 'audio-capture') {
           state.micAllowed = false;
@@ -751,9 +768,20 @@
       }
     },
 
+    /** Gibt den Grund zurück, warum das Mikrofon nicht geht — oder null. */
+    blockedReason() {
+      if (!this.supported) return 'micMissing';
+      if (EMBEDDED) return 'micEmbedded';
+      if (!SECURE) return 'micInsecure';
+      return null;
+    },
+
     async start() {
-      if (!this.supported) {
-        UI.systemMsg(t('micMissing'), 'error');
+      const blocked = this.blockedReason();
+      if (blocked) {
+        UI.systemMsg(t(blocked), blocked === 'micEmbedded' ? 'system' : 'error');
+        state.micAllowed = false;
+        UI.updateSystemCard();
         return false;
       }
       state.wantListen = true;
@@ -2622,6 +2650,7 @@
       el.wNet.textContent = online() ? (isDE() ? 'verbunden' : 'connected') : 'offline';
       el.wMic.textContent = !STT.supported
         ? (isDE() ? 'n. verfügbar' : 'unavailable')
+        : EMBEDDED ? (isDE() ? 'im Rahmen gesperrt' : 'blocked in frame')
         : state.micAllowed === false ? (isDE() ? 'gesperrt' : 'blocked')
         : state.wantListen ? (isDE() ? 'aktiv' : 'live')
         : (isDE() ? 'bereit' : 'ready');
