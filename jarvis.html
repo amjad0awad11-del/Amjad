@@ -234,7 +234,7 @@
         <div class="field" id="fieldVoiceKey" hidden>
           <label for="setVoiceKey" data-i18n="voiceKey">ElevenLabs-Schlüssel</label>
           <input type="password" id="setVoiceKey" autocomplete="off" placeholder="sk_…" />
-          <p class="warn" data-i18n="aiKeyWarn">Achtung: Der Schlüssel liegt dann im Browser-Speicher dieses Geräts.</p>
+          <p class="warn" data-i18n="voiceKeyWarn">Achtung: Dieser Schlüssel liegt im Browser-Speicher dieses Geräts und geht direkt an api.elevenlabs.io. Nur für die private Nutzung am eigenen Gerät.</p>
         </div>
 
         <div class="field">
@@ -245,10 +245,10 @@
         <div class="field">
           <label for="setVoiceModel" data-i18n="voiceModel">Stimm-Modell</label>
           <select id="setVoiceModel">
-            <option value="eleven_multilingual_v2">eleven_multilingual_v2 — ausgewogen</option>
-            <option value="eleven_flash_v2_5">eleven_flash_v2_5 — schnellste Antwort</option>
-            <option value="eleven_turbo_v2_5">eleven_turbo_v2_5 — schnell</option>
-            <option value="eleven_v3">eleven_v3 — ausdrucksstärkste</option>
+            <option value="eleven_multilingual_v2" data-i18n="vmBalanced">eleven_multilingual_v2 — ausgewogen</option>
+            <option value="eleven_flash_v2_5" data-i18n="vmFast">eleven_flash_v2_5 — schnellste Antwort</option>
+            <option value="eleven_turbo_v2_5" data-i18n="vmTurbo">eleven_turbo_v2_5 — schnell</option>
+            <option value="eleven_v3" data-i18n="vmRich">eleven_v3 — ausdrucksstärkste</option>
           </select>
         </div>
 
