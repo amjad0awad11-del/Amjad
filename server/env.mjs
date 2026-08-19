@@ -16,7 +16,7 @@ const file = process.env.JARVIS_ENV_FILE || path.join(here, '.env');
 
 /** Sparsamer Ersatz für ältere Node-Versionen ohne process.loadEnvFile. */
 function parseInto(text) {
-  for (const rawLine of text.split(/\r?\n/)) {
+  for (const rawLine of text.replace(/^\uFEFF/, '').split(/\r?\n/)) {
     const line = rawLine.trim();
     if (!line || line.startsWith('#')) continue;
     const eq = line.indexOf('=');
@@ -37,6 +37,13 @@ if (existsSync(file)) {
     else parseInto(readFileSync(file, 'utf8'));
     console.log(`Schlüssel aus ${file} geladen.`);
   } catch (err) {
-    console.warn(`Konnte ${file} nicht lesen: ${err?.message || err}`);
+    // Weigert sich der eingebaute Leser, nicht einfach aufgeben — sonst
+    // startet der Dienst ohne Schlüssel und niemand weiß warum.
+    try {
+      parseInto(readFileSync(file, 'utf8'));
+      console.log(`Schlüssel aus ${file} geladen (Ersatzleser).`);
+    } catch (err2) {
+      console.warn(`Konnte ${file} nicht lesen: ${err2?.message || err2}`);
+    }
   }
 }
