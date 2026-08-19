@@ -1331,11 +1331,38 @@
     youtube: 'https://www.youtube.com', google: 'https://www.google.com',
     github: 'https://github.com', wikipedia: `https://${isDE() ? 'de' : 'en'}.wikipedia.org`,
     gmail: 'https://mail.google.com', maps: 'https://maps.google.com',
-    amazon: 'https://www.amazon.de', spotify: 'https://open.spotify.com',
-    netflix: 'https://www.netflix.com', linkedin: 'https://www.linkedin.com',
-    instagram: 'https://www.instagram.com', chatgpt: 'https://claude.ai',
-    claude: 'https://claude.ai', anthropic: 'https://www.anthropic.com',
+    karten: 'https://maps.google.com', amazon: 'https://www.amazon.de',
+    spotify: 'https://open.spotify.com', netflix: 'https://www.netflix.com',
+    linkedin: 'https://www.linkedin.com', instagram: 'https://www.instagram.com',
+    facebook: 'https://www.facebook.com', whatsapp: 'https://web.whatsapp.com',
+    tiktok: 'https://www.tiktok.com', reddit: 'https://www.reddit.com',
+    ebay: 'https://www.ebay.de', paypal: 'https://www.paypal.com',
+    booking: 'https://www.booking.com', wetter: 'https://www.wetter.com',
+    drive: 'https://drive.google.com', kalender: 'https://calendar.google.com',
+    calendar: 'https://calendar.google.com', translate: 'https://translate.google.com',
+    claude: 'https://claude.ai', chatgpt: 'https://claude.ai',
+    anthropic: 'https://www.anthropic.com',
   };
+
+  /**
+   * Wandelt einen Namen in eine Adresse um - auch fuer Seiten, die hier nicht
+   * aufgezaehlt sind: erst eine echte Adresse, dann eine Domain, dann die
+   * bekannte Liste, zuletzt der Name als Marke (netflix wird netflix.com).
+   * Bleibt alles erfolglos, ist eine Suche gemeint.
+   */
+  function resolveSite(query) {
+    const raw = String(query || '').trim();
+    if (!raw) return null;
+    const q = raw.toLowerCase()
+      .replace(/^(die|das|der|the|website von|webseite von|seite von)\s+/i, '')
+      .trim();
+
+    if (/^https?:\/\//i.test(raw)) return raw;
+    if (/^[a-z0-9][a-z0-9-]*(\.[a-z0-9-]+)+(\/\S*)?$/i.test(q)) return 'https://' + q;
+    if (KNOWN_SITES[q]) return KNOWN_SITES[q];
+    if (/^[a-z0-9][a-z0-9-]{1,29}$/i.test(q)) return 'https://' + q + '.com';
+    return null;
+  }
 
   /** Öffnet ein Fenster; wenn der Popup-Blocker greift, gibt es den Link zurück. */
   function openUrl(url, label) {
@@ -1872,25 +1899,41 @@
         const engineMatch = n.match(/\b(google|youtube|wikipedia|maps|karten|github)\b/);
         const engine = engineMatch ? (engineMatch[1] === 'karten' ? 'maps' : engineMatch[1]) : null;
 
+        // Ausdrueckliches "oeffne ..." meint eine Seite, nicht eine Suche.
+        const wantsOpen = /^\s*(bitte\s+)?(öffne|oeffne|open|geh zu|gehe zu|geh auf|gehe auf|starte|ruf auf|rufe auf)\b/i.test(text.trim());
+
         let query = text
-          .replace(/^\s*(bitte\s+)?(such(e)?|search|look up|zeig mir|show me|öffne|oeffne|open)\s*/i, '')
+          .replace(/^\s*(bitte\s+)?(such(e)?|search|look up|zeig mir|show me|öffne|oeffne|open|geh zu|gehe zu|geh auf|gehe auf|starte|ruf auf|rufe auf)\s*/i, '')
           .replace(/\b(nach|for|auf|on|in)\b/i, ' ')
-          .replace(/\b(google|youtube|wikipedia|maps|karten|github)\b/i, ' ')
           .replace(/\s+/g, ' ')
           .trim();
 
-        // „öffne youtube“ ohne Suchbegriff → Startseite
+        // Suchmaschine nur herausstreichen, wenn wirklich gesucht wird.
+        if (!wantsOpen) {
+          query = query.replace(/\b(google|youtube|wikipedia|maps|karten|github)\b/i, ' ').replace(/\s+/g, ' ').trim();
+        }
+
+        if (wantsOpen && query) {
+          const url = resolveSite(query);
+          if (url) {
+            const label = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+            return openUrl(url, label);
+          }
+          return openUrl(SEARCH_ENGINES.google(query), 'Google: ' + query);
+        }
+
         if (!query && engine && KNOWN_SITES[engine]) {
           return openUrl(KNOWN_SITES[engine], engine);
         }
+
         if (!query) {
           const site = Object.keys(KNOWN_SITES).find((k) => n.includes(k));
           if (site) return openUrl(KNOWN_SITES[site], site);
-          return isDE() ? 'Wonach soll ich suchen?' : 'What should I search for?';
+          return isDE() ? 'Was soll ich öffnen oder suchen?' : 'What should I open or search for?';
         }
 
         const build = SEARCH_ENGINES[engine || 'google'];
-        return openUrl(build(query), `${engine || 'Google'}: ${query}`);
+        return openUrl(build(query), (engine || 'Google') + ': ' + query);
       },
     },
 
