@@ -8,12 +8,15 @@
  *   /api/speak   Sprachausgabe über ElevenLabs
  *   /api/agent   Aufträge, die wirklich etwas auf diesem Rechner tun
  *
- *   export ANTHROPIC_API_KEY="sk-ant-…"
- *   export ELEVENLABS_API_KEY="sk_…"      # optional
+ *   cp server/.env.example server/.env     # Schlüssel dort eintragen
  *   npm install --prefix server
  *   node server/jarvis-proxy.mjs
+ *
+ * Die Schlüssel können auch als Umgebungsvariablen gesetzt werden; gesetzte
+ * Variablen haben Vorrang vor der Datei.
  */
 
+import './env.mjs';   // muss zuerst stehen — lädt server/.env
 import { createServer } from 'node:http';
 import { Readable } from 'node:stream';
 import Anthropic from '@anthropic-ai/sdk';

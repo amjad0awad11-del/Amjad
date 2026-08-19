@@ -20,6 +20,7 @@ Build-Schritt — einfach ausliefern.
 | `jarvis.js` | Assistent: Spracherkennung, Sprachausgabe, Befehle, KI-Modus |
 | `server/jarvis-proxy.mjs` | Lokaler Dienst: Claude-Proxy, Sprachausgabe, Agent |
 | `server/agent.mjs` | Agent-Logik: Arbeitsordner, Rückfragen, Obergrenzen |
+| `server/.env.example` | Vorlage für die Schlüssel — Kopie als `server/.env` |
 
 ## J.A.R.V.I.S. — Sprachassistent
 

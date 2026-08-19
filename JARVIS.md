@@ -78,18 +78,37 @@ und sagt einmal, warum.
 
 ### Wo die Schlüssel hingehören
 
-Am besten in die Umgebung des lokalen Dienstes, nicht in den Browser:
+In `server/.env` — sonst nirgends:
 
 ```bash
-export ANTHROPIC_API_KEY="sk-ant-..."
-export ELEVENLABS_API_KEY="sk_..."
+cp server/.env.example server/.env
+# Datei öffnen, die beiden Schlüssel eintragen
 node server/jarvis-proxy.mjs
 ```
 
-Damit bleiben sie auf dem Rechner. Wer sie stattdessen in den Einstellungen der
-Oberfläche einträgt, legt sie im Browser-Speicher ab — das ist bequemer, aber nur
-für das eigene Gerät gedacht. Schlüssel gehören nie in ein öffentliches
-Repository; die Dateien hier enthalten keine.
+Der Dienst liest die Datei beim Start („Schlüssel aus … geladen."). Sie steht in
+`.gitignore` und kann nicht versehentlich mit hochgeladen werden. Wer lieber
+`export ANTHROPIC_API_KEY=…` benutzt, kann das weiterhin tun — gesetzte
+Umgebungsvariablen haben Vorrang vor der Datei.
+
+Die Oberfläche hat zwar Felder für die Schlüssel, aber die legen sie im
+Browser-Speicher ab. Das ist nur für das eigene Gerät gedacht; über den lokalen
+Dienst ist es in jedem Fall besser aufgehoben.
+
+### Wenn ein Schlüssel doch einmal sichtbar wurde
+
+In einen Chat kopiert, in einen Screenshot geraten, versehentlich committet —
+dann gilt er als öffentlich, auch wenn die Nachricht gelöscht wird. Ein
+Schlüssel lässt sich nicht zurückholen, nur ersetzen:
+
+1. [console.anthropic.com](https://console.anthropic.com) → **API keys** → den
+   betroffenen Schlüssel **löschen**. Ab dem Moment ist er wertlos.
+2. Neuen Schlüssel erzeugen und in `server/.env` eintragen.
+3. Unter **Usage** kurz nachsehen, ob in der Zwischenzeit etwas verbraucht wurde.
+
+Bei ElevenLabs ist der Weg derselbe: Profil → **API Keys** → widerrufen, neu
+erzeugen. Niemand — kein Dienst, kein Assistent, kein Support — braucht deinen
+Schlüssel im Klartext.
 
 ## Was er kann
 
