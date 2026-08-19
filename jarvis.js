@@ -111,6 +111,18 @@
   /** Mikrofon gibt es nur über https oder auf localhost. */
   const SECURE = window.isSecureContext !== false;
 
+  /**
+   * Läuft die Seite von einem fremden Server (etwa GitHub Pages), kann sie
+   * den Dienst auf localhost nicht erreichen — der Browser lässt solche
+   * Anfragen von einer https-Seite nicht zu. KI-Modus über Proxy, Agent und
+   * die Proxy-Stimme sind dort also nicht nur „aus", sondern unmöglich.
+   */
+  const LOCAL_OK = (() => {
+    const h = window.location.hostname;
+    if (!h || h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h === '::1') return true;
+    return window.location.protocol !== 'https:';
+  })();
+
   /* =======================================================
      2. Sprachtexte
      ======================================================= */
@@ -160,6 +172,9 @@
       agentOffline: 'Der Agent ist nicht erreichbar. Läuft der lokale Dienst? (node server/jarvis-proxy.mjs)',
       agentSpoken: 'Ich frage kurz nach: ',
       fillerHint: 'Wobei kann ich helfen?',
+      remoteNotice: 'Diese Seite läuft im Netz, nicht auf deinem Rechner. Alles Eingebaute funktioniert hier — Zeit, Timer, Aufgaben, Notizen, Rechnen, Umrechnen. KI-Modus, Agent und die eigene Stimme brauchen den Dienst auf deinem Rechner und lassen sich hier nicht einschalten.',
+      remoteUnknown: 'Dafür habe ich keinen eingebauten Befehl — und freie Fragen kann ich auf dieser Seite nicht beantworten, dafür fehlt der Dienst auf deinem Rechner. Was hier geht: „Wie spät ist es?", „Timer 10 Minuten", „Was ist 17 mal 23?", „Füge Aufgabe … hinzu", „Notiere …", „10 km in Meilen". Die ganze Liste zeigt „Hilfe".',
+      remoteSetting: 'Auf dieser Online-Seite nicht verfügbar — dafür läuft der Dienst auf dem eigenen Rechner.',
       setWake: 'Wortwächter', setWakeHint: 'Dauerhaft zuhören und nur auf „Jarvis“ reagieren',
       setSpeak: 'Sprachausgabe', setSpeakHint: 'Antworten laut vorlesen',
       setSfx: 'Signaltöne', setSfxHint: 'Kurze Töne bei Start, Ende und Alarm',
@@ -244,6 +259,9 @@
       agentOffline: 'The agent is unreachable. Is the local service running? (node server/jarvis-proxy.mjs)',
       agentSpoken: 'Just checking: ',
       fillerHint: 'What can I help with?',
+      remoteNotice: 'This page runs on the web, not on your computer. Everything built in works here — time, timers, tasks, notes, maths, conversions. AI mode, the agent and the custom voice need the service on your machine and cannot be switched on here.',
+      remoteUnknown: 'I have no built-in command for that, and I cannot answer open questions on this page — that needs the service on your computer. What works here: “What time is it?”, “Set a timer for 10 minutes”, “What is 17 times 23?”, “Add task …”, “Note that …”, “10 km in miles”. Say “help” for the full list.',
+      remoteSetting: 'Not available on this online page — it needs the service running on your own computer.',
       setWake: 'Wake word', setWakeHint: 'Keep listening and only react to “Jarvis”',
       setSpeak: 'Speech output', setSpeakHint: 'Read answers out loud',
       setSfx: 'Sound cues', setSfxHint: 'Short tones on start, end and alarms',
@@ -529,7 +547,8 @@
       const v = settings.voice;
       if (v.engine !== 'elevenlabs' || !v.voiceId) return false;
       if (this.failures >= 2) return false;
-      return v.mode === 'direct' ? Boolean(v.apiKey) : Boolean(v.proxyUrl);
+      if (v.mode === 'direct') return Boolean(v.apiKey);
+      return Boolean(v.proxyUrl) && LOCAL_OK;   // Proxy nur auf dem eigenen Rechner
     },
 
     /** Einmaliger Hinweis, warum gerade die Systemstimme spricht. */
@@ -1835,7 +1854,10 @@
      ======================================================= */
 
   const AI = {
-    enabled: () => settings.ai.mode !== 'off',
+    // Der Proxy liegt auf diesem Rechner; von einer fremden https-Seite ist er
+    // nicht erreichbar. Der Direktweg zu api.anthropic.com dagegen schon.
+    enabled: () => settings.ai.mode === 'direct'
+      || (settings.ai.mode === 'proxy' && LOCAL_OK),
 
     defaultPersona() {
       return isDE()
@@ -2001,7 +2023,9 @@
     pending: [],          // offene Rückfragen, neueste zuletzt
 
     enabled() {
-      return Boolean(settings.agent.enabled && settings.agent.url);
+      // Ohne erreichbaren Dienst hilft die Einstellung nicht — dann lieber
+      // ehrlich sagen, was geht, statt in einen Fehler zu laufen.
+      return Boolean(LOCAL_OK && settings.agent.enabled && settings.agent.url);
     },
 
     base(suffix = '') {
@@ -2224,7 +2248,7 @@
         return;
       }
 
-      UI.reply(filler ? t('fillerHint') : t('unknownAI'));
+      UI.reply(filler ? t('fillerHint') : t(LOCAL_OK ? 'unknownAI' : 'remoteUnknown'));
     },
 
     /**
@@ -2756,7 +2780,34 @@
       el.setAgentUrl.value = settings.agent.url;
       this.toggleAiFields();
       this.toggleVoiceFields();
+      this.markUnavailable();
       this.fillVoices();
+    },
+
+    /** Schalter sperren, die von dieser Seite aus nichts bewirken können. */
+    markUnavailable() {
+      if (LOCAL_OK) return;
+
+      el.setAgent.checked = false;
+      el.setAgent.disabled = true;
+      el.setAgentUrl.disabled = true;
+
+      for (const [field, select] of [[el.fieldAgentUrl, null], [el.fieldProxy, el.setAiMode]]) {
+        if (!field || field.querySelector('.remote-note')) continue;
+        const note = document.createElement('p');
+        note.className = 'warn remote-note';
+        note.textContent = t('remoteSetting');
+        field.appendChild(note);
+        if (select) select.dataset.remote = '1';
+      }
+
+      // Proxy-Optionen deutlich machen, ohne sie zu verstecken.
+      for (const option of [...el.setAiMode.options, ...el.setVoiceMode.options]) {
+        if (option.value === 'proxy' && !option.dataset.marked) {
+          option.dataset.marked = '1';
+          option.textContent += ' — hier nicht möglich';
+        }
+      }
     },
 
     toggleVoiceFields() {
@@ -3085,6 +3136,7 @@
     setTimeout(() => {
       const greeting = t('greetBoot');
       UI.reply(greeting);
+      if (!LOCAL_OK) UI.systemMsg(t('remoteNotice'));
       if (!STT.supported) UI.systemMsg(t('micMissing'));
       else if (!TTS.supported) UI.systemMsg(t('ttsMissing'));
     }, 320);
