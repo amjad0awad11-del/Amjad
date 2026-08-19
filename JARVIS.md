@@ -9,31 +9,43 @@ optionale KI-Modus brauchen Internet.
 
 ## Starten
 
-Gebraucht wird nur [Node.js](https://nodejs.org) ab Version 20. Danach ein Befehl:
+Ein Befehl. Nichts herunterladen, nichts suchen, nichts entpacken.
 
-**macOS / Linux**
-
-```bash
-git clone -b claude/jarvis-assistant-2428an https://github.com/amjad0awad11-del/Amjad.git jarvis
-cd jarvis
-./start.sh
-```
-
-**Windows** — dasselbe in PowerShell, dann Doppelklick auf `start.bat`:
+**Windows** — Windows-Taste drücken, `powershell` tippen, Enter. Dann einfügen:
 
 ```powershell
-git clone -b claude/jarvis-assistant-2428an https://github.com/amjad0awad11-del/Amjad.git jarvis
-cd jarvis
-.\start.bat
+irm https://raw.githubusercontent.com/amjad0awad11-del/Amjad/refs/heads/claude/jarvis-assistant-2428an/install.ps1 | iex
 ```
 
-Das Startskript installiert beim ersten Mal die Abhängigkeiten, legt
-`server/.env` an, startet den Dienst und öffnet den Browser auf
-**http://localhost:8787/**. Beenden mit `Strg+C`.
+**macOS / Linux** — Terminal öffnen und einfügen:
 
-Oberfläche, Sprachausgabe und Agent laufen über denselben Dienst und dieselbe
-Adresse — es ist also nur ein Fenster offen zu halten. Der Dienst lauscht
-ausschließlich auf `127.0.0.1`; aus dem Netzwerk ist er nicht erreichbar.
+```bash
+curl -fsSL https://raw.githubusercontent.com/amjad0awad11-del/Amjad/refs/heads/claude/jarvis-assistant-2428an/install.sh | bash
+```
+
+Der Befehl holt das Projekt nach `~/jarvis` (Windows: `%USERPROFILE%\jarvis`),
+installiert alles Nötige, startet den Dienst und öffnet den Browser auf
+**http://localhost:8787/**. Beim ersten Mal dauert das etwa eine Minute.
+
+Fehlt Node.js, versucht der Windows-Befehl es selbst zu installieren; klappt das
+nicht, sagt er, was zu tun ist.
+
+### Später wieder starten
+
+Der Ordner `jarvis` bleibt liegen. Zum erneuten Starten:
+
+| | |
+|---|---|
+| **Windows** | `START-WINDOWS.bat` im Ordner `jarvis` doppelklicken |
+| **macOS / Linux** | `cd ~/jarvis && ./start.sh` |
+
+Das Fenster, das dabei aufgeht, **muss offen bleiben** — es ist der Dienst
+selbst. Schließt man es, meldet der Browser „Verbindung abgelehnt".
+
+### Erneut installieren
+
+Denselben Befehl noch einmal einfügen. Vorhandene Schlüssel in `server/.env`
+werden dabei übernommen, nicht überschrieben.
 
 Beim ersten Start läuft eine kurze Startsequenz. Der Klick auf **System starten**
 ist die Nutzergeste, die Audio und Sprachausgabe freischaltet — ohne sie darf
@@ -42,36 +54,8 @@ keine Website Töne abspielen.
 ### Ohne Schlüssel
 
 Zeit, Datum, Timer, Erinnerungen, Aufgaben, Notizen, Rechnen, Umrechnen,
-Würfeln und Witze laufen sofort — dafür braucht es nichts weiter. Wetter und
-Wikipedia brauchen nur Internet. Erst KI-Modus, Agent und die eigene Stimme
-brauchen Schlüssel (siehe unten).
-
-### Von Hand starten
-
-```bash
-npm install --prefix server
-node server/jarvis-proxy.mjs
-```
-
-Ein anderer Port geht mit `PORT=9000 ./start.sh`.
-
-### Bedienung
-
-| Aktion | Wie |
-|---|---|
-| Sprechen | Auf den Kern in der Mitte tippen (oder auf das Mikrofon unten links) |
-| Tippen | Eingabezeile unten, `Enter` sendet |
-| Schnell ins Eingabefeld | Taste `/` |
-| Sprachausgabe abbrechen | `Esc`, „Stopp" oder der Stopp-Knopf |
-| Sprache wechseln | DE/EN oben rechts oder „Sprich Englisch" |
-| Befehlsübersicht | `?` oben rechts oder „Hilfe" |
-
-### Wortwächter
-
-In den Einstellungen lässt sich **Wortwächter** aktivieren. Dann hört
-J.A.R.V.I.S. dauerhaft zu und reagiert nur auf Sätze, die mit „Jarvis" beginnen —
-„Jarvis, wie spät ist es?". Ohne Wortwächter wird jede erkannte Äußerung
-verarbeitet, solange das Mikrofon aktiv ist.
+Würfeln und Witze laufen sofort. Wetter und Wikipedia brauchen nur Internet.
+Erst KI-Modus, Agent und die eigene Stimme brauchen Schlüssel (siehe unten).
 
 ---
 
@@ -82,9 +66,14 @@ Diese Adresse ist kein Server im Internet, sondern dein eigener Rechner. Sie
 antwortet nur, solange der Dienst läuft. Im Terminal muss „J.A.R.V.I.S. läuft"
 stehen. Steht dort nichts mehr, wurde er beendet — einfach neu starten.
 
+**Ich finde `START-WINDOWS.bat` nicht**
+Windows blendet Dateiendungen aus — die Datei heißt dann nur **START-WINDOWS**.
+Sie liegt im Ordner `jarvis` neben `jarvis.html`. Am einfachsten ist der
+Installationsbefehl oben: der sucht nichts, sondern startet direkt.
+
 **Das Fenster schließt sich sofort wieder (Windows)**
-Dann zeigt es eine Fehlermeldung zu schnell zum Lesen. PowerShell öffnen, in den
-Ordner wechseln und `.\start.bat` von dort starten — dann bleibt die Meldung stehen.
+Dann zeigt es eine Fehlermeldung zu schnell zum Lesen. PowerShell öffnen und
+`START-WINDOWS.bat` in das Fenster ziehen, dann Enter — die Meldung bleibt stehen.
 
 **`command not found: node`**
 Node.js fehlt. Von [nodejs.org](https://nodejs.org) installieren, Version 20 oder

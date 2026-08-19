@@ -2,6 +2,8 @@
 #
 # J.A.R.V.I.S. starten (macOS / Linux)
 #
+# Erstinstallation lieber mit install.sh — siehe README.
+#
 #   ./start.sh
 #
 # Kümmert sich um alles: Abhängigkeiten, Schlüsseldatei, Dienst, Browser.

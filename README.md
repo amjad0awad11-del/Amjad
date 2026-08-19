@@ -21,7 +21,8 @@ Build-Schritt — einfach ausliefern.
 | `server/jarvis-proxy.mjs` | Lokaler Dienst: Claude-Proxy, Sprachausgabe, Agent |
 | `server/agent.mjs` | Agent-Logik: Arbeitsordner, Rückfragen, Obergrenzen |
 | `server/.env.example` | Vorlage für die Schlüssel — Kopie als `server/.env` |
-| `start.sh` / `start.bat` | Ein-Befehl-Start für macOS/Linux bzw. Windows |
+| `install.sh` / `install.ps1` | Einzeiler-Installation für macOS/Linux bzw. Windows |
+| `start.sh` / `START-WINDOWS.bat` | Späterer Start, wenn schon installiert |
 
 ## J.A.R.V.I.S. — Sprachassistent
 
@@ -37,14 +38,21 @@ anlegen, Projekte bauen, Befehle ausführen —, und zwar auf Zuruf. Er arbeitet
 dabei nur in einem eigenen Ordner und fragt vor jeder Änderung nach; ein
 gesprochenes „ja" genügt.
 
-```bash
-./start.sh          # Windows: start.bat doppelklicken
-# → http://localhost:8787/
+**Windows** (PowerShell öffnen und einfügen):
+
+```powershell
+irm https://raw.githubusercontent.com/amjad0awad11-del/Amjad/refs/heads/claude/jarvis-assistant-2428an/install.ps1 | iex
 ```
 
-Das Startskript installiert beim ersten Mal alles Nötige, legt die
-Schlüsseldatei an, startet den Dienst und öffnet den Browser. Gebraucht wird nur
-[Node.js](https://nodejs.org) ab Version 20.
+**macOS / Linux** (Terminal):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/amjad0awad11-del/Amjad/refs/heads/claude/jarvis-assistant-2428an/install.sh | bash
+```
+
+Ein Befehl: holt das Projekt nach `~/jarvis`, installiert alles Nötige, startet
+den Dienst und öffnet den Browser auf **http://localhost:8787/**. Später erneut
+starten mit `START-WINDOWS.bat` bzw. `./start.sh` im Ordner `jarvis`.
 
 Alle Befehle, die Einrichtung von Agent, KI-Modus und Stimme sowie die
 Datenschutz-Übersicht stehen in **[JARVIS.md](JARVIS.md)**.
