@@ -1198,17 +1198,19 @@ body.cursor-ready button { cursor: none; }
 /* =========================================================
    Gallery (Arbeiten)
    ========================================================= */
-/* 9 Motive — Spaltenzahl muss die Anzahl teilen, damit keine
-   Lücke am Ende entsteht (9 = 3×3 = 1×9). */
+/* Bildkacheln exakt so groß wie die Showreel-Kacheln: gleiche Spaltenzahl
+   (6 / 3 / 2) und derselbe Abstand. Flex statt Grid, damit eine unvollständige
+   letzte Reihe mittig sitzt statt links zu kleben. */
 .gallery {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 18px;
 }
 .tile {
   position: relative;
   display: block;
-  width: 100%;
+  width: calc((100% - 5 * 18px) / 6);
   margin: 0;
   padding: 0;
   border: 0;
@@ -1494,6 +1496,7 @@ body.cursor-ready button { cursor: none; }
   .section__head--left { text-align: center; }
   .cta__card { grid-template-columns: 1fr; gap: 36px; padding: 40px 30px; }
   .reels { grid-template-columns: repeat(3, 1fr); }
+  .tile { width: calc((100% - 2 * 18px) / 3); }
 }
 
 @media (max-width: 760px) {
@@ -1503,7 +1506,7 @@ body.cursor-ready button { cursor: none; }
   .hero__stats { grid-template-columns: repeat(2, 1fr); gap: 30px 16px; }
   .cards, .results, .quotes { grid-template-columns: 1fr; }
   .reels { grid-template-columns: repeat(2, 1fr); }
-  .gallery { grid-template-columns: 1fr; }
+  .tile { width: calc((100% - 18px) / 2); }
   .section { padding: 72px 0; }
   .lb__prev { left: 12px; }
   .lb__next { right: 12px; }
@@ -1519,7 +1522,6 @@ body.cursor-ready button { cursor: none; }
   .footer__inner { grid-template-columns: 1fr; }
   .cta__card { padding: 32px 22px; }
   .about__mini { grid-template-columns: 1fr; gap: 12px; }
-  .gallery { grid-template-columns: 1fr; }
 }
 
 /* =========================================================
