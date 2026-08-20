@@ -61,11 +61,11 @@ Dann `http://localhost:8000` im Browser öffnen.
 
 ## Bilder & Videos
 
-Die Galerie „Arbeiten" zeigt **9 echte Kampagnenmotive** (WebP, einheitlich 1080 × 1920) —
+Die Galerie „Arbeiten" zeigt **10 echte Kampagnenmotive** (WebP, einheitlich 1080 × 1920) —
 bewusst gemischt aus Studio-Produktaufnahmen und UGC-/Lifestyle-Content, damit
 sich die Motive nicht ähneln: AMBRE Eau de Parfum, HOYA HYDRIA, MELVA Balm,
-SERAPHINE Eye Cream, AURIVA Cream, VIALA Parfum-Set, ARGILE Clay Mask,
-Pflegeritual und BOTANIQUE Body Balm. Die Dateien liegen in `assets/img/`.
+SERAPHINE Eye Cream, AURIVA Cream, LUMIERE Radiance Serum, VIALA Parfum-Set,
+ARGILE Clay Mask, Pflegeritual und BOTANIQUE Body Balm. Die Dateien liegen in `assets/img/`.
 
 Das „Showreel" zeigt **6 echte, vertikale Video-Clips** (`assets/video/reel-01…06.mp4`,
 H.264/AAC). Die Kacheln spielen die Clips stummgeschaltet in Endlosschleife,
@@ -74,15 +74,15 @@ groß im Modal mit Ton und Steuerung.
 
 > **Einheitliche Kachelgröße:** Bild- und Videokacheln werden exakt gleich groß
 > dargestellt (Desktop 177 × 315 px). Die Galerie übernimmt dafür Spaltenzahl und
-> Abstand des Showreels (6 / 3 / 2 Spalten). Bei 9 Motiven bleibt die letzte Reihe
-> mit 3 Kacheln unvollständig — sie wird zentriert. Mit 12 Motiven (6+6) bzw. 6
-> Motiven wäre das Raster wieder vollständig gefüllt.
+> Abstand des Showreels (6 / 3 / 2 Spalten). Bei 10 Motiven ist die letzte Reihe
+> auf dem Desktop mit 4 Kacheln unvollständig — sie wird zentriert. Mit 12 Motiven
+> (6+6) wäre das Raster auch dort vollständig gefüllt.
 
 > **Einheitliche Maße:** Alle Galerie-Motive liegen exakt in **1080 × 1920**
 > vor — dieselben Maße wie die ursprünglichen Bilder. Neue Motive vor dem
 > Einbinden auf 1080 × 1920 bringen, damit das Raster einheitlich bleibt.
-> (Das SERAPHINE-Motiv war quadratisch und wurde dafür auf 9:16 beschnitten;
-> Tiegel, Zweig und AMW-Signet bleiben vollständig erhalten.)
+> (SERAPHINE und LUMIERE waren quadratisch und wurden dafür auf 9:16 beschnitten;
+> Produkt und AMW-Signet bleiben jeweils vollständig erhalten.)
 
 - **Weitere Bilder ergänzen:** Foto in `assets/img/` ablegen und in `index.html`
   in der Galerie eine weitere `.tile`-Kachel anlegen (fortlaufender
