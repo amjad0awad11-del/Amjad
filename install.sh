@@ -68,10 +68,15 @@ if [ -z "$INNER" ]; then
   exit 1
 fi
 
-# Vorhandene Schlüssel retten, bevor der Ordner ersetzt wird.
+# Schlüssel und Connectors retten, bevor der Ordner ersetzt wird. Beides
+# gehört dem Nutzer und muss ein Update überleben.
 KEEP_ENV=""
 if [ -f "$TARGET/server/.env" ]; then
   KEEP_ENV="$(cat "$TARGET/server/.env")"
+fi
+KEEP_CONN=""
+if [ -f "$TARGET/server/connectors.json" ]; then
+  KEEP_CONN="$(cat "$TARGET/server/connectors.json")"
 fi
 
 rm -rf "$TARGET"
@@ -94,6 +99,11 @@ if [ -n "$KEEP_ENV" ]; then
 elif [ ! -f "$TARGET/server/.env" ]; then
   cp "$TARGET/server/.env.example" "$TARGET/server/.env"
   say 'server/.env wurde angelegt (noch ohne Schlüssel).'
+fi
+
+if [ -n "$KEEP_CONN" ]; then
+  printf '%s\n' "$KEEP_CONN" > "$TARGET/server/connectors.json"
+  good 'Deine Connectors sind unverändert geblieben.'
 fi
 
 chmod +x "$TARGET/start.sh" 2>/dev/null || true

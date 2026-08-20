@@ -97,10 +97,15 @@ if (-not $inner) {
   return
 }
 
-# Vorhandene Schluessel und Einstellungen retten.
+# Vorhandene Schluessel und Einstellungen retten. Beides gehoert dem Nutzer
+# und darf ein Update nicht ueberleben muessen, sondern muss es.
 $keepEnv = $null
 $envPath = Join-Path $Target 'server\.env'
 if (Test-Path $envPath) { $keepEnv = Get-Content $envPath -Raw }
+
+$keepConn = $null
+$connPath = Join-Path $Target 'server\connectors.json'
+if (Test-Path $connPath) { $keepConn = Get-Content $connPath -Raw }
 
 if (Test-Path $Target) { Remove-Item $Target -Recurse -Force }
 Move-Item -Path $inner.FullName -Destination $Target
@@ -148,6 +153,11 @@ if ($keepEnv) {
 } elseif (-not (Test-Path $envFile)) {
   Copy-Item (Join-Path $Target 'server\.env.example') $envFile
   Say 'server\.env wurde angelegt (noch ohne Schluessel).'
+}
+
+if ($keepConn) {
+  Set-Content -Path (Join-Path $Target 'server\connectors.json') -Value $keepConn -NoNewline
+  Good 'Deine Connectors sind unveraendert geblieben.'
 }
 
 # ---------- 5. Starten ----------

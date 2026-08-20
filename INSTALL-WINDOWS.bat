@@ -83,6 +83,10 @@ if exist "%TARGET%\server\.env" (
   copy /y "%TARGET%\server\.env" "%WORK%\keep.env" >nul 2>&1
   echo Vorhandene .env gesichert >> "%LOG%"
 )
+if exist "%TARGET%\server\connectors.json" (
+  copy /y "%TARGET%\server\connectors.json" "%WORK%\keep.connectors" >nul 2>&1
+  echo Vorhandene connectors.json gesichert >> "%LOG%"
+)
 if exist "%TARGET%" rmdir /s /q "%TARGET%"
 move "%WORK%\%INNER%" "%TARGET%" >> "%LOG%" 2>&1
 if not exist "%TARGET%\server\jarvis-proxy.mjs" (
@@ -121,6 +125,10 @@ if exist "%WORK%\keep.env" (
   echo   Deine bisherigen Schluessel wurden uebernommen.
 ) else (
   if not exist "%TARGET%\server\.env" copy /y "%TARGET%\server\.env.example" "%TARGET%\server\.env" >nul
+)
+if exist "%WORK%\keep.connectors" (
+  copy /y "%WORK%\keep.connectors" "%TARGET%\server\connectors.json" >nul
+  echo   Deine Connectors sind unveraendert geblieben.
 )
 rmdir /s /q "%WORK%" 2>nul
 
