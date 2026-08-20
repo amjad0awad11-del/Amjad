@@ -169,7 +169,17 @@
 
 <!-- ===== Input bar ===== -->
 <footer class="composer">
+  <!-- Angehängte Dateien stehen über der Zeile, damit die Eingabe frei bleibt -->
+  <div class="tray" id="tray" hidden></div>
   <div class="composer__inner">
+    <button class="composer__attach" id="btnAttach" type="button"
+            data-i18n-label="attach" aria-label="Attach a file">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 11.5 12.5 20a5.5 5.5 0 0 1-7.8-7.8l8.5-8.5a3.7 3.7 0 0 1 5.2 5.2l-8.5 8.5a1.8 1.8 0 0 1-2.6-2.6l7.9-7.8"/>
+      </svg>
+    </button>
+    <input class="visually-hidden" id="filePick" type="file" multiple
+           accept="image/*,video/*,audio/*,.pdf,.txt,.md,.csv,.json,.zip,.doc,.docx,.xls,.xlsx,.ppt,.pptx" />
     <button class="composer__mic" id="btnMic2" type="button" data-i18n-label="sysMic" aria-label="Microphone">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
         <rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3.5"/>
@@ -185,6 +195,16 @@
     <button class="composer__stop" id="btnStop" type="button" data-i18n="stop" data-i18n-label="stopSpeaking" title="Stop speaking">Stop</button>
   </div>
 </footer>
+
+<!-- Erscheint, sobald eine Datei über das Fenster gezogen wird -->
+<div class="dropzone" id="dropzone" hidden>
+  <div class="dropzone__box">
+    <svg viewBox="0 0 24 24" width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 16v2.5A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5V16"/>
+    </svg>
+    <p id="dropzoneText" data-i18n="dropHere">Drop it here</p>
+  </div>
+</div>
 
 <!-- ===== Settings modal ===== -->
 <div class="modal" id="modalSettings" hidden>

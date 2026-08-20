@@ -25,6 +25,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { runAgent, resolvePermission, stopRun, WORKSPACE } from './agent.mjs';
+import { receiveUpload, MAX_UPLOAD_BYTES, UPLOAD_DIR } from './uploads.mjs';
 import { humanError } from './errors.mjs';
 
 const PORT = Number(process.env.PORT || 8787);
@@ -105,6 +106,8 @@ async function serveStatic(res, url) {
   }
 }
 const MAX_BODY_BYTES = 256 * 1024;
+/** Mit Bild im Gespräch: Base64 wiegt rund ein Drittel mehr als die Datei. */
+const MAX_CHAT_BODY_BYTES = Number(process.env.JARVIS_MAX_CHAT_BODY_BYTES || 24 * 1024 * 1024);
 const MAX_TOKENS_CAP = 2048;
 const MAX_MESSAGES = 40;
 const MAX_SPEAK_CHARS = 2000;
@@ -145,17 +148,17 @@ function originAllowed(origin) {
 function cors(res, origin) {
   res.setHeader('Access-Control-Allow-Origin', origin && origin !== 'null' ? origin : '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'content-type');
+  res.setHeader('Access-Control-Allow-Headers', 'content-type, x-jarvis-filename');
   res.setHeader('Vary', 'Origin');
 }
 
-function readBody(req) {
+function readBody(req, limit = MAX_BODY_BYTES) {
   return new Promise((resolve, reject) => {
     let size = 0;
     const chunks = [];
     req.on('data', (chunk) => {
       size += chunk.length;
-      if (size > MAX_BODY_BYTES) {
+      if (size > limit) {
         reject(new Error('body too large'));
         req.destroy();
         return;
@@ -173,10 +176,39 @@ function sanitize(payload) {
     ? payload.model
     : 'claude-opus-5';
 
+  // Ein Bild kommt nicht als Text, sondern als Block — deshalb sind hier
+  // beide Formen erlaubt. Alles andere fällt weg, damit nichts Unbekanntes
+  // durchgereicht wird.
+  const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+  const cleanBlocks = (blocks) => blocks
+    .map((b) => {
+      if (!b || typeof b !== 'object') return null;
+      if (b.type === 'text' && typeof b.text === 'string') {
+        return { type: 'text', text: b.text.slice(0, 8000) };
+      }
+      if (b.type === 'image' && b.source?.type === 'base64'
+          && IMAGE_TYPES.has(b.source.media_type) && typeof b.source.data === 'string') {
+        return {
+          type: 'image',
+          source: { type: 'base64', media_type: b.source.media_type, data: b.source.data },
+        };
+      }
+      return null;
+    })
+    .filter(Boolean);
+
   const messages = Array.isArray(payload.messages) ? payload.messages : [];
   const clean = messages
-    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
-    .map((m) => ({ role: m.role, content: m.content.slice(0, 8000) }))
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant'))
+    .map((m) => {
+      if (typeof m.content === 'string') return { role: m.role, content: m.content.slice(0, 8000) };
+      if (Array.isArray(m.content)) {
+        const blocks = cleanBlocks(m.content);
+        return blocks.length ? { role: m.role, content: blocks } : null;
+      }
+      return null;
+    })
+    .filter(Boolean)
     .slice(-MAX_MESSAGES);
 
   if (!clean.length) throw new Error('no valid messages');
@@ -217,7 +249,33 @@ export function createJarvisServer(deps = {}) {
       claudeKey: Boolean(process.env.ANTHROPIC_API_KEY),
       elevenKey: Boolean(ELEVEN_KEY),
       workspace: WORKSPACE,
+      uploadDir: UPLOAD_DIR,
+      maxUploadBytes: MAX_UPLOAD_BYTES,
     }));
+    return;
+  }
+
+  /* ---- Datei annehmen ---- */
+  if (req.method === 'POST' && url.pathname === '/api/upload') {
+    // Der Name steht im Kopf, nicht im Körper: so laufen die Bytes ohne
+    // Umweg auf die Platte und ein Video sprengt nichts.
+    const raw = String(req.headers['x-jarvis-filename'] || '');
+    let name = raw;
+    try { name = decodeURIComponent(raw); } catch { /* dann eben roh */ }
+
+    try {
+      const file = await receiveUpload(req, {
+        workspace: WORKSPACE,
+        name,
+        type: String(req.headers['content-type'] || ''),
+      });
+      console.log(`  received ${file.name} (${Math.round(file.size / 1024)} KB) → ${file.relative}`);
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, ...file }));
+    } catch (err) {
+      res.writeHead(413, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: String(err?.message || err) }));
+    }
     return;
   }
 
@@ -371,7 +429,7 @@ export function createJarvisServer(deps = {}) {
 
   let request;
   try {
-    request = sanitize(JSON.parse(await readBody(req)));
+    request = sanitize(JSON.parse(await readBody(req, MAX_CHAT_BODY_BYTES)));
   } catch (err) {
     res.writeHead(400, { 'content-type': 'application/json' });
     res.end(JSON.stringify({ error: String(err.message || err) }));

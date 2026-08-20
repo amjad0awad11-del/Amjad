@@ -148,6 +148,18 @@
       langGroup: 'Sprache',
       help: 'Hilfe', core: 'J.A.R.V.I.S.-Kern', startListening: 'Zuhören starten',
       send: 'Senden', stopSpeaking: 'Sprachausgabe stoppen',
+      attach: 'Datei anhängen', attachRemove: 'Entfernen',
+      dropHere: 'Hier ablegen',
+      attachMax: 'Mehr als acht Dateien auf einmal gehen nicht.',
+      attachTooBig: 'Die Datei ist zu groß',
+      attachOnly: '(Datei angehängt)',
+      attachLookPrompt: 'Sieh dir das an.',
+      attachInWorkspace: 'Diese Dateien liegen im Arbeitsordner:',
+      attachFailed: 'Die Datei ließ sich nicht übertragen:',
+      attachNoService: 'Dafür brauche ich den lokalen Dienst — ohne ihn kann ich die Datei nirgends ablegen.',
+      attachNoVision: 'Ansehen kann ich nur JPG, PNG, GIF und WebP bis fünf Megabyte. Für alles andere brauche ich den Agenten.',
+      attachStoredOnly: 'Abgelegt im Arbeitsordner:',
+      attachNothingToDo: 'Die Datei liegt bereit, aber weder KI-Modus noch Agent sind an — eingeschaltet in den Einstellungen kann ich damit arbeiten.',
       helpTitle: 'Was J.A.R.V.I.S. kann',
       tapToTalk: 'Tippen zum Sprechen',
       listening: 'Ich höre zu …',
@@ -246,6 +258,18 @@
       langGroup: 'Language',
       help: 'Help', core: 'J.A.R.V.I.S. core', startListening: 'Start listening',
       send: 'Send', stopSpeaking: 'Stop speaking',
+      attach: 'Attach a file', attachRemove: 'Remove',
+      dropHere: 'Drop it here',
+      attachMax: 'Eight files at a time is the limit.',
+      attachTooBig: 'That file is too large',
+      attachOnly: '(file attached)',
+      attachLookPrompt: 'Take a look at this.',
+      attachInWorkspace: 'These files are in the working folder:',
+      attachFailed: 'The file could not be sent:',
+      attachNoService: 'I need the local service for that — without it there is nowhere to put the file.',
+      attachNoVision: 'I can only look at JPG, PNG, GIF and WebP up to five megabytes. For anything else I need the agent.',
+      attachStoredOnly: 'Saved in the working folder:',
+      attachNothingToDo: 'The file is ready, but neither AI mode nor the agent is on — switch one on in the settings and I can work with it.',
       helpTitle: 'What J.A.R.V.I.S. can do',
       tapToTalk: 'Tap to talk',
       listening: 'Listening …',
@@ -2048,7 +2072,7 @@
      * Verarbeitet sowohl SSE-Streams als auch einfache JSON-Antworten,
      * damit eigene Proxys beide Formen liefern dürfen.
      */
-    async ask(userText, onDelta) {
+    async ask(userText, onDelta, blocks = null) {
       if (settings.ai.mode === 'direct' && !settings.ai.apiKey) {
         throw new Error(isDE()
           ? 'Es ist kein API-Schlüssel hinterlegt.'
@@ -2059,7 +2083,12 @@
       }
       if (!online()) throw new Error(t('offline'));
 
-      const messages = memory.history.slice(-12).concat([{ role: 'user', content: userText }]);
+      // Mit Bild besteht die Nachricht aus Blöcken statt aus Text. Der
+      // Verlauf bleibt Text — Bilder noch einmal mitzuschicken kostet nur.
+      const content = blocks && blocks.length
+        ? [...blocks, { type: 'text', text: userText }]
+        : userText;
+      const messages = memory.history.slice(-12).concat([{ role: 'user', content }]);
 
       const model = settings.ai.model || 'claude-opus-5';
       const body = {
@@ -2164,6 +2193,36 @@
 
     base(suffix = '') {
       return settings.agent.url.replace(/\/+$/, '') + suffix;
+    },
+
+    /**
+     * Der Dienst kann mehr als den Agenten. Aus der eingestellten
+     * Agent-Adresse wird hier die Wurzel gemacht, damit auch /api/upload
+     * und /health erreichbar sind, ohne dass eine zweite Adresse nötig ist.
+     */
+    serviceUrl(pathname = '/') {
+      const raw = settings.agent.url.replace(/\/+$/, '');
+      const root = raw.replace(/\/api\/agent$/, '');
+      return root + pathname;
+    },
+
+    /** Adresse, wenn überhaupt eine im Spiel sein kann — sonst leer. */
+    reachableUrl() {
+      return LOCAL_OK && settings.agent.url ? this.serviceUrl('/') : '';
+    },
+
+    /** Einmal beim Start nachsehen, was der Dienst kann. */
+    async probe() {
+      if (!this.reachableUrl()) return null;
+      try {
+        const res = await fetch(this.serviceUrl('/health'), { signal: AbortSignal.timeout(2500) });
+        if (!res.ok) return null;
+        const info = await res.json();
+        if (Number(info.maxUploadBytes) > 0) Attach.maxUploadBytes = Number(info.maxUploadBytes);
+        return info;
+      } catch {
+        return null;   // Dienst läuft nicht — das ist kein Fehler
+      }
     },
 
     busy() {
@@ -2335,16 +2394,215 @@
   };
 
   /* =======================================================
+     8b. Angehängte Dateien
+     ======================================================= */
+
+  /**
+   * Fotos, Videos und Dokumente, die zur nächsten Nachricht gehören.
+   *
+   * Zwei Wege, je nachdem was geht:
+   *   - Bilder gehen als Bildblock direkt an Claude, der sie ansieht
+   *   - jede Datei geht zusätzlich in den Arbeitsordner des Agenten,
+   *     damit er sie öffnen, umbauen oder weiterverwenden kann
+   *
+   * Ohne laufenden Dienst geht nur der erste Weg — dann wird das auch so
+   * gesagt, statt eine Datei anzunehmen, mit der nichts passieren kann.
+   */
+  const Attach = {
+    items: [],
+    /** Grösser nimmt Claude als Bild nicht an. */
+    MAX_IMAGE_BYTES: 5 * 1024 * 1024,
+    /** Was der Dienst höchstens entgegennimmt — /health nennt den echten Wert. */
+    maxUploadBytes: 200 * 1024 * 1024,
+
+    kindOf(type, name) {
+      const t = String(type || '').toLowerCase();
+      if (t.startsWith('image/')) return 'image';
+      if (t.startsWith('video/')) return 'video';
+      if (t.startsWith('audio/')) return 'audio';
+      if (/\.(jpe?g|png|gif|webp|heic|svg)$/i.test(name || '')) return 'image';
+      if (/\.(mp4|mov|webm|mkv|avi)$/i.test(name || '')) return 'video';
+      if (/\.(mp3|wav|m4a|ogg|flac)$/i.test(name || '')) return 'audio';
+      return 'file';
+    },
+
+    /** Nur diese vier sieht Claude an — andere Bildformate nicht. */
+    visionType(type) {
+      const t = String(type || '').toLowerCase();
+      return ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(t) ? t : '';
+    },
+
+    prettySize(bytes) {
+      if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+      if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`;
+      return `${bytes} B`;
+    },
+
+    has() { return this.items.length > 0; },
+
+    hasNonImage() { return this.items.some((it) => it.kind !== 'image'); },
+
+    /** Dateien aufnehmen — aus dem Auswahlfenster, per Ziehen oder Einfügen. */
+    async add(fileList) {
+      const files = Array.from(fileList || []).filter(Boolean);
+      if (!files.length) return;
+
+      for (const file of files) {
+        if (this.items.length >= 8) {
+          UI.toast(t('attachMax'));
+          break;
+        }
+        if (file.size > this.maxUploadBytes) {
+          UI.toast(`${file.name}: ${t('attachTooBig')} (${this.prettySize(this.maxUploadBytes)})`);
+          continue;
+        }
+
+        const item = {
+          id: `f${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+          file,
+          name: file.name || 'file',
+          size: file.size,
+          type: file.type || '',
+          kind: this.kindOf(file.type, file.name),
+          thumb: '',
+          remotePath: '',
+          uploading: false,
+        };
+        this.items.push(item);
+
+        // Vorschaubild sofort, damit sichtbar ist, was angehängt wurde.
+        if (item.kind === 'image' && file.size <= this.MAX_IMAGE_BYTES) {
+          try { item.thumb = await this.readDataUrl(file); } catch { /* dann ohne */ }
+        }
+        this.render();
+      }
+      this.render();
+    },
+
+    readDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('The file could not be read.'));
+        reader.readAsDataURL(file);
+      });
+    },
+
+    remove(id) {
+      this.items = this.items.filter((it) => it.id !== id);
+      this.render();
+    },
+
+    clear() {
+      this.items = [];
+      this.render();
+    },
+
+    render() {
+      if (!el.tray) return;
+      el.tray.hidden = !this.items.length;
+      el.btnAttach?.classList.toggle('has-files', this.items.length > 0);
+      el.tray.innerHTML = this.items.map((it) => {
+        const thumb = it.thumb
+          ? `<img class="tray__thumb" src="${esc(it.thumb)}" alt="" />`
+          : `<span class="tray__thumb">${esc(this.badge(it.kind))}</span>`;
+        return `<div class="tray__item${it.uploading ? ' is-busy' : ''}" data-id="${esc(it.id)}">
+          ${thumb}
+          <span class="tray__meta">
+            <span class="tray__name" title="${esc(it.name)}">${esc(it.name)}</span>
+            <span class="tray__size">${esc(this.prettySize(it.size))}</span>
+          </span>
+          <button class="tray__x" type="button" data-remove="${esc(it.id)}"
+                  aria-label="${esc(t('attachRemove'))}">✕</button>
+        </div>`;
+      }).join('');
+    },
+
+    badge(kind) {
+      return { image: 'IMG', video: 'VID', audio: 'AUD' }[kind] || 'DOC';
+    },
+
+    /**
+     * Alles in den Arbeitsordner schieben und die Pfade zurückgeben.
+     * Läuft der Dienst nicht, kommt eine leere Liste — der Aufrufer
+     * entscheidet dann, was noch möglich ist.
+     */
+    async upload() {
+      if (!Agent.reachableUrl()) return [];
+      const done = [];
+      for (const item of this.items) {
+        if (item.remotePath) { done.push(item); continue; }
+        item.uploading = true;
+        this.render();
+        try {
+          const res = await fetch(Agent.serviceUrl('/api/upload'), {
+            method: 'POST',
+            headers: {
+              'content-type': item.type || 'application/octet-stream',
+              'x-jarvis-filename': encodeURIComponent(item.name),
+            },
+            body: item.file,
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+          item.remotePath = data.relative || data.path || '';
+          item.serverName = data.name || item.name;
+          done.push(item);
+        } catch (err) {
+          item.error = String(err?.message || err);
+        } finally {
+          item.uploading = false;
+          this.render();
+        }
+      }
+      return done;
+    },
+
+    /** Bildblöcke für die Messages-API — nur was Claude auch ansehen kann. */
+    async visionBlocks() {
+      const blocks = [];
+      for (const item of this.items) {
+        const media = this.visionType(item.type);
+        if (!media || item.size > this.MAX_IMAGE_BYTES) continue;
+        try {
+          const url = item.thumb || await this.readDataUrl(item.file);
+          const data = url.split(',')[1];
+          if (data) blocks.push({ type: 'image', source: { type: 'base64', media_type: media, data } });
+        } catch { /* dieses Bild eben nicht */ }
+      }
+      return blocks;
+    },
+
+    /** Kurze Zeile für das Protokoll, damit man sieht, was mitging. */
+    logHtml() {
+      if (!this.items.length) return '';
+      const bits = this.items.map((it) => {
+        const thumb = it.thumb ? `<img src="${esc(it.thumb)}" alt="" />` : '';
+        return `<span class="msg__file">${thumb}${esc(it.name)}</span>`;
+      });
+      return `<span class="msg__files">${bits.join('')}</span>`;
+    },
+  };
+
+  /* =======================================================
      9. Verstand — Befehl zu Fähigkeit zuordnen
      ======================================================= */
 
   const Brain = {
     async handle(rawText, source = 'text') {
       const text = String(rawText || '').trim();
-      if (!text) return;
+      const files = Attach.has();
+      if (!text && !files) return;
 
       UI.setHint('');
-      UI.userMsg(text);
+      UI.userMsg(text || t('attachOnly'), Attach.logHtml());
+
+      // Hängt etwas dran, geht es nicht an die eingebauten Befehle: „sieh
+      // dir das an" ist kein Timer und keine Notiz.
+      if (files) {
+        await this.handleWithFiles(text);
+        return;
+      }
 
       const n = norm(text);
 
@@ -2386,6 +2644,70 @@
     },
 
     /**
+     * Nachricht mit Anhang.
+     *
+     * Der Agent kann mit jeder Datei etwas anfangen, weil sie auf der Platte
+     * liegt; das Gespräch nur mit Bildern. Deshalb: liegt eine Datei vor, die
+     * kein Bild ist, oder klingt es nach Auftrag, geht es an den Agenten.
+     * Sonst sieht Claude sich die Bilder an.
+     */
+    async handleWithFiles(text) {
+      const items = Attach.items.slice();
+      const wantsAgent = Agent.enabled() && (Attach.hasNonImage() || this.looksLikeTask(text) || !AI.enabled());
+
+      // Erst ablegen — auch fürs Gespräch, dann liegt das Bild später noch da.
+      let stored = [];
+      if (Agent.reachableUrl()) {
+        UI.setState('thinking');
+        stored = await Attach.upload();
+      }
+
+      const failed = items.filter((it) => it.error);
+      if (failed.length && !stored.length) {
+        UI.errorMsg(`${t('attachFailed')} ${failed[0].error}`);
+        UI.setState(state.listening ? 'listening' : 'idle');
+        return;
+      }
+
+      if (wantsAgent) {
+        if (!stored.length) {
+          UI.reply(t('attachNoService'));
+          return;
+        }
+        const list = stored.map((it) => `- ${it.remotePath}`).join('\n');
+        const prompt = `${text || t('attachLookPrompt')}\n\n`
+          + `${t('attachInWorkspace')}\n${list}`;
+        Attach.clear();
+        await Agent.run(prompt);
+        return;
+      }
+
+      if (AI.enabled()) {
+        const blocks = await Attach.visionBlocks();
+        if (!blocks.length) {
+          // Nichts, was Claude ansehen kann, und kein Agent, der es öffnen
+          // könnte — das ehrlich sagen statt so zu tun, als ginge es.
+          UI.reply(stored.length ? `${t('attachStoredOnly')} ${stored.map((f) => f.remotePath).join(', ')}` : t('attachNoVision'));
+          Attach.clear();
+          return;
+        }
+        const question = text || t('attachLookPrompt');
+        Attach.clear();
+        await this.askAI(question, blocks);
+        return;
+      }
+
+      if (stored.length) {
+        UI.reply(`${t('attachStoredOnly')} ${stored.map((f) => f.remotePath).join(', ')}`);
+        Attach.clear();
+        return;
+      }
+
+      UI.reply(t('attachNothingToDo'));
+      Attach.clear();
+    },
+
+    /**
      * Kurze Bestätigungen, Füllwörter und einzelne Wörter sind keine Aufträge.
      * Ohne diese Bremse würde ein verhörtes „ja" den Agenten loslaufen lassen.
      */
@@ -2405,13 +2727,13 @@
       return de.test(n) || en.test(n);
     },
 
-    async askAI(text) {
+    async askAI(text, blocks = null) {
       state.thinking = true;
       UI.setState('thinking');
       const bubble = UI.pendingBubble();
 
       try {
-        const reply = await AI.ask(text, (_delta, full) => bubble.update(full));
+        const reply = await AI.ask(text, (_delta, full) => bubble.update(full), blocks);
         const finalText = reply || (isDE() ? 'Keine Antwort erhalten.' : 'No answer received.');
         bubble.finish(finalText);
         AI.remember(text, finalText);
@@ -2555,7 +2877,8 @@
         'setSfx', 'setAiMode', 'setProxyUrl', 'setApiKey', 'setModel', 'setPersona', 'fieldProxy',
         'fieldKey', 'btnSaveSettings', 'btnReset', 'setVoiceEngine', 'setVoiceMode', 'setVoiceProxy',
         'setVoiceKey', 'setVoiceId', 'setVoiceModel', 'btnVoiceTest', 'voiceBlock', 'fieldVoiceProxy',
-        'fieldVoiceKey', 'fieldBrowserVoice', 'wVoice', 'setAgent', 'setAgentUrl', 'fieldAgentUrl', 'wAgent'];
+        'fieldVoiceKey', 'fieldBrowserVoice', 'wVoice', 'setAgent', 'setAgentUrl', 'fieldAgentUrl', 'wAgent',
+        'tray', 'btnAttach', 'filePick', 'dropzone'];
       for (const id of ids) el[id] = document.getElementById(id);
     },
 
@@ -2604,7 +2927,7 @@
       return parts.map((p) => (/^<a /.test(p) ? p : esc(p))).join('');
     },
 
-    userMsg(text) { this.bubble(t('you'), 'user', this.render(text)); },
+    userMsg(text, extraHtml = '') { this.bubble(t('you'), 'user', this.render(text) + extraHtml); },
 
     say(text) { this.bubble(t('me'), 'jarvis', this.render(text)); },
 
@@ -3124,10 +3447,10 @@
     el.btnMic.addEventListener('click', () => STT.toggle());
     el.btnMic2.addEventListener('click', () => STT.toggle());
 
-    // Texteingabe
+    // Texteingabe — mit Anhang darf die Zeile auch leer sein
     const send = () => {
       const text = el.input.value.trim();
-      if (!text) return;
+      if (!text && !Attach.has()) return;
       el.input.value = '';
       Brain.handle(text, 'text');
     };
@@ -3141,6 +3464,48 @@
       const chip = e.target.closest('.chip');
       if (!chip) return;
       Brain.handle(chip.textContent, 'text');
+    });
+
+    /* ---- Dateien anhängen ---- */
+    el.btnAttach.addEventListener('click', () => el.filePick.click());
+    el.filePick.addEventListener('change', () => {
+      Attach.add(el.filePick.files);
+      el.filePick.value = '';   // dieselbe Datei soll erneut wählbar sein
+    });
+    el.tray.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-remove]');
+      if (btn) Attach.remove(btn.dataset.remove);
+    });
+
+    // Ziehen und Ablegen über dem ganzen Fenster. Der Zähler ist nötig, weil
+    // dragleave auch beim Wechsel zwischen Kindelementen feuert.
+    let dragDepth = 0;
+    const hasFiles = (e) => Array.from(e.dataTransfer?.types || []).includes('Files');
+    window.addEventListener('dragenter', (e) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      dragDepth++;
+      el.dropzone.hidden = false;
+    });
+    window.addEventListener('dragover', (e) => { if (hasFiles(e)) e.preventDefault(); });
+    window.addEventListener('dragleave', () => {
+      dragDepth = Math.max(0, dragDepth - 1);
+      if (!dragDepth) el.dropzone.hidden = true;
+    });
+    window.addEventListener('drop', (e) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      dragDepth = 0;
+      el.dropzone.hidden = true;
+      Attach.add(e.dataTransfer.files);
+    });
+
+    // Bild aus der Zwischenablage einfügen
+    window.addEventListener('paste', (e) => {
+      const files = Array.from(e.clipboardData?.files || []);
+      if (!files.length) return;
+      e.preventDefault();
+      Attach.add(files);
     });
 
     el.btnStop.addEventListener('click', () => TTS.stop());
@@ -3335,6 +3700,9 @@
     startVisualizer();
 
     if (memory.timers.length) Timers.ensureTick();
+
+    // Was der Dienst annimmt, sagt der Dienst — nicht raten.
+    Agent.probe();
 
     el.bootEnter.addEventListener('click', enterSystem);
     boot();
