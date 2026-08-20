@@ -79,6 +79,15 @@ if [ -f "$TARGET/server/connectors.json" ]; then
   KEEP_CONN="$(cat "$TARGET/server/connectors.json")"
 fi
 
+# Einen noch laufenden Dienst beenden. Unter Linux und macOS liesse sich der
+# Ordner zwar auch so ersetzen, aber der alte Prozess bliebe auf dem Port
+# sitzen und die neue Fassung kaeme gar nicht erst hoch.
+if pgrep -f 'jarvis-proxy' >/dev/null 2>&1; then
+  say 'Der alte Dienst läuft noch — ich beende ihn.'
+  pkill -f 'jarvis-proxy' >/dev/null 2>&1 || true
+  sleep 2
+fi
+
 rm -rf "$TARGET"
 mkdir -p "$(dirname "$TARGET")"
 mv "$INNER" "$TARGET"

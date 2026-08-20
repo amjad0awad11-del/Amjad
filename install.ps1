@@ -107,7 +107,34 @@ $keepConn = $null
 $connPath = Join-Path $Target 'server\connectors.json'
 if (Test-Path $connPath) { $keepConn = Get-Content $connPath -Raw }
 
-if (Test-Path $Target) { Remove-Item $Target -Recurse -Force }
+# Ein noch laufender Dienst haelt den Ordner fest, und Windows laesst ihn
+# dann nicht ersetzen. Statt den Nutzer eine rote Fehlermeldung lesen zu
+# lassen: gezielt den eigenen Dienst beenden. Gezielt heisst ueber die
+# Befehlszeile - andere node-Programme des Nutzers bleiben unangetastet.
+$running = @(Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" -ErrorAction SilentlyContinue |
+  Where-Object { $_.CommandLine -like '*jarvis-proxy*' })
+if ($running.Count) {
+  Say 'Der alte Dienst laeuft noch - ich beende ihn.'
+  foreach ($proc in $running) {
+    Stop-Process -Id $proc.ProcessId -Force -ErrorAction SilentlyContinue
+  }
+  Start-Sleep -Seconds 2
+}
+
+if (Test-Path $Target) {
+  try {
+    Remove-Item $Target -Recurse -Force -ErrorAction Stop
+  } catch {
+    Write-Host ''
+    Bad 'Der Ordner jarvis laesst sich nicht ersetzen - es benutzt ihn noch etwas.'
+    Write-Host ''
+    Say 'Meist ist es das schwarze Fenster, in dem J.A.R.V.I.S. laeuft.'
+    Say 'Alle solchen Fenster schliessen und diesen Befehl erneut einfuegen.'
+    Say 'Hilft das nicht, den Rechner neu starten - danach ist der Ordner frei.'
+    Bye
+    return
+  }
+}
 Move-Item -Path $inner.FullName -Destination $Target
 Remove-Item $tmpDir -Recurse -Force -ErrorAction SilentlyContinue
 Good "Projekt liegt in $Target"

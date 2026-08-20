@@ -87,7 +87,23 @@ if exist "%TARGET%\server\connectors.json" (
   copy /y "%TARGET%\server\connectors.json" "%WORK%\keep.connectors" >nul 2>&1
   echo Vorhandene connectors.json gesichert >> "%LOG%"
 )
+REM Laeuft der alte Dienst noch, laesst Windows den Ordner nicht ersetzen.
+REM Gezielt nur den eigenen Dienst beenden, nicht jedes node-Programm.
+powershell -NoProfile -Command "Get-CimInstance Win32_Process -EA SilentlyContinue | Where-Object { $_.Name -eq 'node.exe' -and $_.CommandLine -like '*jarvis-proxy*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -EA SilentlyContinue }" >nul 2>&1
+timeout /t 2 /nobreak >nul
+
 if exist "%TARGET%" rmdir /s /q "%TARGET%"
+if exist "%TARGET%\server\jarvis-proxy.mjs" (
+  echo   FEHLER: Der Ordner jarvis laesst sich nicht ersetzen.
+  echo   FEHLER: rmdir fehlgeschlagen - Ordner in Benutzung >> "%LOG%"
+  echo.
+  echo   Es benutzt ihn noch etwas - meist das schwarze Fenster,
+  echo   in dem J.A.R.V.I.S. laeuft. Alle solchen Fenster schliessen
+  echo   und diese Datei erneut doppelklicken.
+  echo.
+  pause
+  exit /b 1
+)
 move "%WORK%\%INNER%" "%TARGET%" >> "%LOG%" 2>&1
 if not exist "%TARGET%\server\jarvis-proxy.mjs" (
   echo   FEHLER: Der Ordner liess sich nicht anlegen.
