@@ -1198,11 +1198,11 @@ body.cursor-ready button { cursor: none; }
 /* =========================================================
    Gallery (Arbeiten)
    ========================================================= */
-/* 10 Motive — Spaltenzahl muss die Anzahl teilen, damit keine
-   Lücke am Ende entsteht (10 = 5×2 = 2×5 = 1×10). */
+/* 9 Motive — Spaltenzahl muss die Anzahl teilen, damit keine
+   Lücke am Ende entsteht (9 = 3×3 = 1×9). */
 .gallery {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 18px;
 }
 .tile {
@@ -1493,7 +1493,6 @@ body.cursor-ready button { cursor: none; }
   .faq__inner { grid-template-columns: 1fr; gap: 32px; }
   .section__head--left { text-align: center; }
   .cta__card { grid-template-columns: 1fr; gap: 36px; padding: 40px 30px; }
-  .gallery { grid-template-columns: repeat(2, 1fr); }
   .reels { grid-template-columns: repeat(3, 1fr); }
 }
 
@@ -1504,6 +1503,7 @@ body.cursor-ready button { cursor: none; }
   .hero__stats { grid-template-columns: repeat(2, 1fr); gap: 30px 16px; }
   .cards, .results, .quotes { grid-template-columns: 1fr; }
   .reels { grid-template-columns: repeat(2, 1fr); }
+  .gallery { grid-template-columns: 1fr; }
   .section { padding: 72px 0; }
   .lb__prev { left: 12px; }
   .lb__next { right: 12px; }
