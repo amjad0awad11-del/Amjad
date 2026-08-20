@@ -235,7 +235,7 @@ export function createJarvisServer(deps = {}) {
     const prompt = String(ask.prompt || '').slice(0, 8000).trim();
     if (!prompt) {
       res.writeHead(400, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ error: 'prompt fehlt' }));
+      res.end(JSON.stringify({ error: 'prompt is missing' }));
       return;
     }
 
@@ -277,7 +277,7 @@ export function createJarvisServer(deps = {}) {
     try { ask = JSON.parse(await readBody(req)); } catch { /* als leer behandeln */ }
     const ok = resolvePermission(String(ask.id || ''), Boolean(ask.approved));
     res.writeHead(ok ? 200 : 404, { 'content-type': 'application/json' });
-    res.end(JSON.stringify(ok ? { ok: true } : { error: 'Rückfrage nicht gefunden oder abgelaufen' }));
+    res.end(JSON.stringify(ok ? { ok: true } : { error: 'permission request not found or expired' }));
     return;
   }
 
@@ -287,7 +287,7 @@ export function createJarvisServer(deps = {}) {
     try { ask = JSON.parse(await readBody(req)); } catch { /* als leer behandeln */ }
     const ok = stopRun(String(ask.runId || ''));
     res.writeHead(ok ? 200 : 404, { 'content-type': 'application/json' });
-    res.end(JSON.stringify(ok ? { ok: true } : { error: 'kein solcher Lauf' }));
+    res.end(JSON.stringify(ok ? { ok: true } : { error: 'no such run' }));
     return;
   }
 
@@ -295,7 +295,7 @@ export function createJarvisServer(deps = {}) {
   if (req.method === 'POST' && url.pathname === '/api/speak') {
     if (!ELEVEN_KEY) {
       res.writeHead(503, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ error: 'ELEVENLABS_API_KEY ist auf dem Server nicht gesetzt' }));
+      res.end(JSON.stringify({ error: 'ELEVENLABS_API_KEY is not set on the server' }));
       return;
     }
 
@@ -315,7 +315,7 @@ export function createJarvisServer(deps = {}) {
 
     if (!text || !/^[A-Za-z0-9]{8,40}$/.test(voiceId) || !/^[a-z0-9_]{3,40}$/.test(modelId)) {
       res.writeHead(400, { 'content-type': 'application/json' });
-      res.end(JSON.stringify({ error: 'text, voice_id oder model_id fehlt bzw. ist ungültig' }));
+      res.end(JSON.stringify({ error: 'text, voice_id or model_id is missing or invalid' }));
       return;
     }
 
@@ -412,7 +412,7 @@ export function createJarvisServer(deps = {}) {
 
     const final = await stream.finalMessage();
     if (final.stop_reason === 'refusal') {
-      write({ type: 'content_block_delta', delta: { type: 'text_delta', text: '\n[Die Anfrage wurde abgelehnt.]' } });
+      write({ type: 'content_block_delta', delta: { type: 'text_delta', text: '\n[The request was declined.]' } });
     }
 
     if (!res.writableEnded) {
@@ -436,20 +436,20 @@ if (process.env.JARVIS_NO_AUTOSTART !== '1') {
 
   server.listen(PORT, HOST, () => {
     console.log('');
-    console.log('  J.A.R.V.I.S. läuft.');
+    console.log('  J.A.R.V.I.S. is running.');
     console.log('');
-    console.log(`  Im Browser öffnen:  http://localhost:${PORT}/`);
+    console.log(`  Open in your browser:  http://localhost:${PORT}/`);
     console.log('');
-    console.log(`  Arbeitsordner des Agenten: ${WORKSPACE}`);
+    console.log(`  Agent working folder: ${WORKSPACE}`);
     if (!process.env.ANTHROPIC_API_KEY) {
-      console.log('  ! ANTHROPIC_API_KEY fehlt — KI-Modus und Agent bleiben aus.');
-      console.log('    Schlüssel in server/.env eintragen (Vorlage: server/.env.example).');
+      console.log('  ! ANTHROPIC_API_KEY missing — AI mode and the agent stay off.');
+      console.log('    Put the key in server/.env (template: server/.env.example).');
     }
     if (!ELEVEN_KEY) {
-      console.log('  · ELEVENLABS_API_KEY fehlt — es spricht die Systemstimme.');
+      console.log('  . ELEVENLABS_API_KEY missing — the system voice will speak.');
     }
     console.log('');
-    console.log('  Beenden mit Strg+C');
+    console.log('  Stop with Ctrl+C');
     console.log('');
   });
 }

@@ -23,7 +23,7 @@
   };
 
   const DEFAULT_SETTINGS = {
-    lang: 'de-DE',
+    lang: 'en-US',
     voiceURI: '',
     rate: 1,
     pitch: 1,
@@ -145,6 +145,9 @@
       save: 'Speichern',
       resetAll: 'Alles zurücksetzen',
       settings: 'Einstellungen',
+      langGroup: 'Sprache',
+      help: 'Hilfe', core: 'J.A.R.V.I.S.-Kern', startListening: 'Zuhören starten',
+      send: 'Senden', stopSpeaking: 'Sprachausgabe stoppen',
       helpTitle: 'Was J.A.R.V.I.S. kann',
       tapToTalk: 'Tippen zum Sprechen',
       listening: 'Ich höre zu …',
@@ -240,6 +243,9 @@
       save: 'Save',
       resetAll: 'Reset everything',
       settings: 'Settings',
+      langGroup: 'Language',
+      help: 'Help', core: 'J.A.R.V.I.S. core', startListening: 'Start listening',
+      send: 'Send', stopSpeaking: 'Stop speaking',
       helpTitle: 'What J.A.R.V.I.S. can do',
       tapToTalk: 'Tap to talk',
       listening: 'Listening …',
@@ -1457,7 +1463,7 @@
     /* ---- Hilfe ---- */
     {
       id: 'help',
-      re: /^(hilfe|help|befehle|commands|was kannst du|what can you do|kommandos)\b/i,
+      re: /^(hilfe|help|befehle|commands|was kannst du|what can you do|kommandos|show me (?:the |your )?commands|list (?:the |your )?commands|what commands)\b/i,
       run() {
         UI.openHelp();
         return isDE()
@@ -1469,7 +1475,7 @@
     /* ---- Identität ---- */
     {
       id: 'identity',
-      re: /(wer bist du|wie hei(ß|ss)t du|dein name|stell dich vor|who are you|what.s your name|introduce yourself)/i,
+      re: /(wer bist du|wie hei(ß|ss)t du|dein name|stell dich vor|who are you|what(?:'s|s| is) your name|what should i call you|introduce yourself)/i,
       run() {
         return isDE()
           ? 'Ich bin J.A.R.V.I.S. — dein Assistent im Browser. Ich verstehe gesprochene und getippte Befehle, arbeite die meisten davon direkt auf diesem Gerät ab und kann für freie Fragen die Claude-API nutzen.'
@@ -1505,7 +1511,7 @@
     /* ---- Uhrzeit ---- */
     {
       id: 'time',
-      re: /(wie sp(ä|a)t|uhrzeit|die zeit|what time|current time|time is it)/i,
+      re: /(wie sp(ä|a)t|uhrzeit|die zeit|what time|current time|time is it|tell me the time|(?:do you )?(?:have|got) the time)/i,
       run() {
         const now = new Date();
         return isDE()
@@ -1517,7 +1523,7 @@
     /* ---- Datum ---- */
     {
       id: 'date',
-      re: /(welches datum|welcher tag|datum heute|heutige datum|what.s the date|what date|what day is it|today.s date)/i,
+      re: /(welches datum|welcher tag|datum heute|heutige datum|what(?:'s| is|s)?\s*(?:the\s+)?(?:today'?s\s+)?date|what date|what day is (?:it|today)|today'?s date|date today|which day)/i,
       run() {
         return isDE() ? `Heute ist ${fmtDate()}.` : `Today is ${fmtDate()}.`;
       },
@@ -1541,7 +1547,7 @@
     /* ---- Timer ---- */
     {
       id: 'timerSet',
-      re: /(timer|wecker|countdown|erinnere mich in|erinner mich in|remind me in|set a timer|stell(e)? (einen|nen)? timer)/i,
+      re: /(timer|wecker|countdown|erinnere mich in|erinner mich in|remind me in|set a timer|wake me in|weck(e)? mich in|stell(e)? (einen|nen)? timer)/i,
       run(_m, text) {
         const n = norm(text);
 
@@ -1631,7 +1637,7 @@
     /* ---- Aufgaben ---- */
     {
       id: 'tasks',
-      re: /(aufgabe|aufgaben|task|tasks|todo|to-do|einkaufsliste|meine liste)/i,
+      re: /(aufgabe|aufgaben|task|tasks|todo|to-do|einkaufsliste|meine liste|remind me to|on my list|shopping list|to my list)/i,
       run(_m, text) {
         const n = norm(text);
         const open = () => memory.tasks.filter((x) => !x.done);
@@ -1728,16 +1734,20 @@
     /* ---- Einheiten umrechnen ---- */
     {
       id: 'convert',
-      re: /(\d+(?:[.,]\d+)?)\s*([a-zäöüß°/]+(?:\s+[a-zäöüß°/]+)?)\s+(?:in|nach|to|as)\s+([a-zäöüß°/]+(?:\s+[a-zäöüß°/]+)?)/i,
+      // Zwei Wege zur selben Frage: „10 km in miles" und „how many miles
+      // is 10 km". Der zweite nennt die Zieleinheit zuerst — deshalb ein
+      // eigener Zweig statt einer Umschreibung des Satzes.
+      re: /(?:(\d+(?:[.,]\d+)?)\s*([a-zäöüß°/]+(?:\s+[a-zäöüß°/]+)?)\s+(?:in|nach|to|as)\s+([a-zäöüß°/]+(?:\s+[a-zäöüß°/]+)?)|(?:how many|how much|wie ?viele?)\s+([a-zäöüß°/]+)\s+(?:is|are|in|sind|ist|hat)\s+(\d+(?:[.,]\d+)?)\s*([a-zäöüß°/]+))/i,
       run(m) {
-        const value = parseFloat(String(m[1]).replace(',', '.'));
+        const reversed = m[1] === undefined;
+        const value = parseFloat(String(reversed ? m[5] : m[1]).replace(',', '.'));
         // „Grad Celsius" / „degrees C" auf die reine Einheit kürzen
         const strip = (u) => String(u)
           .replace(/\b(grad|grade|degrees?|einheiten?|units?)\b/gi, '')
           .replace(/\s+/g, ' ')
           .trim();
-        const from = strip(m[2]);
-        const to = strip(m[3]);
+        const from = strip(reversed ? m[6] : m[2]);
+        const to = strip(reversed ? m[4] : m[3]);
         if (!from || !to) return null;
         const res = convertUnits(value, from, to);
         if (!res) return null;   // kein passendes Paar → nächster Skill
@@ -1792,7 +1802,7 @@
     /* ---- Witz ---- */
     {
       id: 'joke',
-      re: /(witz|scherz|joke|make me laugh|erheiter)/i,
+      re: /(witz|scherz|joke|make me laugh|something funny|cheer me up|erheiter)/i,
       run() {
         const list = JOKES[isDE() ? 'de' : 'en'];
         return list[Math.floor(Math.random() * list.length)];
@@ -1906,7 +1916,7 @@
     /* ---- Websuche / Seite öffnen ---- */
     {
       id: 'open',
-      re: /(such(e)? (nach|auf)|google|youtube|öffne|oeffne|open|zeig mir .* auf|search for|look up on)/i,
+      re: /(such(e)? (nach|auf)|google|youtube|öffne|oeffne|open|zeig mir .* auf|search for|look up on|take me to|bring up|pull up|launch)/i,
       run(_m, text) {
         const n = norm(text);
 
@@ -1914,10 +1924,10 @@
         const engine = engineMatch ? (engineMatch[1] === 'karten' ? 'maps' : engineMatch[1]) : null;
 
         // Ausdrueckliches "oeffne ..." meint eine Seite, nicht eine Suche.
-        const wantsOpen = /^\s*(bitte\s+)?(öffne|oeffne|open|geh zu|gehe zu|geh auf|gehe auf|starte|ruf auf|rufe auf)\b/i.test(text.trim());
+        const wantsOpen = /^\s*(bitte\s+)?(öffne|oeffne|open|geh zu|gehe zu|geh auf|gehe auf|starte|ruf auf|rufe auf|take me to|bring up|pull up|launch)\b/i.test(text.trim());
 
         let query = text
-          .replace(/^\s*(bitte\s+)?(such(e)?|search|look up|zeig mir|show me|öffne|oeffne|open|geh zu|gehe zu|geh auf|gehe auf|starte|ruf auf|rufe auf)\s*/i, '')
+          .replace(/^\s*(bitte\s+)?(such(e)?|search|look up|zeig mir|show me|öffne|oeffne|open|geh zu|gehe zu|geh auf|gehe auf|starte|ruf auf|rufe auf|take me to|bring up|pull up|launch)\s*/i, '')
           .replace(/\b(nach|for|auf|on|in)\b/i, ' ')
           .replace(/\s+/g, ' ')
           .trim();
@@ -1989,10 +1999,12 @@
       return isDE()
         ? 'Du bist J.A.R.V.I.S., ein ruhiger, präziser und höflicher Assistent. '
           + 'Antworte knapp — höchstens drei Sätze — denn deine Antwort wird laut vorgelesen. '
-          + 'Verzichte auf Markdown, Aufzählungszeichen und Emojis. Sag offen, wenn du etwas nicht weißt.'
+          + 'Verzichte auf Markdown, Aufzählungszeichen und Emojis. Sag offen, wenn du etwas nicht weißt. '
+          + 'Sprich immer die Sprache der Frage.'
         : 'You are J.A.R.V.I.S., a calm, precise and courteous assistant. '
           + 'Keep answers short — three sentences at most — because they are read out loud. '
-          + 'No markdown, no bullet points, no emoji. Say plainly when you do not know something.';
+          + 'No markdown, no bullet points, no emoji. Say plainly when you do not know something. '
+          + 'Always speak the language of the question.';
     },
 
     systemPrompt() {
@@ -2000,7 +2012,11 @@
       const open = memory.tasks.filter((x) => !x.done);
       const context = [
         isDE() ? `Aktuelle Zeit: ${fmtTimeFull()} am ${fmtDate()}.` : `Current time: ${fmtTimeFull()} on ${fmtDate()}.`,
-        isDE() ? `Antworte auf Deutsch.` : `Answer in English.`,
+        // Nicht die Oberflächensprache erzwingen, sondern die der Frage —
+        // sonst antwortet er deutsch auf Englisch und umgekehrt.
+        'Antworte immer in derselben Sprache, in der die letzte Nachricht geschrieben ist. '
+          + 'Always reply in the same language as the most recent user message. '
+          + 'Mische niemals zwei Sprachen in einer Antwort. Never mix two languages in one answer.',
         open.length
           ? (isDE() ? `Offene Aufgaben des Nutzers: ${open.map((x) => x.text).join('; ')}.` : `The user's open tasks: ${open.map((x) => x.text).join('; ')}.`)
           : '',
@@ -2841,6 +2857,14 @@
       $$('[data-i18n-ph]').forEach((node) => {
         const value = I18N[isDE() ? 'de' : 'en'][node.dataset.i18nPh];
         if (value) node.placeholder = value;
+      });
+      // aria-label und title stehen nur im Markup — ohne diese Zeile bleiben
+      // Tooltip und Screenreader in der zuerst geschriebenen Sprache stehen.
+      $$('[data-i18n-label]').forEach((node) => {
+        const value = I18N[isDE() ? 'de' : 'en'][node.dataset.i18nLabel];
+        if (!value) return;
+        node.setAttribute('aria-label', value);
+        if (node.hasAttribute('title')) node.setAttribute('title', value);
       });
       $$('.seg__btn').forEach((b) => b.classList.toggle('is-active', b.dataset.lang === settings.lang));
       el.bootEnter.textContent = t('bootEnter');

@@ -35,15 +35,15 @@ if (existsSync(file)) {
   try {
     if (typeof process.loadEnvFile === 'function') process.loadEnvFile(file);
     else parseInto(readFileSync(file, 'utf8'));
-    console.log(`Schlüssel aus ${file} geladen.`);
+    console.log(`Keys loaded from ${file}.`);
   } catch (err) {
     // Weigert sich der eingebaute Leser, nicht einfach aufgeben — sonst
     // startet der Dienst ohne Schlüssel und niemand weiß warum.
     try {
       parseInto(readFileSync(file, 'utf8'));
-      console.log(`Schlüssel aus ${file} geladen (Ersatzleser).`);
+      console.log(`Keys loaded from ${file} (fallback reader).`);
     } catch (err2) {
-      console.warn(`Konnte ${file} nicht lesen: ${err2?.message || err2}`);
+      console.warn(`Could not read ${file}: ${err2?.message || err2}`);
     }
   }
 }

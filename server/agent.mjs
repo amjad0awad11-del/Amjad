@@ -73,7 +73,7 @@ export function resolvePermission(id, approved) {
   clearTimeout(entry.timer);
   entry.resolve({
     approved: Boolean(approved),
-    reason: approved ? 'vom Nutzer freigegeben' : 'vom Nutzer abgelehnt',
+    reason: approved ? 'approved by the user' : 'denied by the user',
   });
   return true;
 }
@@ -102,14 +102,14 @@ export function activeRuns() {
  */
 export async function runAgent({ prompt, sessionId, write, queryFn }) {
   if (typeof queryFn !== 'function') {
-    write({ type: 'error', message: 'Der Agent ist nicht eingerichtet (kein Einstiegspunkt übergeben).' });
+    write({ type: 'error', message: 'The agent is not set up (no entry point was provided).' });
     return;
   }
 
   try {
     await mkdir(WORKSPACE, { recursive: true });
   } catch (err) {
-    write({ type: 'error', message: `Der Arbeitsordner ${WORKSPACE} lässt sich nicht anlegen: ${err?.message || err}` });
+    write({ type: 'error', message: `Cannot create the working folder ${WORKSPACE}: ${err?.message || err}` });
     return;
   }
 
@@ -153,12 +153,12 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
       };
 
       timer = setTimeout(
-        () => finish(false, 'Keine Antwort innerhalb der Wartezeit — abgelehnt.'),
+        () => finish(false, 'No answer within the waiting time — denied.'),
         PERMISSION_TIMEOUT_MS,
       );
 
       pending.set(id, { resolve: (answer) => finish(answer.approved, answer.reason), timer });
-      options?.signal?.addEventListener('abort', () => finish(false, 'Abgebrochen.'), { once: true });
+      options?.signal?.addEventListener('abort', () => finish(false, 'Cancelled.'), { once: true });
     });
   };
 
@@ -174,12 +174,19 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
     systemPrompt: {
       type: 'preset',
       preset: 'claude_code',
+      // Zweisprachig, und ohne feste Antwortsprache: der Agent soll in der
+      // Sprache des Auftrags antworten, nicht in einer voreingestellten.
       append: [
-        'Du bist J.A.R.V.I.S. und arbeitest für eine Person, die dir meist zuspricht statt zu tippen.',
-        'Fasse dich in deinen Antworten kurz — höchstens drei Sätze — denn sie werden laut vorgelesen.',
-        'Kein Markdown, keine Aufzählungszeichen, keine Emojis in der Antwort.',
-        'Sag am Ende in einem Satz, was du tatsächlich getan hast und wo das Ergebnis liegt.',
-        'Wenn ein Auftrag unklar ist, frag nach, statt zu raten.',
+        'You are J.A.R.V.I.S., working for someone who usually speaks to you rather than types.',
+        'ALWAYS reply in the same language the user used for their request.',
+        'Never mix two languages in one answer.',
+        'Keep answers short — three sentences at most — they are read aloud.',
+        'No markdown, no bullet points, no emoji in the reply.',
+        'End by saying in one sentence what you actually did and where the result is.',
+        'If a request is unclear, ask rather than guess.',
+        '',
+        'Auf Deutsch gilt dasselbe: antworte in der Sprache des Auftrags, fasse dich kurz,',
+        'kein Markdown, und sag am Ende in einem Satz, was du getan hast und wo das Ergebnis liegt.',
       ].join(' '),
     },
   };
@@ -238,7 +245,7 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
             write({ type: 'text', text });
           }
           if (message.is_error || message.subtype !== 'success') {
-            failure = String(message.result || message.subtype || 'Der Auftrag ist fehlgeschlagen.');
+            failure = String(message.result || message.subtype || 'The task failed.');
           }
           break;
         }
@@ -255,7 +262,7 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
       // „erledigt" zu melden wäre eine Lüge.
       write({
         type: 'error',
-        message: 'Der Agent hat nichts ausgeführt. Meist fehlt der Zugang: ANTHROPIC_API_KEY in server/.env eintragen und den Dienst neu starten.',
+        message: 'The agent did nothing. Usually the key is missing: put ANTHROPIC_API_KEY in server/.env and restart the service.',
       });
     } else {
       write({ type: 'done', sessionId: liveSession, text: text.trim(), costUsd: cost });
@@ -268,7 +275,7 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
     // Offene Rückfragen dieses Laufs nicht hängen lassen.
     for (const [id, entry] of pending) {
       clearTimeout(entry.timer);
-      entry.resolve({ approved: false, reason: 'Lauf beendet' });
+      entry.resolve({ approved: false, reason: 'run finished' });
       pending.delete(id);
     }
   }

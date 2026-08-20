@@ -7,26 +7,26 @@
  */
 
 export function humanError(err) {
-  const raw = String(err?.message ?? err ?? 'Unbekannter Fehler');
+  const raw = String(err?.message ?? err ?? 'Unknown error');
   const status = err?.status ?? err?.statusCode;
 
   if (/could not resolve authentication|missing.*api.?key|api.?key.*(missing|empty)/i.test(raw)) {
-    return 'Es ist kein Anthropic-Schlüssel hinterlegt. Trage ANTHROPIC_API_KEY in server/.env ein und starte den Dienst neu.';
+    return 'No Anthropic key is configured. Put ANTHROPIC_API_KEY in server/.env and restart the service.';
   }
   if (status === 401 || status === 403 || /authentication_error|invalid.*api.?key|permission_error/i.test(raw)) {
-    return 'Der Anthropic-Schlüssel wurde abgelehnt. Prüfe ihn in server/.env — vielleicht ist er widerrufen oder falsch kopiert.';
+    return 'The Anthropic key was rejected. Check it in server/.env — it may be revoked or copied incompletely.';
   }
   if (/credit balance|insufficient|billing|quota/i.test(raw)) {
-    return 'Das Guthaben reicht nicht. Unter console.anthropic.com → Billing aufladen.';
+    return 'The account is out of credit. Top it up at console.anthropic.com under Billing.';
   }
   if (status === 429 || /rate.?limit/i.test(raw)) {
-    return 'Zu viele Anfragen in kurzer Zeit. Einen Moment warten und noch einmal versuchen.';
+    return 'Too many requests in a short time. Wait a moment and try again.';
   }
   if (/ENOTFOUND|EAI_AGAIN|ECONNREFUSED|network|fetch failed/i.test(raw)) {
-    return 'Keine Verbindung zur API. Internetverbindung prüfen.';
+    return 'Cannot reach the API. Check the internet connection.';
   }
   if (/claude code|executable|spawn|ENOENT/i.test(raw)) {
-    return `Der Agent konnte nicht starten (${raw.slice(0, 120)}). Läuft "npm install --prefix server" durch?`;
+    return `The agent could not start (${raw.slice(0, 120)}). Did "npm install --prefix server" complete?`;
   }
   return raw.slice(0, 300);
 }
