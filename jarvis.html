@@ -317,6 +317,16 @@
         <input type="text" id="setAgentUrl" placeholder="http://localhost:8787/api/agent" />
       </div>
 
+      <div class="field" id="fieldServiceKey">
+        <label for="setServiceKey" data-i18n="svcKey">Anthropic-Schl&uuml;ssel f&uuml;r den Agenten</label>
+        <div class="field__row">
+          <input type="password" id="setServiceKey" placeholder="sk-ant-&hellip;" autocomplete="off" />
+          <button class="btn" id="btnSaveKey" type="button" data-i18n="svcKeySave">Speichern</button>
+        </div>
+        <p class="hint" data-i18n="svcKeyHint">Wird auf diesem Rechner in server/.env abgelegt und sofort &uuml;bernommen &mdash; kein Neustart n&ouml;tig. Der Schl&uuml;ssel verl&auml;sst den Rechner nur Richtung Anthropic.</p>
+        <p class="hint" id="svcKeyState" hidden></p>
+      </div>
+
       <hr class="rule" />
 
       <h4 class="sub" data-i18n="connTitle">Connectors — was der Agent zusätzlich erreicht</h4>

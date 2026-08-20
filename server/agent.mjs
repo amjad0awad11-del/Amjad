@@ -127,7 +127,7 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
     write({
       type: 'error',
       message: 'No Anthropic key is set, so the agent cannot start. '
-        + 'Put ANTHROPIC_API_KEY in server/.env and restart the service.',
+        + 'Put your key in Settings, under Agent — it takes effect straight away.',
     });
     return;
   }

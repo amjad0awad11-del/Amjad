@@ -28,6 +28,7 @@ import { runAgent, resolvePermission, stopRun, WORKSPACE } from './agent.mjs';
 import { receiveUpload, MAX_UPLOAD_BYTES, UPLOAD_DIR } from './uploads.mjs';
 import { listConnectors, updateConnector } from './connectors.mjs';
 import { humanError } from './errors.mjs';
+import { checkKey, saveKey, clearKey, verifyKey } from './keyfile.mjs';
 
 const PORT = Number(process.env.PORT || 8787);
 
@@ -252,6 +253,62 @@ export function createJarvisServer(deps = {}) {
       workspace: WORKSPACE,
       uploadDir: UPLOAD_DIR,
       maxUploadBytes: MAX_UPLOAD_BYTES,
+    }));
+    return;
+  }
+
+  /* ---- Schlüssel aus der Oberfläche setzen ---- */
+  // Der Dienst horcht nur auf 127.0.0.1, es kommt also niemand von aussen
+  // hier an. Das ist die Voraussetzung dafür, dass dieser Weg überhaupt
+  // vertretbar ist.
+  if (req.method === 'POST' && url.pathname === '/api/key') {
+    let ask = {};
+    try { ask = JSON.parse(await readBody(req)); } catch { /* als leer behandeln */ }
+
+    if (ask.clear === true) {
+      clearKey('ANTHROPIC_API_KEY');
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, claudeKey: false, message: 'The key has been removed.' }));
+      return;
+    }
+
+    const checked = checkKey(ask.anthropic);
+    if (!checked.ok) {
+      res.writeHead(400, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: checked.why }));
+      return;
+    }
+
+    let file;
+    try {
+      file = saveKey('ANTHROPIC_API_KEY', checked.key);
+    } catch (err) {
+      res.writeHead(500, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: `Could not write ${err?.path || 'server/.env'}: ${err?.message || err}` }));
+      return;
+    }
+
+    // Erst schreiben, dann nachfragen: ein Schlüssel, den Anthropic gerade
+    // nicht bestätigen kann, ist deswegen nicht falsch — und der Nutzer soll
+    // ihn nicht ein zweites Mal eintippen müssen.
+    const live = await verifyKey(checked.key);
+    if (!live.ok && !live.soft) {
+      clearKey('ANTHROPIC_API_KEY');
+      res.writeHead(400, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: live.why }));
+      return;
+    }
+
+    // Der Client bekommt den Schlüssel nie zurück — nur, dass einer da ist.
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({
+      ok: true,
+      claudeKey: true,
+      verified: live.ok,
+      message: live.ok
+        ? 'The key works. The agent is ready — no restart needed.'
+        : live.why,
+      file,
     }));
     return;
   }

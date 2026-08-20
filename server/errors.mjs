@@ -11,10 +11,11 @@ export function humanError(err) {
   const status = err?.status ?? err?.statusCode;
 
   if (/could not resolve authentication|missing.*api.?key|api.?key.*(missing|empty)/i.test(raw)) {
-    return 'No Anthropic key is configured. Put ANTHROPIC_API_KEY in server/.env and restart the service.';
+    return 'No Anthropic key is set. Put your key in Settings, under Agent.';
   }
   if (status === 401 || status === 403 || /authentication_error|invalid.*api.?key|permission_error/i.test(raw)) {
-    return 'The Anthropic key was rejected. Check it in server/.env — it may be revoked or copied incompletely.';
+    return 'The Anthropic key was rejected — it may be revoked or copied incompletely. '
+      + 'Enter it again in Settings, under Agent.';
   }
   if (/credit balance|insufficient|billing|quota/i.test(raw)) {
     return 'The account is out of credit. Top it up at console.anthropic.com under Billing.';
@@ -29,8 +30,8 @@ export function humanError(err) {
   // Wer J.A.R.V.I.S. im Browser benutzt, hat kein solches Fenster - für ihn
   // heisst dieselbe Lage schlicht: der Schlüssel kommt nicht an.
   if (/not logged in|run \/login|login expired|oauth token revoked/i.test(raw)) {
-    return 'The agent could not sign in. Your key did not reach it: check that '
-      + 'ANTHROPIC_API_KEY is in server/.env and restart the service.';
+    return 'The agent could not sign in — your key did not reach it. '
+      + 'Enter it again in Settings, under Agent.';
   }
   if (/claude code|executable|spawn|ENOENT/i.test(raw)) {
     return `The agent could not start (${raw.slice(0, 120)}). Did "npm install --prefix server" complete?`;

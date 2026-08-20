@@ -666,3 +666,43 @@ select option { background: #0b0e1c; }
 @media (max-width: 420px) {
   .pill { display: none; }
 }
+
+/* Schlüsselfeld mit Knopf daneben: das Speichern gehört sichtbar zum Feld,
+   nicht zum Speichern-Knopf ganz unten — der schreibt nur Einstellungen im
+   Browser, dieser hier legt etwas auf der Platte ab. */
+.field__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.field__row input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.field__row .btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+#svcKeyState.is-good { color: var(--green); }
+#svcKeyState.is-bad  { color: var(--red); }
+
+/* Der Knopf im Fehler: der nächste Schritt gehört dorthin, wo das Problem
+   steht, nicht drei Menüs weiter. */
+.step__fix {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 3px 10px;
+  border: 1px solid rgba(248,113,113,0.5);
+  border-radius: 999px;
+  background: rgba(248,113,113,0.12);
+  color: #fecaca;
+  font: inherit;
+  font-size: 0.86em;
+  cursor: pointer;
+}
+
+.step__fix:hover { background: rgba(248,113,113,0.22); }
+.step__fix:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }

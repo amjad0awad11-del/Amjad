@@ -190,6 +190,11 @@
       agentIntro: 'Mit eingeschaltetem Agenten kann J.A.R.V.I.S. auf diesem Rechner wirklich etwas tun: Dateien anlegen, Projekte bauen, Befehle ausführen. Alles, was etwas verändert, fragt vorher nach.',
       agentOn: 'Agent einschalten', agentOnHint: 'Braucht den lokalen Dienst — ohne ihn passiert nichts',
       agentUrl: 'Agent-Adresse', agentRunning: 'Auftrag läuft', agentStop: 'Abbrechen',
+      svcKey: 'Anthropic-Schlüssel für den Agenten', svcKeySave: 'Speichern',
+      svcKeyHint: 'Wird auf diesem Rechner in server/.env abgelegt und sofort übernommen — kein Neustart nötig. Der Schlüssel verlässt den Rechner nur Richtung Anthropic.',
+      svcKeyFix: 'Schlüssel eintragen', svcKeySaving: 'Wird geprüft …', svcKeySet: 'Ein Schlüssel ist hinterlegt.',
+      svcKeyNone: 'Noch kein Schlüssel — der Agent kann ohne ihn nichts tun.',
+      svcKeyOffline: 'Der lokale Dienst läuft nicht — ohne ihn lässt sich hier nichts ablegen.',
       agentAsk: 'Darf ich das ausführen?', agentAllow: 'Erlauben', agentDeny: 'Ablehnen',
       agentAllowed: 'Freigegeben.', agentDenied: 'Abgelehnt.', agentStopped: 'Auftrag abgebrochen.',
       agentAuto: 'gelesen', agentDone: 'Auftrag erledigt.',
@@ -308,6 +313,11 @@
       agentIntro: 'With the agent on, J.A.R.V.I.S. can actually do things on this machine: create files, build projects, run commands. Anything that changes something asks first.',
       agentOn: 'Enable agent', agentOnHint: 'Needs the local service — without it nothing happens',
       agentUrl: 'Agent address', agentRunning: 'Task running', agentStop: 'Stop',
+      svcKey: 'Anthropic key for the agent', svcKeySave: 'Save',
+      svcKeyHint: 'Stored on this computer in server/.env and used straight away — no restart needed. The key leaves this computer only on its way to Anthropic.',
+      svcKeyFix: 'Enter the key', svcKeySaving: 'Checking …', svcKeySet: 'A key is stored.',
+      svcKeyNone: 'No key yet — the agent can do nothing without one.',
+      svcKeyOffline: 'The local service is not running — nothing can be stored here without it.',
       agentAsk: 'May I run this?', agentAllow: 'Allow', agentDeny: 'Deny',
       agentAllowed: 'Allowed.', agentDenied: 'Denied.', agentStopped: 'Task stopped.',
       agentAuto: 'read', agentDone: 'Task complete.',
@@ -2195,6 +2205,75 @@
      8b. Agent — Aufträge auf diesem Rechner
      ======================================================= */
 
+  /**
+   * Der Anthropic-Schlüssel für den Dienst.
+   *
+   * Bewusst nicht in den Einstellungen des Browsers: der Agent läuft auf der
+   * Platte und braucht ihn dort. Hier steht nur der Weg dorthin.
+   */
+  const Keys = {
+    /** Was der Dienst über seinen Schlüssel sagt, im Feld anzeigen. */
+    show() {
+      if (!el.fieldServiceKey) return;
+      // Ohne erreichbaren Dienst gibt es nichts abzulegen — dann das Feld
+      // gar nicht erst anbieten, statt einen Knopf zu zeigen, der scheitert.
+      const usable = settings.agent.enabled && Agent.reachableUrl();
+      el.fieldServiceKey.hidden = !usable;
+      if (!usable) return;
+
+      const box = el.svcKeyState;
+      box.hidden = false;
+      box.classList.remove('is-good', 'is-bad');
+      if (Agent.serviceHasKey === true) {
+        box.textContent = t('svcKeySet');
+        box.classList.add('is-good');
+      } else if (Agent.serviceHasKey === false) {
+        box.textContent = t('svcKeyNone');
+        box.classList.add('is-bad');
+      } else {
+        box.textContent = t('svcKeyOffline');
+      }
+    },
+
+    async save() {
+      const value = el.setServiceKey.value;
+      const box = el.svcKeyState;
+      box.hidden = false;
+      box.classList.remove('is-good', 'is-bad');
+      box.textContent = t('svcKeySaving');
+      el.btnSaveKey.disabled = true;
+
+      try {
+        const res = await fetch(Agent.serviceUrl('/api/key'), {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ anthropic: value }),
+        });
+        const info = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          box.textContent = info.error || `HTTP ${res.status}`;
+          box.classList.add('is-bad');
+          return;
+        }
+
+        // Angekommen: das Feld leeren. Der Schlüssel liegt jetzt auf der
+        // Platte; ihn weiter im Formular stehen zu lassen, hiesse ihn ohne
+        // Not auf dem Bildschirm zu zeigen.
+        el.setServiceKey.value = '';
+        Agent.serviceHasKey = true;
+        box.textContent = info.message || t('svcKeySet');
+        box.classList.add(info.verified === false ? 'is-bad' : 'is-good');
+        UI.updateSystemCard();
+      } catch {
+        box.textContent = t('agentOffline');
+        box.classList.add('is-bad');
+      } finally {
+        el.btnSaveKey.disabled = false;
+      }
+    },
+  };
+
   const Agent = {
     runId: null,
     sessionId: null,
@@ -2237,6 +2316,7 @@
         if (Number(info.maxUploadBytes) > 0) Attach.maxUploadBytes = Number(info.maxUploadBytes);
         this.serviceHasKey = info.claudeKey !== false;
         UI.updateSystemCard();
+        Keys.show();
         return info;
       } catch {
         return null;   // Dienst läuft nicht — das ist kein Fehler
@@ -3015,7 +3095,8 @@
         'fieldKey', 'btnSaveSettings', 'btnReset', 'setVoiceEngine', 'setVoiceMode', 'setVoiceProxy',
         'setVoiceKey', 'setVoiceId', 'setVoiceModel', 'btnVoiceTest', 'voiceBlock', 'fieldVoiceProxy',
         'fieldVoiceKey', 'fieldBrowserVoice', 'wVoice', 'setAgent', 'setAgentUrl', 'fieldAgentUrl', 'wAgent',
-        'tray', 'btnAttach', 'filePick', 'dropzone', 'connList'];
+        'tray', 'btnAttach', 'filePick', 'dropzone', 'connList',
+        'fieldServiceKey', 'setServiceKey', 'btnSaveKey', 'svcKeyState'];
       for (const id of ids) el[id] = document.getElementById(id);
     },
 
@@ -3204,6 +3285,18 @@
           li.className = 'step step--error';
           li.innerHTML = `<span class="step__mark">!</span><span class="step__body">${esc(message)}</span>`;
           steps.appendChild(li);
+
+          // Fehlt der Schlüssel, ist der nächste Schritt immer derselbe.
+          // Ihn hier anzubieten erspart die Suche durch die Einstellungen —
+          // genau die Suche, an der es sonst hängen bleibt.
+          if (/ANTHROPIC_API_KEY|no anthropic key|could not sign in/i.test(message)) {
+            const fix = document.createElement('button');
+            fix.type = 'button';
+            fix.className = 'step__fix';
+            fix.textContent = t('svcKeyFix');
+            fix.addEventListener('click', () => UI.openSettingsAtKey());
+            li.querySelector('.step__body').appendChild(fix);
+          }
           scroll();
         },
       };
@@ -3404,6 +3497,27 @@
       this.toggleVoiceFields();
       this.markUnavailable();
       this.fillVoices();
+      // Beim Öffnen nachsehen, wie der Dienst gerade dasteht — die Anzeige
+      // soll den Stand von jetzt zeigen, nicht den vom Seitenaufbau.
+      Keys.show();
+      Agent.probe().then(() => Keys.show());
+    },
+
+    openSettings() {
+      this.syncSettingsForm();
+      el.modalSettings.hidden = false;
+      // Beim Öffnen frisch holen: der Dienst kann inzwischen gestartet
+      // oder gestoppt worden sein.
+      Connectors.load();
+    },
+
+    /** Einstellungen öffnen und direkt beim Schlüsselfeld stehen bleiben. */
+    openSettingsAtKey() {
+      this.openSettings();
+      requestAnimationFrame(() => {
+        el.fieldServiceKey.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        el.setServiceKey.focus();
+      });
     },
 
     /** Schalter sperren, die von dieser Seite aus nichts bewirken können. */
@@ -3689,13 +3803,7 @@
 
     // Modale Fenster
     el.btnHelp.addEventListener('click', () => { el.modalHelp.hidden = false; });
-    el.btnSettings.addEventListener('click', () => {
-      UI.syncSettingsForm();
-      el.modalSettings.hidden = false;
-      // Beim Öffnen frisch holen: der Dienst kann inzwischen gestartet
-      // oder gestoppt worden sein.
-      Connectors.load();
-    });
+    el.btnSettings.addEventListener('click', () => UI.openSettings());
 
     /* ---- Connectors ein- und ausschalten ---- */
     el.connList.addEventListener('click', (e) => {
@@ -3754,6 +3862,14 @@
       settings.speak = before;
       UI.updateSystemCard();
     });
+    // Der Schlüssel geht an den Dienst, nicht in den Browser-Speicher: er
+    // gehört auf die Platte, wo der Agent ihn findet. Deshalb ein eigener
+    // Knopf statt des Speichern-Knopfes unten.
+    el.btnSaveKey.addEventListener('click', () => Keys.save());
+    el.setServiceKey.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter') { ev.preventDefault(); Keys.save(); }
+    });
+
     el.setRate.addEventListener('input', () => { el.outRate.textContent = Number(el.setRate.value).toFixed(2); });
     el.setPitch.addEventListener('input', () => { el.outPitch.textContent = Number(el.setPitch.value).toFixed(2); });
 
