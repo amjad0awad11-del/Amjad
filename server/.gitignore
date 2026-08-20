@@ -2,3 +2,6 @@ node_modules/
 .env
 .env.*
 !.env.example
+
+# Was eingeschaltet ist und welche Schlüssel dazugehören — gehört dem Nutzer
+connectors.json

@@ -26,6 +26,7 @@ import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { runAgent, resolvePermission, stopRun, WORKSPACE } from './agent.mjs';
 import { receiveUpload, MAX_UPLOAD_BYTES, UPLOAD_DIR } from './uploads.mjs';
+import { listConnectors, updateConnector } from './connectors.mjs';
 import { humanError } from './errors.mjs';
 
 const PORT = Number(process.env.PORT || 8787);
@@ -252,6 +253,37 @@ export function createJarvisServer(deps = {}) {
       uploadDir: UPLOAD_DIR,
       maxUploadBytes: MAX_UPLOAD_BYTES,
     }));
+    return;
+  }
+
+  /* ---- Connectors: was gibt es, was ist an ---- */
+  if (req.method === 'GET' && url.pathname === '/api/connectors') {
+    try {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify(await listConnectors()));
+    } catch (err) {
+      res.writeHead(500, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: String(err?.message || err) }));
+    }
+    return;
+  }
+
+  /* ---- Connectors: einen ein- oder ausschalten ---- */
+  if (req.method === 'POST' && url.pathname === '/api/connectors') {
+    let ask = {};
+    try { ask = JSON.parse(await readBody(req)); } catch { /* als leer behandeln */ }
+    try {
+      const list = await updateConnector(String(ask.id || ''), {
+        enabled: ask.enabled,
+        settings: ask.settings,
+      });
+      console.log(`  connector ${ask.id} → ${ask.enabled ? 'on' : 'off'}`);
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify(list));
+    } catch (err) {
+      res.writeHead(400, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: String(err?.message || err) }));
+    }
     return;
   }
 

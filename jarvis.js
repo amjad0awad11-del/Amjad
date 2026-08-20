@@ -159,6 +159,13 @@
       attachNoService: 'Dafür brauche ich den lokalen Dienst — ohne ihn kann ich die Datei nirgends ablegen.',
       attachNoVision: 'Ansehen kann ich nur JPG, PNG, GIF und WebP bis fünf Megabyte. Für alles andere brauche ich den Agenten.',
       attachStoredOnly: 'Abgelegt im Arbeitsordner:',
+      connTitle: 'Connectors — was der Agent zusätzlich erreicht',
+      connIntro: 'Ohne Connector arbeitet der Agent nur in seinem eigenen Ordner. Jeder eingeschaltete Connector gibt ihm ein Stück mehr: einen Ordner auf der Platte, einen echten Browser, ein Gedächtnis. Jedes Werkzeug daraus fragt weiterhin vorher nach.',
+      connLoading: 'Wird geladen …',
+      connNoService: 'Connectors braucht den lokalen Dienst. Starte ihn, dann steht hier die Liste.',
+      connNeedsField: 'Dieser Connector braucht noch eine Angabe — sonst bleibt er aus.',
+      connFailed: 'Ging nicht:',
+      connLive: 'Mit dabei:',
       attachNothingToDo: 'Die Datei liegt bereit, aber weder KI-Modus noch Agent sind an — eingeschaltet in den Einstellungen kann ich damit arbeiten.',
       helpTitle: 'Was J.A.R.V.I.S. kann',
       tapToTalk: 'Tippen zum Sprechen',
@@ -269,6 +276,13 @@
       attachNoService: 'I need the local service for that — without it there is nowhere to put the file.',
       attachNoVision: 'I can only look at JPG, PNG, GIF and WebP up to five megabytes. For anything else I need the agent.',
       attachStoredOnly: 'Saved in the working folder:',
+      connTitle: 'Connectors — what else the agent can reach',
+      connIntro: 'With no connector the agent works only inside its own folder. Each one you switch on gives it a bit more: a folder on your disk, a real browser, a memory. Every tool from them still asks before it is used.',
+      connLoading: 'Loading …',
+      connNoService: 'Connectors need the local service. Start it and the list appears here.',
+      connNeedsField: 'This connector still needs a detail — until then it stays off.',
+      connFailed: 'That did not work:',
+      connLive: 'Along for this one:',
       attachNothingToDo: 'The file is ready, but neither AI mode nor the agent is on — switch one on in the settings and I can work with it.',
       helpTitle: 'What J.A.R.V.I.S. can do',
       tapToTalk: 'Tap to talk',
@@ -2356,6 +2370,16 @@
           card.addStep('', evt.detail, 'note');
           return spoken;
 
+        // Welche Connectors bei diesem Auftrag mitlaufen — gut zu wissen,
+        // bevor die erste Rückfrage aus einem davon kommt.
+        case 'connectors':
+          card.addStep('', `${t('connLive')} ${(evt.names || []).join(', ')}`, 'note');
+          return spoken;
+
+        case 'note':
+          card.addStep('', evt.message, 'note');
+          return spoken;
+
         case 'tool_error':
           card.addStep('', evt.detail, 'error');
           return spoken;
@@ -2581,6 +2605,104 @@
         return `<span class="msg__file">${thumb}${esc(it.name)}</span>`;
       });
       return `<span class="msg__files">${bits.join('')}</span>`;
+    },
+  };
+
+  /* =======================================================
+     8c. Connectors
+     ======================================================= */
+
+  /**
+   * Was der Agent über seinen eigenen Ordner hinaus erreicht.
+   *
+   * Der Zustand liegt beim Dienst, nicht im Browser: ein Connector ist ein
+   * Programm auf diesem Rechner, und was davon läuft, entscheidet der
+   * Rechner. Die Oberfläche zeigt nur an und schaltet um.
+   */
+  const Connectors = {
+    items: [],
+    loaded: false,
+
+    async load() {
+      if (!Agent.reachableUrl()) {
+        this.render(null);
+        return;
+      }
+      try {
+        const res = await fetch(Agent.serviceUrl('/api/connectors'), {
+          signal: AbortSignal.timeout(4000),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        this.items = data.items || [];
+        this.loaded = true;
+        this.render(this.items);
+      } catch {
+        this.render(null);   // Dienst läuft nicht — das ist kein Fehler
+      }
+    },
+
+    async set(id, patch) {
+      const item = this.items.find((i) => i.id === id);
+      if (!item) return;
+      try {
+        const res = await fetch(Agent.serviceUrl('/api/connectors'), {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ id, ...patch }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        this.items = data.items || [];
+        this.render(this.items);
+
+        const now = this.items.find((i) => i.id === id);
+        if (now?.wanted && !now.enabled && now.missing.length) {
+          UI.toast(t('connNeedsField'));
+        }
+      } catch (err) {
+        UI.toast(`${t('connFailed')} ${err.message}`);
+      }
+    },
+
+    render(items) {
+      if (!el.connList) return;
+
+      if (!items) {
+        el.connList.innerHTML = `<p class="hint">${esc(t('connNoService'))}</p>`;
+        return;
+      }
+
+      el.connList.innerHTML = items.map((item) => {
+        const fields = (item.needs || []).map((f) => `
+          <div class="conn__field">
+            <label for="conn-${esc(item.id)}-${esc(f.key)}">${esc(f.label)}</label>
+            <input id="conn-${esc(item.id)}-${esc(f.key)}" type="${f.secret ? 'password' : 'text'}"
+                   data-conn="${esc(item.id)}" data-key="${esc(f.key)}"
+                   value="${esc(item.settings?.[f.key] || '')}"
+                   placeholder="${esc(f.placeholder || '')}" />
+            ${f.hint ? `<span class="conn__hint">${esc(f.hint)}</span>` : ''}
+          </div>`).join('');
+
+        const missing = item.wanted && !item.enabled && item.missing.length
+          ? `<div class="conn__note">${esc(t('connNeedsField'))}</div>`
+          : '';
+
+        return `<div class="conn__item${item.enabled ? ' is-on' : ''}">
+          <div class="conn__head">
+            <div class="conn__text">
+              <span class="conn__name">${esc(item.label)}</span>
+              <span class="conn__blurb">${esc(item.blurb)}</span>
+            </div>
+            <button type="button" class="conn__switch" role="switch"
+                    aria-checked="${item.wanted ? 'true' : 'false'}"
+                    aria-label="${esc(item.label)}"
+                    data-toggle="${esc(item.id)}"></button>
+          </div>
+          ${fields ? `<div class="conn__fields">${fields}</div>` : ''}
+          ${missing}
+        </div>`;
+      }).join('');
     },
   };
 
@@ -2878,7 +3000,7 @@
         'fieldKey', 'btnSaveSettings', 'btnReset', 'setVoiceEngine', 'setVoiceMode', 'setVoiceProxy',
         'setVoiceKey', 'setVoiceId', 'setVoiceModel', 'btnVoiceTest', 'voiceBlock', 'fieldVoiceProxy',
         'fieldVoiceKey', 'fieldBrowserVoice', 'wVoice', 'setAgent', 'setAgentUrl', 'fieldAgentUrl', 'wAgent',
-        'tray', 'btnAttach', 'filePick', 'dropzone'];
+        'tray', 'btnAttach', 'filePick', 'dropzone', 'connList'];
       for (const id of ids) el[id] = document.getElementById(id);
     },
 
@@ -3553,6 +3675,37 @@
     el.btnSettings.addEventListener('click', () => {
       UI.syncSettingsForm();
       el.modalSettings.hidden = false;
+      // Beim Öffnen frisch holen: der Dienst kann inzwischen gestartet
+      // oder gestoppt worden sein.
+      Connectors.load();
+    });
+
+    /* ---- Connectors ein- und ausschalten ---- */
+    el.connList.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-toggle]');
+      if (!btn) return;
+      const on = btn.getAttribute('aria-checked') !== 'true';
+      const id = btn.dataset.toggle;
+      const item = Connectors.items.find((i) => i.id === id);
+      // Ausgefüllte Felder mitschicken, sonst geht beim Einschalten
+      // verloren, was gerade eingetippt wurde.
+      const settings = {};
+      for (const input of $$(`[data-conn="${id}"]`, el.connList)) {
+        settings[input.dataset.key] = input.value;
+      }
+      Connectors.set(id, { enabled: on, settings: item?.needs?.length ? settings : undefined });
+    });
+
+    // Ein Feld wird gespeichert, sobald es den Fokus verliert.
+    el.connList.addEventListener('change', (e) => {
+      const input = e.target.closest('[data-conn]');
+      if (!input) return;
+      const id = input.dataset.conn;
+      const settings = {};
+      for (const field of $$(`[data-conn="${id}"]`, el.connList)) {
+        settings[field.dataset.key] = field.value;
+      }
+      Connectors.set(id, { settings });
     });
     $$('[data-close]').forEach((node) => {
       node.addEventListener('click', () => {

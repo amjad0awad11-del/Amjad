@@ -24,21 +24,30 @@ Build-Schritt — einfach ausliefern.
 | `install.sh` / `install.ps1` | Einzeiler-Installation für macOS/Linux bzw. Windows |
 | `start.sh` / `START-WINDOWS.bat` | Späterer Start, wenn schon installiert |
 
-## J.A.R.V.I.S. — Sprachassistent
+## J.A.R.V.I.S. — voice assistant
 
-Zusätzlich zur Website liegt ein eigenständiger Sprachassistent im Projekt:
-`jarvis.html`. Er versteht gesprochene und getippte Befehle — Zeit, Wetter,
-Timer, Erinnerungen, Aufgaben, Notizen, Rechnen, Einheiten, Wikipedia und
-Websuche —, spricht Deutsch und Englisch und läuft ohne Konto und ohne
-Build-Schritt. Freie Fragen kann er optional über die Claude-API beantworten,
-und für die Sprachausgabe lässt sich eine eigene ElevenLabs-Stimme hinterlegen.
+Alongside the website, the project contains a standalone voice assistant:
+`jarvis.html`. It understands spoken and typed commands — time, weather, timers,
+reminders, tasks, notes, arithmetic, units, Wikipedia and web search — speaks
+English and German, and runs with no account and no build step. Open questions
+can optionally go to the Claude API, and a custom ElevenLabs voice can be used
+for speech output. (This section is in English because the assistant itself is;
+the rest of this file documents the German website.)
 
-Mit eingeschaltetem **Agenten** kann er außerdem wirklich etwas tun — Dateien
-anlegen, Projekte bauen, Befehle ausführen —, und zwar auf Zuruf. Er arbeitet
-dabei nur in einem eigenen Ordner und fragt vor jeder Änderung nach; ein
-gesprochenes „ja" genügt.
+With the **agent** switched on it can also actually do things — create files,
+build projects, run commands — on request. It works only inside a folder of its
+own and asks before every change; a spoken "yes" is enough.
 
-**Windows** (PowerShell öffnen und einfügen):
+**Files** can go along with what you say: attach a photo, a video or a document
+with the paperclip, by dragging it onto the window, or by pasting it. Photos go
+to Claude to be looked at; every file lands in the agent's working folder so it
+can be worked on.
+
+**Connectors** extend the agent's reach beyond that folder — a folder on your
+disk, a real browser, a memory that survives a restart. Each connector's tools
+still ask before they are used.
+
+**Windows** (open PowerShell and paste):
 
 ```powershell
 irm https://raw.githubusercontent.com/amjad0awad11-del/Amjad/refs/heads/claude/jarvis-assistant-2428an/install.ps1 | iex
@@ -50,12 +59,12 @@ irm https://raw.githubusercontent.com/amjad0awad11-del/Amjad/refs/heads/claude/j
 curl -fsSL https://raw.githubusercontent.com/amjad0awad11-del/Amjad/refs/heads/claude/jarvis-assistant-2428an/install.sh | bash
 ```
 
-Ein Befehl: holt das Projekt nach `~/jarvis`, installiert alles Nötige, startet
-den Dienst und öffnet den Browser auf **http://localhost:8787/**. Später erneut
-starten mit `START-WINDOWS.bat` bzw. `./start.sh` im Ordner `jarvis`.
+One command: it fetches the project into `~/jarvis`, installs what it needs,
+starts the service and opens the browser at **http://localhost:8787/**. To start
+it again later, use `START-WINDOWS.bat` or `./start.sh` in the `jarvis` folder.
 
-Alle Befehle, die Einrichtung von Agent, KI-Modus und Stimme sowie die
-Datenschutz-Übersicht stehen in **[JARVIS.md](JARVIS.md)**.
+Every command, the setup for the agent, AI mode, files, connectors and the voice,
+and the privacy overview are in **[JARVIS.md](JARVIS.md)**.
 
 ## Marke & Kontakt
 

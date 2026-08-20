@@ -1,253 +1,313 @@
-# J.A.R.V.I.S. — Sprachassistent im Browser
+# J.A.R.V.I.S. — a voice assistant in your browser
 
-Ein vollständiger Sprachassistent als statische Seite: `jarvis.html`, `jarvis.css`,
-`jarvis.js`. Kein Build-Schritt, keine Abhängigkeiten, kein Konto nötig. Die
-meisten Befehle laufen komplett auf dem Gerät; nur Wetter, Wikipedia und der
-optionale KI-Modus brauchen Internet.
+A complete voice assistant as a static page: `jarvis.html`, `jarvis.css`,
+`jarvis.js`. No build step, no dependencies, no account needed. Most commands run
+entirely on your device; only weather, Wikipedia and the optional AI mode need
+the internet.
 
 ---
 
-## Starten
+## Starting it
 
-Ein Befehl. Nichts herunterladen, nichts suchen, nichts entpacken.
+One command. Nothing to download, nothing to find, nothing to unzip.
 
-**Windows** — Windows-Taste drücken, `powershell` tippen, Enter. Dann einfügen:
+**Windows** — press the Windows key, type `powershell`, press Enter. Then paste:
 
 ```powershell
 irm https://raw.githubusercontent.com/amjad0awad11-del/Amjad/refs/heads/claude/jarvis-assistant-2428an/install.ps1 | iex
 ```
 
-**macOS / Linux** — Terminal öffnen und einfügen:
+**macOS / Linux** — open Terminal and paste:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/amjad0awad11-del/Amjad/refs/heads/claude/jarvis-assistant-2428an/install.sh | bash
 ```
 
-Der Befehl holt das Projekt nach `~/jarvis` (Windows: `%USERPROFILE%\jarvis`),
-installiert alles Nötige, startet den Dienst und öffnet den Browser auf
-**http://localhost:8787/**. Beim ersten Mal dauert das etwa eine Minute.
+The command fetches the project into `~/jarvis` (Windows: `%USERPROFILE%\jarvis`),
+installs what it needs, starts the service and opens your browser at
+**http://localhost:8787/**. The first time takes about a minute.
 
-Fehlt Node.js, versucht der Windows-Befehl es selbst zu installieren; klappt das
-nicht, sagt er, was zu tun ist.
+If Node.js is missing, the Windows command tries to install it; if that fails it
+tells you what to do.
 
-### Später wieder starten
+### Starting it again later
 
-Der Ordner `jarvis` bleibt liegen. Zum erneuten Starten:
+The `jarvis` folder stays where it is. To start it again:
 
 | | |
 |---|---|
-| **Windows** | `START-WINDOWS.bat` im Ordner `jarvis` doppelklicken |
+| **Windows** | double-click `START-WINDOWS.bat` in the `jarvis` folder |
 | **macOS / Linux** | `cd ~/jarvis && ./start.sh` |
 
-Das Fenster, das dabei aufgeht, **muss offen bleiben** — es ist der Dienst
-selbst. Schließt man es, meldet der Browser „Verbindung abgelehnt".
+The window that opens **must stay open** — it is the service itself. Close it and
+the browser says "connection refused".
 
-### Erneut installieren
+### Installing again
 
-Denselben Befehl noch einmal einfügen. Vorhandene Schlüssel in `server/.env`
-werden dabei übernommen, nicht überschrieben.
+Paste the same command again. Any keys already in `server/.env` are carried over,
+not overwritten.
 
-Beim ersten Start läuft eine kurze Startsequenz. Der Klick auf **System starten**
-ist die Nutzergeste, die Audio und Sprachausgabe freischaltet — ohne sie darf
-keine Website Töne abspielen.
+On the first start there is a short boot sequence. Clicking **Start system** is
+the gesture that unlocks audio and speech — without it no website is allowed to
+play sound.
 
-### Ohne Schlüssel
+### Without any keys
 
-Zeit, Datum, Timer, Erinnerungen, Aufgaben, Notizen, Rechnen, Umrechnen,
-Würfeln und Witze laufen sofort. Wetter und Wikipedia brauchen nur Internet.
-Erst KI-Modus, Agent und die eigene Stimme brauchen Schlüssel (siehe unten).
+Time, date, timers, reminders, tasks, notes, arithmetic, conversions, dice and
+jokes work immediately. Weather and Wikipedia need only an internet connection.
+Only AI mode, the agent and the custom voice need keys (see below).
 
 ---
 
-## Wenn etwas nicht läuft
+## When something does not work
 
-**„Diese Seite ist nicht erreichbar" auf http://localhost:8787/**
-Diese Adresse ist kein Server im Internet, sondern dein eigener Rechner. Sie
-antwortet nur, solange der Dienst läuft. Im Terminal muss „J.A.R.V.I.S. läuft"
-stehen. Steht dort nichts mehr, wurde er beendet — einfach neu starten.
+**"This site can't be reached" at http://localhost:8787/**
+That address is not a server on the internet, it is your own machine. It only
+answers while the service is running. The terminal must say "J.A.R.V.I.S. is
+running". If it says nothing any more, the service was stopped — start it again.
 
-**Ich finde `START-WINDOWS.bat` nicht**
-Windows blendet Dateiendungen aus — die Datei heißt dann nur **START-WINDOWS**.
-Sie liegt im Ordner `jarvis` neben `jarvis.html`. Am einfachsten ist der
-Installationsbefehl oben: der sucht nichts, sondern startet direkt.
+**I cannot find `START-WINDOWS.bat`**
+Windows hides file extensions, so the file appears as just **START-WINDOWS**. It
+sits in the `jarvis` folder next to `jarvis.html`. The install command above is
+easier: it looks for nothing, it just starts.
 
-**Das Fenster schließt sich sofort wieder (Windows)**
-Dann zeigt es eine Fehlermeldung zu schnell zum Lesen. PowerShell öffnen und
-`START-WINDOWS.bat` in das Fenster ziehen, dann Enter — die Meldung bleibt stehen.
+**The window closes again immediately (Windows)**
+Then it is showing an error too quickly to read. Open PowerShell and drag
+`START-WINDOWS.bat` into the window, then press Enter — the message stays on
+screen.
 
 **`command not found: node`**
-Node.js fehlt. Von [nodejs.org](https://nodejs.org) installieren, Version 20 oder
-neuer, dann erneut starten.
+Node.js is missing. Install it from [nodejs.org](https://nodejs.org), version 20
+or newer, then start again.
 
 **`permission denied`**
-`bash start.sh` statt `./start.sh`.
+Use `bash start.sh` instead of `./start.sh`.
 
-**`EADDRINUSE` / „address already in use"**
-Der Port ist belegt. `PORT=9000 bash start.sh`, dann
-`http://localhost:9000/` öffnen.
+**`EADDRINUSE` / "address already in use"**
+The port is taken. Run `PORT=9000 bash start.sh`, then open
+`http://localhost:9000/`.
 
-**Die Seite lädt, aber der Agent sagt „nicht erreichbar"**
-Die Adresse in den Einstellungen muss zum Port passen, auf dem der Dienst läuft.
-Bei einem anderen Port dort ebenfalls anpassen.
+**The page loads but the agent says it is unreachable**
+The address in the settings has to match the port the service is running on. If
+you changed the port, change it there too.
 
-**Der Agent antwortet, tut aber nichts**
-Dann fehlt der Zugang. Der Dienst sagt es beim Start („ANTHROPIC_API_KEY fehlt")
-und der Agent meldet es im Protokoll. Schlüssel in `server/.env` eintragen und
-den Dienst neu starten — die Datei wird nur beim Start gelesen.
+**The agent answers but does nothing**
+Then it has no access. The service says so at startup ("ANTHROPIC_API_KEY
+missing") and the agent says so in the transcript. Put the key in `server/.env`
+and restart the service — the file is only read at startup.
 
-**Zum Nachsehen, was der Dienst überhaupt hat**
+**To see what the service actually has**
 
 ```bash
 curl http://localhost:8787/health
 ```
 
-Antwortet mit `claudeKey`, `elevenKey` und dem Arbeitsordner — damit ist klar,
-welcher Schlüssel angekommen ist und welcher nicht.
+It answers with `claudeKey`, `elevenKey` and the working folder, so it is clear
+which key arrived and which did not.
 
-## Schlüssel besorgen
+## Getting the keys
 
-Die eingebauten Befehle brauchen keinen Schlüssel. Nur drei Dinge kosten etwas:
-der KI-Modus, der Agent und die eigene Stimme.
+The built-in commands need no key. Only three things cost anything: AI mode, the
+agent, and the custom voice.
 
-### Anthropic (KI-Modus und Agent)
+### Anthropic (AI mode and the agent)
 
-1. [console.anthropic.com](https://console.anthropic.com) öffnen und anmelden.
-2. Unter **Billing** Guthaben aufladen — ohne Guthaben antwortet die API nicht.
-3. Unter **API keys** einen Schlüssel erzeugen (`sk-ant-…`) und sofort kopieren;
-   er wird nur einmal angezeigt.
+1. Open [console.anthropic.com](https://console.anthropic.com) and sign in.
+2. Under **Billing**, add credit — without credit the API does not answer.
+3. Under **API keys**, create a key (`sk-ant-…`) and copy it right away; it is
+   shown only once.
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
 ```
 
-**Wichtig:** Ein Claude-Abo (Pro oder Max) deckt claude.ai und Claude Code ab,
-**nicht** die API. API-Nutzung wird getrennt über das Guthaben in der Console
-abgerechnet. Der Agent zeigt nach jedem Auftrag, was er gekostet hat, und bricht
-bei 2 US-Dollar je Auftrag von selbst ab.
+**Important:** a Claude subscription (Pro or Max) covers claude.ai and Claude
+Code, **not** the API. API usage is billed separately against the credit in the
+console. The agent shows what each task cost, and stops by itself at two US
+dollars per task.
 
-### ElevenLabs (eigene Stimme)
+### ElevenLabs (the custom voice)
 
-1. [elevenlabs.io](https://elevenlabs.io) öffnen und anmelden.
-2. Oben rechts auf das Profilbild → **API Keys** → neuen Schlüssel erzeugen (`sk_…`).
+1. Open [elevenlabs.io](https://elevenlabs.io) and sign in.
+2. Top right, click your profile picture → **API Keys** → create a key (`sk_…`).
 
 ```bash
 export ELEVENLABS_API_KEY="sk_..."
 ```
 
-Der kostenlose Tarif enthält ein monatliches Zeichenkontingent — zum Ausprobieren
-reicht das. Ist es aufgebraucht, fällt J.A.R.V.I.S. auf die Systemstimme zurück
-und sagt einmal, warum.
+The free tier includes a monthly character allowance, which is enough to try it
+out. Once it is used up J.A.R.V.I.S. falls back to the system voice and says once
+why.
 
-### Wo die Schlüssel hingehören
+### Where the keys go
 
-In `server/.env` — sonst nirgends:
+In `server/.env`, nowhere else:
 
 ```bash
 cp server/.env.example server/.env
-# Datei öffnen, die beiden Schlüssel eintragen
+# open the file and put both keys in
 node server/jarvis-proxy.mjs
 ```
 
-Der Dienst liest die Datei beim Start („Schlüssel aus … geladen."). Sie steht in
-`.gitignore` und kann nicht versehentlich mit hochgeladen werden. Wer lieber
-`export ANTHROPIC_API_KEY=…` benutzt, kann das weiterhin tun — gesetzte
-Umgebungsvariablen haben Vorrang vor der Datei.
+The service reads the file at startup ("Keys loaded from …"). It is listed in
+`.gitignore` and cannot be uploaded by accident. If you prefer
+`export ANTHROPIC_API_KEY=…`, that still works — environment variables that are
+already set take precedence over the file.
 
-Die Oberfläche hat zwar Felder für die Schlüssel, aber die legen sie im
-Browser-Speicher ab. Das ist nur für das eigene Gerät gedacht; über den lokalen
-Dienst ist es in jedem Fall besser aufgehoben.
+The interface does have fields for the keys, but those store them in browser
+storage. That is meant for your own device only; the local service is the better
+place either way.
 
-### Wenn ein Schlüssel doch einmal sichtbar wurde
+### If a key ever becomes visible
 
-In einen Chat kopiert, in einen Screenshot geraten, versehentlich committet —
-dann gilt er als öffentlich, auch wenn die Nachricht gelöscht wird. Ein
-Schlüssel lässt sich nicht zurückholen, nur ersetzen:
+Pasted into a chat, caught in a screenshot, committed by accident — then it
+counts as public, even if the message is deleted. A key cannot be taken back,
+only replaced:
 
-1. [console.anthropic.com](https://console.anthropic.com) → **API keys** → den
-   betroffenen Schlüssel **löschen**. Ab dem Moment ist er wertlos.
-2. Neuen Schlüssel erzeugen und in `server/.env` eintragen.
-3. Unter **Usage** kurz nachsehen, ob in der Zwischenzeit etwas verbraucht wurde.
+1. [console.anthropic.com](https://console.anthropic.com) → **API keys** →
+   **delete** the affected key. From that moment it is worthless.
+2. Create a new key and put it in `server/.env`.
+3. Check **Usage** to see whether anything was spent in the meantime.
 
-Bei ElevenLabs ist der Weg derselbe: Profil → **API Keys** → widerrufen, neu
-erzeugen. Niemand — kein Dienst, kein Assistent, kein Support — braucht deinen
-Schlüssel im Klartext.
+ElevenLabs works the same way: profile → **API Keys** → revoke, create a new one.
+Nobody — no service, no assistant, no support desk — needs your key in the clear.
 
-## Was er kann
+## What it can do
 
-Alle Befehle gibt es auf Deutsch und Englisch. Die Beispiele sind Deutsch; die
-englischen Entsprechungen stehen in der Hilfe in der Anwendung.
+Every command works in English and German. The examples are English; the German
+equivalents are in the in-app help.
 
-### Zeit & Termine
-| Befehl | Ergebnis |
+### Time and appointments
+| Command | Result |
 |---|---|
-| „Wie spät ist es?" | Aktuelle Uhrzeit |
-| „Welches Datum haben wir?" | Heutiges Datum |
-| „Timer 10 Minuten" | Countdown mit Signalton und Systembenachrichtigung |
-| „Erinnere mich in 1 Stunde ans Lüften" | Erinnerung mit Text |
-| „Erinnere mich um 18:30 an den Anruf" | Erinnerung zur Uhrzeit (morgen, falls schon vorbei) |
-| „Zeig mir die Timer" / „Timer abbrechen" | Laufende Timer anzeigen bzw. löschen |
+| "What time is it?" | The current time |
+| "What is the date?" | Today's date |
+| "Set a timer for 10 minutes" | Countdown with a chime and a system notification |
+| "Remind me in 1 hour to air the room" | A reminder with text |
+| "Remind me at 6:30 pm about the call" | A reminder at a time (tomorrow if already past) |
+| "Show my timers" / "Cancel the timer" | Show or clear running timers |
 
-### Listen
-| Befehl | Ergebnis |
+### Lists
+| Command | Result |
 |---|---|
-| „Füge Aufgabe Milch kaufen hinzu" | Aufgabe anlegen |
-| „Zeig meine Aufgaben" | Liste vorlesen |
-| „Aufgabe 1 erledigt" | Abhaken (per Nummer oder Stichwort) |
-| „Alle Aufgaben löschen" | Liste leeren |
-| „Notiere: Der Schlüssel liegt unter der Matte" | Notiz speichern |
-| „Zeig meine Notizen" | Notizen vorlesen |
+| "Add task buy milk" | Create a task |
+| "Show my tasks" | Read the list out |
+| "Task 1 done" | Tick it off (by number or by keyword) |
+| "Delete all tasks" | Empty the list |
+| "Note: the key is under the mat" | Save a note |
+| "Show my notes" | Read the notes out |
 
-Aufgaben, Notizen und Timer stehen live im rechten Bereich und überleben einen
-Neustart des Browsers.
+Tasks, notes and timers appear live in the right-hand panel and survive a browser
+restart.
 
-### Rechnen & Umrechnen
-| Befehl | Ergebnis |
+### Arithmetic and conversion
+| Command | Result |
 |---|---|
-| „Was ist 17 mal 23?" | `391` |
-| „Berechne (12 + 8) / 4" | `5` |
-| „Wurzel aus 144" | `12` |
-| „10 km in Meilen" | `6,214 mi` |
-| „20 Grad C in F" | `68 °F` |
-| „100 kg in Pfund" | `200 Pfund` (deutsches Pfund = 500 g) |
+| "What is 17 times 23?" | `391` |
+| "Calculate (12 + 8) / 4" | `5` |
+| "Square root of 144" | `12` |
+| "10 km in miles" | `6.214 mi` |
+| "20 celsius in fahrenheit" | `68 °F` |
+| "How many pounds is 5 kg?" | `11.023 pounds` |
 
-Der Rechner ist ein eigener Parser (Tokenizer plus Shunting-Yard) — **kein
-`eval()`**. Er kennt `+ − × ÷ ^ %`, Klammern, `sqrt`, `abs`, `round`, `floor`,
-`ceil`, `sin`, `cos`, `tan`, `log`, `ln`, `exp`, `pi` und `e`, und versteht auch
-gesprochene Formen wie „mal", „geteilt durch", „hoch", „Prozent von".
+The calculator is its own parser (tokenizer plus shunting-yard) — **no `eval()`**.
+It knows `+ − × ÷ ^ %`, brackets, `sqrt`, `abs`, `round`, `floor`, `ceil`, `sin`,
+`cos`, `tan`, `log`, `ln`, `exp`, `pi` and `e`, and it understands spoken forms
+like "times", "divided by", "to the power of", "percent of".
 
-### Wissen & Umwelt
-| Befehl | Ergebnis |
+### Knowledge and surroundings
+| Command | Result |
 |---|---|
-| „Wie ist das Wetter in Berlin?" | Wetter über [Open-Meteo](https://open-meteo.com) — ohne Schlüssel |
-| „Wie ist das Wetter?" | Nutzt den Standort, sonst den zuletzt genutzten Ort |
-| „Wer ist Ada Lovelace?" | Zusammenfassung aus Wikipedia (erste drei Sätze plus Link) |
+| "What is the weather in Berlin?" | Weather via [Open-Meteo](https://open-meteo.com) — no key needed |
+| "What is the weather?" | Uses your location, otherwise the last place you asked about |
+| "Who is Ada Lovelace?" | A summary from Wikipedia (first three sentences plus a link) |
 
-### Web & System
-| Befehl | Ergebnis |
+### Web and system
+| Command | Result |
 |---|---|
-| „Suche nach Rezepten" | Google-Suche in neuem Tab |
-| „Suche Katzen auf YouTube" | Gezielte Suche (Google, YouTube, Wikipedia, Maps, GitHub) |
-| „Öffne YouTube" | Bekannte Seite öffnen |
-| „Systemstatus" | Zeit, Netz, Akku, Mikrofon, KI-Modus, offene Aufgaben |
-| „Vollbild" / „Kopiere das" | Vollbild umschalten, letzte Antwort in die Zwischenablage |
+| "Search for recipes" | A Google search in a new tab |
+| "Search cats on YouTube" | A targeted search (Google, YouTube, Wikipedia, Maps, GitHub) |
+| "Open YouTube" / "Take me to Shopify" / "Launch Gmail" | Open a site |
+| "Status report" | Time, network, battery, microphone, AI mode, open tasks |
+| "Fullscreen" / "Copy that" | Toggle fullscreen, last answer to the clipboard |
 
-Blockiert der Popup-Blocker das neue Fenster, liefert J.A.R.V.I.S. den Link
-zum Anklicken nach — der Befehl geht nicht verloren.
+If the popup blocker stops the new window, J.A.R.V.I.S. hands you the link to
+click instead — the command is not lost.
 
-### Sonstiges
-„Würfle", „Wirf eine Münze", „Zufallszahl zwischen 1 und 10", „Erzähl einen
-Witz", „Sprich langsamer", „Sei still", „Sprich Englisch", „Protokoll leeren".
+### Odds and ends
+"Roll a die", "Flip a coin", "Random number between 1 and 10", "Tell me a joke",
+"Speak slower", "Be quiet", "Speak German", "Clear the transcript".
 
 ---
 
-## Agent — Aufträge wirklich ausführen
+## Files — photos, videos and documents
 
-Ohne Agent ist J.A.R.V.I.S. eine Website: Er kann reden, rechnen und nachschlagen,
-aber nichts auf dem Rechner tun. Mit Agent kann er es — Dateien anlegen, Projekte
-bauen, Befehle ausführen. Dahinter steckt das Claude Agent SDK, also dieselbe
-Maschinerie wie in Claude Code.
+Anything can go along with what you say. Three ways to attach:
 
-### Einschalten
+- the **paperclip** in the input bar
+- **drag** a file onto the window
+- **paste** from the clipboard (a screenshot, for instance)
+
+What is attached appears above the input as a row of chips, with a thumbnail for
+photos, and each can be taken off again before you send.
+
+Where a file goes depends on what it is and what is switched on:
+
+| | |
+|---|---|
+| **Photos, with AI mode on** | Go straight to Claude as an image. "What is in this picture?" works. JPG, PNG, GIF and WebP up to 5 MB. |
+| **Any file, with the agent on** | Written into the agent's working folder under `uploads/`, so the agent can open it, change it or build on it. |
+| **Neither switched on** | It says so, rather than accepting a file nothing can be done with. |
+
+Up to eight files at a time, and up to 200 MB each
+(`JARVIS_MAX_UPLOAD_BYTES`). The name comes from the browser, so it is treated
+that way: only the last part of the path survives, only harmless characters, and
+the result is checked again against the working folder. An existing file is never
+overwritten — a second `photo.png` becomes `photo-1.png`.
+
+---
+
+## Connectors — what else the agent can reach
+
+Out of the box the agent works inside its own folder and nowhere else. A
+connector gives it a bit more. Each one is an MCP server: a small program that
+hands the agent extra tools.
+
+Settings → **Connectors**. Four come with it:
+
+| Connector | What it adds |
+|---|---|
+| **Your files** | Read and write in one folder you choose — your Documents or Desktop. You name the folder; nothing outside it is reachable. |
+| **A real browser** | Open pages, click, fill in forms, take screenshots. This is what lets it work inside a site like Shopify or Canva. |
+| **Long memory** | Remembers people, projects and decisions between sessions instead of starting fresh each time. |
+| **Step-by-step thinking** | Works a long job through in order rather than answering off the top of its head. |
+
+Switching one on is not the same as giving it a free hand: **every tool from a
+connector still asks before it is used**, exactly like writing a file or running
+a command. The question in the transcript names the connector it came from.
+
+A connector that needs a detail — "Your files" needs a folder — stays off until
+you fill it in, and says so instead of silently doing nothing.
+
+What is switched on lives in `server/connectors.json`. The browser writes that
+file for you; it is in `.gitignore`, so it never leaves the machine. To add any
+other MCP server, edit the `custom` list by hand — either a program to run or an
+address to call. `server/connectors.example.json` shows both shapes.
+
+The first time a connector starts, `npx` downloads it, which takes a moment. If
+one cannot be loaded the task still runs — just without those extra tools, and
+the transcript says so.
+
+---
+
+## The agent — actually carrying tasks out
+
+Without the agent, J.A.R.V.I.S. is a website: it can talk, calculate and look
+things up, but it cannot touch your machine. With the agent it can — create
+files, build projects, run commands. Underneath is the Claude Agent SDK, the same
+machinery as Claude Code.
+
+### Switching it on
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
@@ -255,174 +315,178 @@ npm install --prefix server
 node server/jarvis-proxy.mjs
 ```
 
-Dann Einstellungen → **Agent einschalten**, Adresse `http://localhost:8787/api/agent`.
-Ab da genügt: „Baue mir eine Landingpage mit React."
+Then Settings → **Enable agent**, address `http://localhost:8787/api/agent`.
+After that, "Build me a landing page with React" is enough.
 
-### Was ihn im Zaum hält
+### What keeps it in check
 
-Ein Assistent mit Zugriff auf die Konsole ist nur so gut wie seine Grenzen. Vier
-greifen hier, und keine davon lässt sich aus dem Browser aufweichen:
+An assistant with access to a console is only as good as its limits. Four apply
+here, and none of them can be loosened from the browser:
 
-| Grenze | Wirkung |
+| Limit | Effect |
 |---|---|
-| **Arbeitsordner** | Der Agent arbeitet in `~/jarvis-workspace`, nicht im ganzen Dateisystem. Über `JARVIS_WORKSPACE` änderbar. |
-| **Rückfrage** | Alles, was etwas verändert — schreiben, ausführen, installieren — landet als Frage im Protokoll und passiert erst nach einem Ja. Nur Lesen (`Read`, `Glob`, `Grep`) läuft ohne Nachfrage. |
-| **Obergrenzen** | Höchstens 40 Schritte und 2 US-Dollar je Auftrag (`JARVIS_AGENT_MAX_TURNS`, `JARVIS_AGENT_BUDGET_USD`). |
-| **Gesperrte Befehle** | `sudo`, `shutdown`, `reboot`, `mkfs`, `dd` und rekursives Löschen ab Wurzel sind gar nicht erst erlaubt. |
+| **Working folder** | The agent works in `~/jarvis-workspace`, not the whole file system. Changeable via `JARVIS_WORKSPACE`. |
+| **Asking first** | Anything that changes something — writing, running, installing, and every connector tool — appears as a question in the transcript and happens only after a yes. Only reading (`Read`, `Glob`, `Grep`) runs without asking. |
+| **Ceilings** | At most 40 steps and 2 US dollars per task (`JARVIS_AGENT_MAX_TURNS`, `JARVIS_AGENT_BUDGET_USD`). |
+| **Blocked commands** | `sudo`, `shutdown`, `reboot`, `mkfs`, `dd` and recursive deletion from the root are not allowed at all. |
 
-Bleibt eine Rückfrage zwei Minuten unbeantwortet, gilt sie als abgelehnt
-(`JARVIS_PERMISSION_TIMEOUT_MS`). Ein laufender Auftrag lässt sich jederzeit über
-**Abbrechen** stoppen.
+A question left unanswered for two minutes counts as denied
+(`JARVIS_PERMISSION_TIMEOUT_MS`). A running task can be stopped at any time with
+**Stop**.
 
-### Freihändig arbeiten
+### Hands free
 
-Läuft das Mikrofon, liest J.A.R.V.I.S. die Rückfrage laut vor. Ein gesprochenes
-„ja" gibt frei, „nein" lehnt ab — der ganze Ablauf funktioniert ohne Tastatur.
+With the microphone on, J.A.R.V.I.S. reads the question out loud. A spoken "yes"
+approves, "no" denies — the whole loop works without a keyboard.
 
-Damit ein verhörtes „ja" nicht versehentlich einen Auftrag startet, gehen
-einzelne Wörter und Füllwörter nie an den Agenten. Sie beantworten nur eine
-offene Rückfrage — oder werden nachgefragt.
+So that a misheard "yes" cannot start a task by accident, single words and filler
+never reach the agent. They only answer an open question — or get queried back.
 
-### Agent oder Gespräch?
+### Agent or conversation?
 
-Sind Agent und KI-Modus beide an, entscheidet der Wortlaut: Aufträge („baue",
-„erstelle", „installiere", „schreib", „repariere" …) gehen an den Agenten,
-alles andere ins Gespräch. Das spart Zeit und Geld. Ist nur der Agent an,
-bekommt er alles.
+With both the agent and AI mode on, the wording decides: tasks ("build",
+"create", "install", "write", "fix" …) go to the agent, everything else to the
+conversation. That saves time and money. With only the agent on, it gets
+everything.
 
-### Kosten im Blick
+### Keeping an eye on cost
 
-Jeder abgeschlossene Auftrag zeigt seine Kosten in der Kopfzeile der Karte.
+Every finished task shows what it cost in the header of its card.
 
-## Stimme
+## Voice
 
-Voreingestellt ist die ElevenLabs-Stimme **`L1aJrPa7pLJEyYlh3Ilq`**. Dafür braucht
-es einen ElevenLabs-Schlüssel — ohne ihn spricht J.A.R.V.I.S. mit der
-Systemstimme des Browsers weiter und sagt einmal im Protokoll, warum.
+The default is the ElevenLabs voice **`L1aJrPa7pLJEyYlh3Ilq`**. That needs an
+ElevenLabs key — without one J.A.R.V.I.S. carries on with the browser's system
+voice and says once in the transcript why.
 
-### Über den Proxy (empfohlen)
+### Through the proxy (recommended)
 
-Der Schlüssel bleibt auf dem Rechner:
+The key stays on your machine:
 
 ```bash
 export ELEVENLABS_API_KEY="sk_..."
 node server/jarvis-proxy.mjs
 ```
 
-In den Einstellungen dann **Sprachausgabe über: ElevenLabs**, Verbindung
-**Lokaler Proxy**, Adresse `http://localhost:8787/api/speak`. Mit **Stimme
-testen** ist das Ergebnis sofort zu hören.
+In the settings choose **Speech output via: ElevenLabs**, connection **Local
+proxy**, address `http://localhost:8787/api/speak`. **Test voice** plays the
+result straight away.
 
-### Direkt aus dem Browser
+### Direct from the browser
 
-Verbindung auf **Direkt** stellen und den Schlüssel eintragen. Er liegt dann im
-`localStorage` dieses Geräts und geht direkt an `api.elevenlabs.io`. Nur für
-die private Nutzung am eigenen Rechner.
+Set the connection to **Direct** and enter the key. It then lives in this
+device's `localStorage` and goes straight to `api.elevenlabs.io`. For private use
+on your own machine only.
 
-### Modelle
+### Models
 
-| Modell | Wofür |
+| Model | For what |
 |---|---|
-| `eleven_multilingual_v2` | Voreinstellung - ausgewogen, Deutsch und Englisch |
-| `eleven_flash_v2_5` | niedrigste Latenz, gut für schnelles Hin und Her |
-| `eleven_turbo_v2_5` | schnell bei guter Qualität |
-| `eleven_v3` | ausdrucksstärkste Wiedergabe |
+| `eleven_multilingual_v2` | Default — balanced, English and German |
+| `eleven_flash_v2_5` | Lowest latency, good for quick back and forth |
+| `eleven_turbo_v2_5` | Fast at good quality |
+| `eleven_v3` | The most expressive delivery |
 
-### Rückfall
+### Falling back
 
-Schlägt die Stimme zweimal fehl - falscher Schlüssel, Proxy aus, kein Guthaben -,
-wechselt J.A.R.V.I.S. für diese Sitzung auf die Systemstimme, meldet den Grund
-einmal im Protokoll und zeigt den Rückfall in der Systemübersicht. Ein Speichern
-der Einstellungen setzt den Zähler zurück. Der Tempo-Regler wirkt auch auf die
-ElevenLabs-Ausgabe.
+If the voice fails twice — wrong key, proxy off, no credit — J.A.R.V.I.S.
+switches to the system voice for that session, says why once in the transcript,
+and shows the fallback in the system overview. Saving the settings resets the
+counter. The rate slider affects the ElevenLabs output too.
 
-Wer ganz ohne externen Dienst arbeiten will, stellt **Sprachausgabe über** auf
-**Systemstimme des Browsers** - dann bleibt alles auf dem Gerät.
+To work with no outside service at all, set **Speech output via** to **Browser
+system voice** — then everything stays on the device.
 
-## KI-Modus (optional)
+## AI mode (optional)
 
-Ohne KI-Modus antwortet J.A.R.V.I.S. auf alles, was oben steht, und sagt bei
-allem anderen ehrlich, dass er keinen Befehl dafür hat. Mit KI-Modus gehen freie
-Fragen an die **Claude Messages API**. Es gibt zwei Wege.
+Without AI mode, J.A.R.V.I.S. answers everything listed above and says honestly
+that it has no command for anything else. With AI mode, open questions go to the
+**Claude Messages API**. There are two ways.
 
-### 1. Lokaler Proxy (empfohlen)
+### 1. Local proxy (recommended)
 
-Der API-Schlüssel bleibt auf dem Rechner und taucht nie im Browser auf.
+The API key stays on your machine and never appears in the browser.
 
 ```bash
 export ANTHROPIC_API_KEY="sk-ant-..."
-export ELEVENLABS_API_KEY="sk_..."        # optional, für die eigene Stimme
+export ELEVENLABS_API_KEY="sk_..."        # optional, for the custom voice
 npm install --prefix server
 node server/jarvis-proxy.mjs
-#   KI      -> http://localhost:8787/api/chat
-#   Stimme  -> http://localhost:8787/api/speak
+#   AI     -> http://localhost:8787/api/chat
+#   Voice  -> http://localhost:8787/api/speak
 ```
 
-Dann in den Einstellungen **KI-Modus → Lokaler Proxy** wählen und die Adresse
-eintragen. Der Proxy
+Then choose **AI mode → Local proxy** in the settings and enter the address. The
+proxy
 
-- nimmt nur Anfragen von `localhost` an (per `JARVIS_ALLOWED_ORIGINS` erweiterbar),
-  damit nicht jede beliebige Website das Guthaben des Schlüssels verbrauchen kann,
-- begrenzt Nachrichtenzahl, Nachrichtenlänge, `max_tokens` und Anfragegröße,
-- streamt die Antwort als Server-Sent-Events zurück,
-- läuft mit `output_config.effort: "low"`, weil die Antworten kurz sind und
-  vorgelesen werden.
+- accepts requests only from `localhost` (widen with `JARVIS_ALLOWED_ORIGINS`),
+  so no arbitrary website can spend the key's credit,
+- limits the number of messages, their length, `max_tokens` and the request size,
+- accepts images as well as text, and drops any block shape it does not know,
+- streams the answer back as server-sent events,
+- runs with `output_config.effort: "low"`, because the answers are short and read
+  aloud.
 
-`ANTHROPIC_API_KEY` ist nicht zwingend: Ohne die Variable nutzt das SDK ein
-vorhandenes `ant auth login`-Profil.
+`ANTHROPIC_API_KEY` is not strictly required: without the variable the SDK uses
+an existing `ant auth login` profile.
 
-### 2. Direkt aus dem Browser
+### 2. Direct from the browser
 
-Nur für die private Nutzung am eigenen Gerät. Der Schlüssel liegt dann im
-`localStorage` und geht direkt an `api.anthropic.com` (mit dem Header
-`anthropic-dangerous-direct-browser-access`). Wer die Seite mit anderen teilt oder
-öffentlich hostet, sollte diesen Weg nicht wählen.
+For private use on your own device only. The key then lives in `localStorage` and
+goes straight to `api.anthropic.com` (with the
+`anthropic-dangerous-direct-browser-access` header). If you share the page with
+anyone or host it publicly, do not choose this route.
 
-### Modell und Charakter
+### Model and character
 
-Voreingestellt ist **Claude Opus 5** (`claude-opus-5`); Sonnet 5 und Haiku 4.5
-stehen ebenfalls zur Wahl. Das Feld **Charakter** überschreibt den System-Prompt —
-die Voreinstellung bittet um höchstens drei Sätze ohne Markdown, weil die Antwort
-vorgelesen wird. Die letzten zwölf Gesprächsschritte gehen als Kontext mit, dazu
-Datum, Uhrzeit und die offenen Aufgaben.
+The default is **Claude Opus 5** (`claude-opus-5`); Sonnet 5 and Haiku 4.5 are
+also available. The **Character** field overrides the system prompt — the default
+asks for at most three sentences without markdown, because the answer is read
+aloud. The last twelve turns go along as context, plus the date, the time and
+your open tasks.
+
+Neither the conversation nor the agent is told which language to answer in. Both
+are asked to answer in the language of your message, and never to mix two
+languages in one answer.
 
 ---
 
-## Datenschutz
+## Privacy
 
-| Was | Wohin |
+| What | Where it goes |
 |---|---|
-| Aufgaben, Notizen, Timer, Einstellungen, Verlauf | Nur `localStorage` dieses Browsers |
-| Spracherkennung | Chrome/Edge senden das Audio an den Spracherkennungsdienst des Browsers |
-| Wetter | Koordinaten bzw. Ortsname an `open-meteo.com` |
-| Wissensfragen | Suchbegriff an `wikipedia.org` |
-| KI-Modus | Frage plus Verlauf an den eigenen Proxy bzw. `api.anthropic.com` |
-| Eigene Stimme | Antworttext an den eigenen Proxy bzw. `api.elevenlabs.io` |
-| Agent | Auftrag, Dateiinhalte und Befehlsausgaben an `api.anthropic.com` — der Agent liest, was er zur Arbeit braucht |
+| Tasks, notes, timers, settings, history | Only this browser's `localStorage` |
+| Speech recognition | Chrome/Edge send the audio to the browser's own recognition service |
+| Weather | Coordinates or place name to `open-meteo.com` |
+| Knowledge questions | The search term to `wikipedia.org` |
+| AI mode | The question plus history to your own proxy or `api.anthropic.com` |
+| Custom voice | The answer text to your own proxy or `api.elevenlabs.io` |
+| Attached files | To your own machine's working folder; photos also to `api.anthropic.com` when AI mode is on |
+| Connectors | Only what the agent asks a connector to do, and only after you approve it |
+| Agent | The task, file contents and command output to `api.anthropic.com` — the agent reads what it needs to work |
 
-„Alles zurücksetzen" in den Einstellungen löscht sämtliche gespeicherten Daten.
+"Reset everything" in the settings deletes all stored data.
 
 ---
 
-## Browser
+## Browsers
 
-| Funktion | Chrome / Edge | Safari | Firefox |
+| Feature | Chrome / Edge | Safari | Firefox |
 |---|---|---|---|
-| Oberfläche, Texteingabe, Rechner, Listen, Timer | ✅ | ✅ | ✅ |
-| Sprachausgabe | ✅ | ✅ | ✅ |
-| Spracherkennung | ✅ | teilweise | ❌ |
+| Interface, typing, calculator, lists, timers | ✅ | ✅ | ✅ |
+| Speech output | ✅ | ✅ | ✅ |
+| Speech recognition | ✅ | partly | ❌ |
 
-Ohne Spracherkennung sagt J.A.R.V.I.S. das beim Start und bleibt über die
-Texteingabe voll benutzbar. Alle Animationen respektieren
-`prefers-reduced-motion`.
+Without speech recognition J.A.R.V.I.S. says so at startup and stays fully usable
+by typing. Every animation respects `prefers-reduced-motion`.
 
 ---
 
-## Eine Fähigkeit ergänzen
+## Adding a skill
 
-Fähigkeiten stehen in `jarvis.js` im Feld `SKILLS` und werden der Reihe nach
-geprüft. Die erste, deren `re` passt **und** deren `run` nicht `null` liefert,
-gewinnt; `null` bedeutet „passt doch nicht, weitersuchen".
+Skills live in `jarvis.js` in the `SKILLS` array and are checked in order. The
+first whose `re` matches **and** whose `run` does not return `null` wins; `null`
+means "not this one after all, keep looking".
 
 ```js
 {
@@ -434,11 +498,12 @@ gewinnt; `null` bedeutet „passt doch nicht, weitersuchen".
 }
 ```
 
-`run` darf einen String zurückgeben, ein `Promise` oder ein Objekt:
+`run` may return a string, a `Promise`, or an object:
 
-- `{ text }` — anzeigen und vorlesen
-- `{ text, speak }` — anderen Text vorlesen als anzeigen (z. B. ohne Link)
-- `{ text, silent: true }` — nur anzeigen, nicht vorlesen
+- `{ text }` — show it and read it out
+- `{ text, speak }` — read out something different from what is shown (without a
+  link, for instance)
+- `{ text, silent: true }` — show it only, do not read it out
 
-Neue Einträge gehören vor die allgemeine `knowledge`-Fähigkeit, sonst fängt
-diese die Frage vorher ab.
+New entries belong before the general `knowledge` skill, otherwise that one
+catches the question first.

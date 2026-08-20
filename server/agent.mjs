@@ -17,6 +17,7 @@ import { mkdir } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { humanError } from './errors.mjs';
+import { buildMcpServers } from './connectors.mjs';
 
 export const WORKSPACE = process.env.JARVIS_WORKSPACE
   || path.join(os.homedir(), 'jarvis-workspace');
@@ -43,6 +44,17 @@ const DISALLOWED = [
 
 const pending = new Map();   // Freigabe-ID → { resolve, timer }
 const runs = new Map();      // Lauf-ID → AbortController
+
+/**
+ * Werkzeuge aus Connectors heissen mcp__<server>__<werkzeug>. Für die
+ * Rückfrage im Browser wird daraus „server · werkzeug" — die rohe Kennung
+ * sagt niemandem etwas.
+ */
+export function prettyToolName(name) {
+  const m = /^mcp__([^_]+(?:_[^_]+)*?)__(.+)$/.exec(String(name || ''));
+  if (!m) return String(name || '');
+  return `${m[1]} · ${m[2].replace(/_/g, ' ')}`;
+}
 
 /** Kurzfassung eines Werkzeugaufrufs für die Rückfrage im Browser. */
 export function describeTool(name, input) {
@@ -131,12 +143,12 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
     const detail = describeTool(toolName, input);
 
     if (READ_ONLY.has(toolName)) {
-      write({ type: 'tool', name: toolName, detail, auto: true });
+      write({ type: 'tool', name: prettyToolName(toolName), detail, auto: true });
       return { behavior: 'allow' };
     }
 
     const id = randomUUID();
-    write({ type: 'permission', id, tool: toolName, detail });
+    write({ type: 'permission', id, tool: prettyToolName(toolName), detail });
 
     return new Promise((resolve) => {
       // Eigenes Merkmal statt eines Blicks in `pending`: resolvePermission
@@ -162,10 +174,24 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
     });
   };
 
+  // Eingeschaltete Connectors dazunehmen. Fällt das aus, läuft der Auftrag
+  // trotzdem — nur eben ohne die zusätzlichen Werkzeuge.
+  let mcpServers = {};
+  let connectorNames = [];
+  try {
+    ({ mcpServers, names: connectorNames } = await buildMcpServers());
+  } catch (err) {
+    write({ type: 'note', message: `Connectors could not be loaded: ${err?.message || err}` });
+  }
+  if (connectorNames.length) {
+    write({ type: 'connectors', names: connectorNames });
+  }
+
   const options = {
     cwd: WORKSPACE,
     permissionMode: 'default',
     disallowedTools: DISALLOWED,
+    ...(connectorNames.length ? { mcpServers } : {}),
     canUseTool,
     maxTurns: MAX_TURNS,
     maxBudgetUsd: MAX_BUDGET_USD,
@@ -212,7 +238,7 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
               write({ type: 'text', text: block.text });
             } else if (block.type === 'tool_use') {
               sawSomething = true;
-              write({ type: 'tool', name: block.name, detail: describeTool(block.name, block.input) });
+              write({ type: 'tool', name: prettyToolName(block.name), detail: describeTool(block.name, block.input) });
             }
           }
           if (message.error) failure = String(message.error?.message || message.error);

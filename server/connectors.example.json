@@ -1,0 +1,29 @@
+{
+  "_note": "Copy this to connectors.json to switch connectors on. The browser writes this file for you — editing by hand is only needed for the custom list.",
+
+  "connectors": {
+    "files":    { "enabled": false, "settings": { "folder": "" } },
+    "browser":  { "enabled": false, "settings": {} },
+    "memory":   { "enabled": false, "settings": {} },
+    "thinking": { "enabled": false, "settings": {} }
+  },
+
+  "custom": [
+    {
+      "_note": "Any other MCP server. Either a program to run ...",
+      "name": "example-command",
+      "enabled": false,
+      "command": "npx",
+      "args": ["-y", "some-mcp-server"],
+      "env": { "SOME_TOKEN": "" }
+    },
+    {
+      "_note": "... or an address, for a service that is already running somewhere.",
+      "name": "example-url",
+      "enabled": false,
+      "type": "http",
+      "url": "https://example.com/mcp",
+      "headers": { "Authorization": "Bearer …" }
+    }
+  ]
+}
