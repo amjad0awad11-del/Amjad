@@ -61,7 +61,7 @@ Dann `http://localhost:8000` im Browser öffnen.
 
 ## Bilder & Videos
 
-Die Galerie „Arbeiten" zeigt **9 echte Kampagnenmotive** (WebP, hochkant 9:16) —
+Die Galerie „Arbeiten" zeigt **9 echte Kampagnenmotive** (WebP, einheitlich 1080 × 1920) —
 bewusst gemischt aus Studio-Produktaufnahmen und UGC-/Lifestyle-Content, damit
 sich die Motive nicht ähneln: AMBRE Eau de Parfum, HOYA HYDRIA, MELVA Balm,
 SERAPHINE Eye Cream, AURIVA Cream, VIALA Parfum-Set, ARGILE Clay Mask,
@@ -77,9 +77,11 @@ groß im Modal mit Ton und Steuerung.
 > Showreel (6): 6 / 3 / 2 Spalten. Beim Hinzufügen weiterer Motive oder Clips
 > die Spaltenzahl in `styles.css` entsprechend anpassen.
 
-> **Hinweis:** Alle Galerie-Motive liegen im Verhältnis 9:16 vor. Das
-> SERAPHINE-Motiv war ursprünglich quadratisch (1080 × 1080) und wurde auf 9:16
-> zugeschnitten (Tiegel, Zweig und AMW-Signet bleiben vollständig erhalten).
+> **Einheitliche Maße:** Alle Galerie-Motive liegen exakt in **1080 × 1920**
+> vor — dieselben Maße wie die ursprünglichen Bilder. Neue Motive vor dem
+> Einbinden auf 1080 × 1920 bringen, damit das Raster einheitlich bleibt.
+> (Das SERAPHINE-Motiv war quadratisch und wurde dafür auf 9:16 beschnitten;
+> Tiegel, Zweig und AMW-Signet bleiben vollständig erhalten.)
 
 - **Weitere Bilder ergänzen:** Foto in `assets/img/` ablegen und in `index.html`
   in der Galerie eine weitere `.tile`-Kachel anlegen (fortlaufender
