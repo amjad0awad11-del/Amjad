@@ -1264,7 +1264,7 @@ body.cursor-ready button { cursor: none; }
    ========================================================= */
 .reels {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 18px;
 }
 .reel {
@@ -1493,6 +1493,7 @@ body.cursor-ready button { cursor: none; }
   .faq__inner { grid-template-columns: 1fr; gap: 32px; }
   .section__head--left { text-align: center; }
   .cta__card { grid-template-columns: 1fr; gap: 36px; padding: 40px 30px; }
+  .reels { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 760px) {
@@ -1501,7 +1502,7 @@ body.cursor-ready button { cursor: none; }
   .hero { padding: 150px 0 70px; }
   .hero__stats { grid-template-columns: repeat(2, 1fr); gap: 30px 16px; }
   .cards, .results, .quotes { grid-template-columns: 1fr; }
-  .reels { grid-template-columns: 1fr; }
+  .reels { grid-template-columns: repeat(2, 1fr); }
   .gallery { grid-template-columns: 1fr; }
   .section { padding: 72px 0; }
   .lb__prev { left: 12px; }

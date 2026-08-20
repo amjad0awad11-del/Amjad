@@ -72,12 +72,10 @@ H.264/AAC). Die Kacheln spielen die Clips stummgeschaltet in Endlosschleife,
 während sie im Sichtbereich sind (pausieren außerhalb); ein Klick öffnet den Clip
 groß im Modal mit Ton und Steuerung.
 
-> **Einheitliche Kachelgröße & Raster ohne Lücken:** Galerie und Showreel nutzen
-> dieselbe Spaltenzahl und denselben Abstand, damit Bild- und Videokacheln exakt
-> gleich groß dargestellt werden (Desktop 372 × 661 px). Die Spaltenzahl teilt
-> zugleich die Anzahl der Elemente, sodass keine leere Zelle entsteht:
-> 3 Spalten (Galerie 9 = 3×3, Showreel 6 = 3×2), unter 760 px je 1 Spalte.
-> Beim Hinzufügen weiterer Motive oder Clips die Spaltenzahl entsprechend anpassen.
+> **Raster ohne Lücken:** Die Spaltenzahl teilt jeweils die Anzahl der Elemente,
+> damit keine leere Zelle am Ende entsteht — Galerie (9): 3 / 1 Spalten,
+> Showreel (6): 6 / 3 / 2 Spalten. Beim Hinzufügen weiterer Motive oder Clips
+> die Spaltenzahl in `styles.css` entsprechend anpassen.
 
 > **Einheitliche Maße:** Alle Galerie-Motive liegen exakt in **1080 × 1920**
 > vor — dieselben Maße wie die ursprünglichen Bilder. Neue Motive vor dem
