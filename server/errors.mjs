@@ -25,6 +25,13 @@ export function humanError(err) {
   if (/ENOTFOUND|EAI_AGAIN|ECONNREFUSED|network|fetch failed/i.test(raw)) {
     return 'Cannot reach the API. Check the internet connection.';
   }
+  // „Please run /login" ist ein Rat für die Kommandozeile von Claude Code.
+  // Wer J.A.R.V.I.S. im Browser benutzt, hat kein solches Fenster - für ihn
+  // heisst dieselbe Lage schlicht: der Schlüssel kommt nicht an.
+  if (/not logged in|run \/login|login expired|oauth token revoked/i.test(raw)) {
+    return 'The agent could not sign in. Your key did not reach it: check that '
+      + 'ANTHROPIC_API_KEY is in server/.env and restart the service.';
+  }
   if (/claude code|executable|spawn|ENOENT/i.test(raw)) {
     return `The agent could not start (${raw.slice(0, 120)}). Did "npm install --prefix server" complete?`;
   }

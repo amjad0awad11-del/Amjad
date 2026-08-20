@@ -2235,11 +2235,16 @@
         if (!res.ok) return null;
         const info = await res.json();
         if (Number(info.maxUploadBytes) > 0) Attach.maxUploadBytes = Number(info.maxUploadBytes);
+        this.serviceHasKey = info.claudeKey !== false;
+        UI.updateSystemCard();
         return info;
       } catch {
         return null;   // Dienst läuft nicht — das ist kein Fehler
       }
     },
+
+    /** Beim Start unbekannt: erst die Antwort des Dienstes setzt das. */
+    serviceHasKey: null,
 
     busy() {
       return Boolean(this.runId);
@@ -2290,6 +2295,7 @@
       const card = UI.runCard();
       this.card = card;
       this.pending = [];
+      this.failed = null;
       state.thinking = true;
       UI.setState('thinking');
 
@@ -2331,10 +2337,15 @@
           }
         }
 
-        card.finish();
-        const say = spoken.trim() || t('agentDone');
-        state.lastReply = say;
-        TTS.speak(say);
+        if (this.failed) {
+          state.lastReply = this.failed;
+          TTS.speak(this.failed);
+        } else {
+          card.finish();
+          const say = spoken.trim() || t('agentDone');
+          state.lastReply = say;
+          TTS.speak(say);
+        }
       } catch (err) {
         const offline = /failed to fetch|networkerror|load failed/i.test(err.message || '');
         const message = offline ? t('agentOffline') : `${t('netError')} — ${err.message}`;
@@ -2344,6 +2355,7 @@
         this.runId = null;
         this.card = null;
         this.pending = [];
+        this.failed = null;
         state.thinking = false;
         UI.setState(state.listening ? 'listening' : 'idle');
         UI.updateSystemCard();
@@ -2405,6 +2417,7 @@
           return spoken;
 
         case 'error':
+          this.failed = evt.message;
           card.fail(evt.message);
           return spoken;
 
@@ -3272,7 +3285,9 @@
       })();
       el.wAgent.textContent = !settings.agent.enabled
         ? (isDE() ? 'aus' : 'off')
-        : Agent.busy() ? (isDE() ? 'arbeitet' : 'working') : (isDE() ? 'bereit' : 'ready');
+        : Agent.busy() ? (isDE() ? 'arbeitet' : 'working')
+        : Agent.serviceHasKey === false ? (isDE() ? 'Schlüssel fehlt' : 'key missing')
+        : (isDE() ? 'bereit' : 'ready');
       el.wVoice.textContent = (() => {
         if (!settings.speak) return isDE() ? 'stumm' : 'muted';
         if (settings.voice.engine !== 'elevenlabs') return isDE() ? 'System' : 'system';

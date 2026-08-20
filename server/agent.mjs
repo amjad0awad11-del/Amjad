@@ -118,6 +118,20 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
     return;
   }
 
+  // Ohne Schlüssel meldet Claude Code „Not logged in - Please run /login".
+  // Das ist ein Rat, den hier niemand befolgen kann: es gibt kein Fenster, in
+  // dem sich /login tippen liesse. Also vorher nachsehen und sagen, was
+  // wirklich fehlt.
+  const apiKey = String(process.env.ANTHROPIC_API_KEY || '').trim();
+  if (!apiKey) {
+    write({
+      type: 'error',
+      message: 'No Anthropic key is set, so the agent cannot start. '
+        + 'Put ANTHROPIC_API_KEY in server/.env and restart the service.',
+    });
+    return;
+  }
+
   try {
     await mkdir(WORKSPACE, { recursive: true });
   } catch (err) {
@@ -189,6 +203,7 @@ export async function runAgent({ prompt, sessionId, write, queryFn }) {
 
   const options = {
     cwd: WORKSPACE,
+    env: { ...process.env, ANTHROPIC_API_KEY: apiKey },
     permissionMode: 'default',
     disallowedTools: DISALLOWED,
     ...(connectorNames.length ? { mcpServers } : {}),

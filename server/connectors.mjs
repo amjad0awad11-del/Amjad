@@ -38,6 +38,11 @@ export function configPath() {
  * selbst. `needs` beschreibt die Felder, die im Browser abgefragt werden —
  * ohne ausgefüllte Pflichtfelder bleibt ein Connector aus.
  */
+// Unter Windows heisst npx in Wahrheit npx.cmd. Ein blosses "npx" findet
+// Node dort nicht und der Connector startet mit ENOENT gar nicht erst - auf
+// Linux und macOS fiele das nie auf.
+const NPX = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+
 export const CATALOGUE = [
   {
     id: 'files',
@@ -51,7 +56,7 @@ export const CATALOGUE = [
       hint: 'The agent may only touch this folder and what is inside it.',
     }],
     build: (s) => ({
-      command: 'npx',
+      command: NPX,
       args: ['-y', '@modelcontextprotocol/server-filesystem', s.folder],
     }),
   },
@@ -61,7 +66,7 @@ export const CATALOGUE = [
     blurb: 'Open pages, click, fill in forms and take screenshots. This is what lets it work inside a site like Shopify or Canva.',
     needs: [],
     build: () => ({
-      command: 'npx',
+      command: NPX,
       args: ['-y', '@playwright/mcp@latest'],
     }),
   },
@@ -71,7 +76,7 @@ export const CATALOGUE = [
     blurb: 'Remembers people, projects and decisions between sessions, instead of starting fresh every time.',
     needs: [],
     build: () => ({
-      command: 'npx',
+      command: NPX,
       args: ['-y', '@modelcontextprotocol/server-memory'],
     }),
   },
@@ -81,7 +86,7 @@ export const CATALOGUE = [
     blurb: 'Works a long job through in order rather than answering off the top of its head. Slower, steadier.',
     needs: [],
     build: () => ({
-      command: 'npx',
+      command: NPX,
       args: ['-y', '@modelcontextprotocol/server-sequential-thinking'],
     }),
   },
