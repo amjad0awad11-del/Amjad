@@ -365,58 +365,53 @@
     if (!form) return;
     const success = $("#formSuccess");
     const error = $("#formError");
-    const btn = $(".form__submit", form);
-    const btnLabel = btn ? btn.querySelector("span") : null;
-    const idleText = btnLabel ? btnLabel.textContent : "";
 
-    const setBusy = (busy) => {
-      if (!btn) return;
-      btn.disabled = busy;
-      if (btnLabel) btnLabel.textContent = busy ? "Wird gesendet…" : idleText;
-    };
-    const show = (el, msg) => {
-      if (!el) return;
-      if (msg) el.textContent = msg;
-      el.hidden = false;
-    };
-    const hide = (el) => { if (el) el.hidden = true; };
+    // Nummer aus dem WhatsApp-Button übernehmen — so steht sie nur an einer Stelle
+    const waLink = $(".btn--wa");
+    const waNumber = waLink
+      ? (waLink.getAttribute("href").match(/wa\.me\/(\d+)/) || [])[1]
+      : null;
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      hide(success);
-      hide(error);
+      if (error) error.hidden = true;
 
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
-      setBusy(true);
+      if (!waNumber) {
+        if (error) {
+          error.textContent =
+            "WhatsApp ist gerade nicht erreichbar. Bitte schreiben Sie uns an info@amwagence.de.";
+          error.hidden = false;
+        }
+        return;
+      }
 
-      fetch(form.getAttribute("action") || "kontakt.php", {
-        method: "POST",
-        body: new FormData(form),
-        headers: { "X-Requested-With": "fetch", Accept: "application/json" },
-      })
-        .then((res) => res.json().catch(() => ({ ok: res.ok, message: "" })))
-        .then((data) => {
-          if (data && data.ok) {
-            show(success, data.message || undefined);
-            form.reset();
-          } else {
-            show(
-              error,
-              (data && data.message) ||
-                "Die Anfrage konnte nicht gesendet werden. Bitte schreiben Sie uns an info@amwagence.de."
-            );
-          }
-        })
-        .catch(() => {
-          show(
-            error,
-            "Verbindung fehlgeschlagen. Bitte prüfen Sie Ihre Internetverbindung oder schreiben Sie an info@amwagence.de."
-          );
-        })
-        .then(() => setBusy(false));
+      const val = (id) => {
+        const el = form.querySelector("#" + id);
+        return el && el.value ? el.value.trim() : "";
+      };
+
+      const lines = [
+        "Neue Anfrage über amwagence.de",
+        "",
+        "Name: " + val("name"),
+        "E-Mail: " + val("email"),
+      ];
+      if (val("company")) lines.push("Unternehmen: " + val("company"));
+      lines.push("Budget: " + val("budget"));
+      if (val("message")) lines.push("", "Nachricht:", val("message"));
+
+      const url =
+        "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(lines.join("\n"));
+
+      // Neuer Tab, mit Fallback falls der Browser Pop-ups blockt
+      const win = window.open(url, "_blank", "noopener");
+      if (!win) window.location.href = url;
+
+      if (success) success.hidden = false;
     });
   }
 
