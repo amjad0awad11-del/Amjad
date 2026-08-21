@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=3" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' font-family='sans-serif' font-weight='bold' fill='%23a855f7'%3EA%3C/text%3E%3C/svg%3E" />
   <!-- Consent-Management & Meta Pixel (lädt erst nach Einwilligung) -->
-  <script src="assets/js/consent.js" defer></script>
+  <script src="assets/js/consent.js?v=3" defer></script>
 </head>
 <body>
   <!-- Preloader -->
@@ -514,10 +514,12 @@
               <textarea id="message" name="message" rows="3" placeholder=" "></textarea>
               <label for="message">Worum geht's? (optional)</label>
             </div>
-            <button type="submit" class="btn btn--primary btn--lg form__submit" data-magnetic>
+            <a id="waSubmit" class="btn btn--primary btn--lg form__submit"
+               href="https://wa.me/4915562753949?text=Hallo%20AMW%2C%20ich%20interessiere%20mich%20f%C3%BCr%20ein%20kostenloses%20Erstgespr%C3%A4ch."
+               target="_blank" rel="noopener noreferrer" data-magnetic>
               <span>Erstgespräch anfragen</span>
               <svg viewBox="0 0 24 24" class="btn__arrow" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </button>
+            </a>
             <p class="form__note">Oder direkt per Mail: <a href="mailto:info@amwagence.de">info@amwagence.de</a></p>
             <p class="form__success" id="formSuccess" hidden>✓ WhatsApp wird geöffnet — bitte dort auf „Senden" tippen.</p>
             <p class="form__error" id="formError" role="alert" hidden></p>
@@ -581,6 +583,38 @@
     <div class="vm__stage" id="vmStage"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=3"></script>
+
+  <script>
+  /* Formulardaten an den WhatsApp-Link anhängen. Schlägt das fehl,
+     bleibt der Link trotzdem gültig und öffnet WhatsApp. */
+  (function () {
+    var a = document.getElementById("waSubmit");
+    var form = document.getElementById("contactForm");
+    if (!a || !form) return;
+    var NUM = "4915562753949";
+
+    a.addEventListener("click", function () {
+      try {
+        var v = function (id) {
+          var el = document.getElementById(id);
+          return el && el.value ? el.value.trim() : "";
+        };
+        if (!v("name") && !v("email")) return;   // leeres Formular -> Standardtext
+
+        var t = ["Neue Anfrage über amwagence.de", ""];
+        if (v("name"))    t.push("Name: " + v("name"));
+        if (v("email"))   t.push("E-Mail: " + v("email"));
+        if (v("company")) t.push("Unternehmen: " + v("company"));
+        if (v("budget"))  t.push("Budget: " + v("budget"));
+        if (v("message")) t.push("", "Nachricht:", v("message"));
+
+        a.href = "https://wa.me/" + NUM + "?text=" + encodeURIComponent(t.join("\n"));
+        var ok = document.getElementById("formSuccess");
+        if (ok) ok.hidden = false;
+      } catch (e) { /* Link bleibt wie er ist */ }
+    });
+  })();
+  </script>
 </body>
 </html>
