@@ -17,6 +17,85 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' font-family='sans-serif' font-weight='bold' fill='%23a855f7'%3EA%3C/text%3E%3C/svg%3E" />
   <!-- Consent-Management & Meta Pixel (lädt erst nach Einwilligung) -->
   <script src="assets/js/consent.js?v=3" defer></script>
+  <style>
+  /* Meta-Ads-Fokusblock — bewusst inline, damit ein alter styles.css-Cache
+     diese Sektion nicht ungestylt darstellt. */
+  .ma { display: flex; flex-direction: column; gap: 20px; }
+
+  .ma__hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding: 40px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(160deg, rgba(168,85,247,.10), rgba(34,211,238,.06) 55%, transparent),
+                var(--surface);
+  }
+  .ma__glow {
+    position: absolute; inset: -40% 45% 40% -20%;
+    background: radial-gradient(circle, rgba(168,85,247,.30), transparent 68%);
+    filter: blur(60px); pointer-events: none; z-index: -1;
+  }
+  .ma__head { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+  .ma__icon {
+    flex: none; width: 56px; height: 56px; display: grid; place-items: center;
+    border-radius: 16px; color: #fff;
+    background: var(--grad); box-shadow: 0 12px 30px rgba(124,58,237,.45);
+  }
+  .ma__icon svg { width: 28px; height: 28px; }
+  .ma__title {
+    margin: 0; font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(26px, 3.4vw, 34px); letter-spacing: -.02em; line-height: 1.1;
+  }
+  .ma__sub {
+    display: block; margin-top: 2px; font-size: 13px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--cyan);
+  }
+  .ma__lead {
+    margin: 0 0 26px; max-width: 62ch; font-size: 17.5px;
+    line-height: 1.7; color: var(--muted);
+  }
+  .ma__formats { padding-top: 22px; border-top: 1px solid var(--line); }
+  .ma__formats-label {
+    display: block; margin-bottom: 14px; font-size: 13px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--muted-2);
+  }
+  .ma__chips { display: flex; flex-wrap: wrap; gap: 9px; }
+  .ma__chips li {
+    padding: 8px 15px; border: 1px solid var(--line-strong); border-radius: 999px;
+    background: rgba(255,255,255,.03); font-size: 14px; color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ma__pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .ma__pillar {
+    padding: 26px 22px; border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--surface); transition: border-color .35s, transform .35s var(--ease);
+  }
+  .ma__pillar:hover { border-color: rgba(168,85,247,.45); transform: translateY(-4px); }
+  .ma__num {
+    display: block; margin-bottom: 12px; font-family: var(--font-display);
+    font-size: 13px; letter-spacing: .2em; color: var(--violet);
+  }
+  .ma__pillar h4 {
+    margin: 0 0 8px; font-family: var(--font-display); font-weight: 600;
+    font-size: 17px; letter-spacing: -.01em; color: var(--text);
+  }
+  .ma__pillar p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--muted); }
+
+  @media (max-width: 980px) {
+    .ma__pillars { grid-template-columns: repeat(2, 1fr); }
+    .ma__hero { padding: 32px 26px; }
+  }
+  @media (max-width: 620px) {
+    .ma__pillars { grid-template-columns: 1fr; }
+    .ma__hero { padding: 26px 20px; }
+    .ma__head { gap: 13px; }
+    .ma__icon { width: 46px; height: 46px; }
+    .ma__icon svg { width: 23px; height: 23px; }
+  }
+  </style>
 </head>
 <body>
   <!-- Preloader -->
@@ -149,74 +228,76 @@
     <section class="section" id="leistungen">
       <div class="container">
         <div class="section__head">
-          <span class="eyebrow reveal" data-reveal>01 — Leistungen</span>
-          <h2 class="section__title reveal" data-reveal>Alles, was skaliert.<br /><span class="grad-text">Nichts, was bremst.</span></h2>
+          <span class="eyebrow reveal" data-reveal>01 — Leistung</span>
+          <h2 class="section__title reveal" data-reveal>Ein Kanal.<br /><span class="grad-text">Voll ausgereizt.</span></h2>
           <p class="section__lead reveal" data-reveal>
-            Full-Funnel-Performance aus einer Hand: von der ersten Strategie
-            über scroll-stoppende Creatives bis zur profitablen Skalierung.
+            Wir verzetteln uns nicht. Statt fünf Kanäle halbherzig zu bespielen,
+            beherrschen wir einen bis ins Detail — <strong>Meta Ads</strong> auf
+            Instagram und Facebook.
           </p>
         </div>
 
-        <div class="cards">
-          <article class="card tilt reveal" data-reveal data-tilt>
-            <div class="card__glow"></div>
-            <div class="card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="1.3" fill="currentColor"/></svg>
+        <div class="ma">
+
+          <article class="ma__hero reveal" data-reveal>
+            <div class="ma__glow" aria-hidden="true"></div>
+            <div class="ma__head">
+              <span class="ma__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="1.3" fill="currentColor"/></svg>
+              </span>
+              <div>
+                <h3 class="ma__title">Meta Ads</h3>
+                <span class="ma__sub">Instagram &amp; Facebook</span>
+              </div>
             </div>
-            <h3 class="card__title">Meta Ads</h3>
-            <p class="card__text">Instagram &amp; Facebook Kampagnen, die Aufmerksamkeit in Umsatz verwandeln — vom Prospecting bis zum Retargeting.</p>
-            <span class="card__tag">Instagram · Facebook</span>
+
+            <p class="ma__lead">
+              Drei Milliarden Menschen scrollen täglich durch Meta. Ihre Kunden sind
+              längst dort — die einzige Frage ist, ob Ihre Anzeige sie stoppt.
+              Genau daran arbeiten wir: an Creatives, die im Feed nicht übersehen
+              werden, und an Kampagnen, die aus Aufmerksamkeit planbaren Umsatz machen.
+            </p>
+
+            <div class="ma__formats">
+              <span class="ma__formats-label">Bild &amp; Video — in jedem Format, das Meta ausspielt</span>
+              <ul class="ma__chips">
+                <li>Reels 9:16</li>
+                <li>Stories 9:16</li>
+                <li>Feed 4:5</li>
+                <li>Feed 1:1</li>
+                <li>Carousel</li>
+                <li>Collection</li>
+              </ul>
+            </div>
           </article>
 
-          <article class="card tilt reveal" data-reveal data-tilt>
-            <div class="card__glow"></div>
-            <div class="card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v12.5a3.5 3.5 0 1 1-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M9 3c0 3 2 5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </div>
-            <h3 class="card__title">TikTok Ads</h3>
-            <p class="card__text">Native, trendbasierte Creatives für die Plattform mit der höchsten organischen Reichweite. Wir sprechen die Sprache der Feeds.</p>
-            <span class="card__tag">Spark Ads · UGC</span>
-          </article>
+          <div class="ma__pillars">
+            <article class="ma__pillar reveal" data-reveal>
+              <span class="ma__num">01</span>
+              <h4>Creative-Produktion</h4>
+              <p>Statics, Videos und UGC im Wochentakt — jedes Motiv in allen
+                 relevanten Seitenverhältnissen, damit keine Platzierung verschenkt wird.</p>
+            </article>
+            <article class="ma__pillar reveal" data-reveal>
+              <span class="ma__num">02</span>
+              <h4>Saubere Kampagnen-Struktur</h4>
+              <p>Korrektes Tracking, klare Zuordnung, nachvollziehbare Zahlen.
+                 Damit jeder investierte Euro sichtbar arbeitet.</p>
+            </article>
+            <article class="ma__pillar reveal" data-reveal>
+              <span class="ma__num">03</span>
+              <h4>Systematisches Testing</h4>
+              <p>Hooks, Angles und Zielgruppen werden getestet, bis die Gewinner
+                 feststehen — datenbasiert statt aus dem Bauch heraus.</p>
+            </article>
+            <article class="ma__pillar reveal" data-reveal>
+              <span class="ma__num">04</span>
+              <h4>Profitable Skalierung</h4>
+              <p>Was funktioniert, skalieren wir kontrolliert nach oben — mit
+                 wöchentlicher Optimierung und transparentem Reporting.</p>
+            </article>
+          </div>
 
-          <article class="card tilt reveal" data-reveal data-tilt>
-            <div class="card__glow"></div>
-            <div class="card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16 16l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </div>
-            <h3 class="card__title">Google Ads</h3>
-            <p class="card__text">Such-, Shopping- &amp; YouTube-Kampagnen mit klarer Kaufabsicht. Wir fangen Nachfrage genau dann ab, wenn sie entsteht.</p>
-            <span class="card__tag">Search · Shopping · PMax</span>
-          </article>
-
-          <article class="card tilt reveal" data-reveal data-tilt>
-            <div class="card__glow"></div>
-            <div class="card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V9M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <h3 class="card__title">Performance &amp; Funnel</h3>
-            <p class="card__text">Wir denken in Systemen: Tracking, Attribution und Funnel-Aufbau, damit jeder Euro nachweisbar arbeitet.</p>
-            <span class="card__tag">Tracking · CRO</span>
-          </article>
-
-          <article class="card tilt reveal" data-reveal data-tilt>
-            <div class="card__glow"></div>
-            <div class="card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 20h8M12 16v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M7 9l2.5 2.5L14 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </div>
-            <h3 class="card__title">Creative Production</h3>
-            <p class="card__text">Scroll-stoppende Ad-Creatives, Statics &amp; Video im Wochentakt — getestet, iteriert, skaliert. Kreation trifft Daten.</p>
-            <span class="card__tag">Video · Static · UGC</span>
-          </article>
-
-          <article class="card tilt reveal" data-reveal data-tilt>
-            <div class="card__glow"></div>
-            <div class="card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 8h18M7 5.5h.01M10 5.5h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </div>
-            <h3 class="card__title">Webdesign &amp; Landingpages</h3>
-            <p class="card__text">Hochkonvertierende Landingpages &amp; Websites, die Traffic in Kunden verwandeln — schnell, mobil &amp; markenstark.</p>
-            <span class="card__tag">CRO · Speed</span>
-          </article>
         </div>
       </div>
     </section>
