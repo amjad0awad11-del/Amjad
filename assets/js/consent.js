@@ -38,12 +38,27 @@
   }
 
   /* ---------- Einwilligung speichern / lesen --------------- */
+  /* Die Entscheidung wird doppelt gespeichert: localStorage plus Cookie.
+     Der Cookie greift auch dann, wenn localStorage blockiert ist, und gilt
+     für http und https gleichermaßen — sonst erschiene der Banner nach dem
+     Umstellen auf HTTPS erneut. */
   function readConsent() {
-    try { return window.localStorage.getItem(STORAGE_KEY); }
-    catch (e) { return null; }
+    try {
+      var v = window.localStorage.getItem(STORAGE_KEY);
+      if (v) return v;
+    } catch (e) {}
+    try {
+      var m = document.cookie.match(/(?:^|;\s*)amw-consent=([^;]*)/);
+      if (m) return decodeURIComponent(m[1]);
+    } catch (e) {}
+    return null;
   }
   function writeConsent(value) {
     try { window.localStorage.setItem(STORAGE_KEY, value); } catch (e) {}
+    try {
+      document.cookie = STORAGE_KEY + "=" + encodeURIComponent(value) +
+        ";path=/;max-age=31536000;SameSite=Lax";
+    } catch (e) {}
   }
 
   /* ---------- Consent-Banner ------------------------------- */
@@ -117,6 +132,7 @@
   /* Widerruf: window.amwResetConsent() blendet den Banner erneut ein. */
   window.amwResetConsent = function () {
     try { window.localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    try { document.cookie = STORAGE_KEY + "=;path=/;max-age=0;SameSite=Lax"; } catch (e) {}
     if (!document.getElementById("consentBar")) showBanner();
   };
 })();

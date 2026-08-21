@@ -364,25 +364,59 @@
     const form = $("#contactForm");
     if (!form) return;
     const success = $("#formSuccess");
+    const error = $("#formError");
+    const btn = $(".form__submit", form);
+    const btnLabel = btn ? btn.querySelector("span") : null;
+    const idleText = btnLabel ? btnLabel.textContent : "";
+
+    const setBusy = (busy) => {
+      if (!btn) return;
+      btn.disabled = busy;
+      if (btnLabel) btnLabel.textContent = busy ? "Wird gesendet…" : idleText;
+    };
+    const show = (el, msg) => {
+      if (!el) return;
+      if (msg) el.textContent = msg;
+      el.hidden = false;
+    };
+    const hide = (el) => { if (el) el.hidden = true; };
+
     form.addEventListener("submit", (e) => {
       e.preventDefault();
+      hide(success);
+      hide(error);
+
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
-      const btn = $(".form__submit", form);
-      if (btn) {
-        btn.querySelector("span").textContent = "Wird gesendet…";
-        btn.disabled = true;
-      }
-      setTimeout(() => {
-        if (success) success.hidden = false;
-        form.reset();
-        if (btn) {
-          btn.querySelector("span").textContent = "Erstgespräch anfragen";
-          btn.disabled = false;
-        }
-      }, 900);
+      setBusy(true);
+
+      fetch(form.getAttribute("action") || "kontakt.php", {
+        method: "POST",
+        body: new FormData(form),
+        headers: { "X-Requested-With": "fetch", Accept: "application/json" },
+      })
+        .then((res) => res.json().catch(() => ({ ok: res.ok, message: "" })))
+        .then((data) => {
+          if (data && data.ok) {
+            show(success, data.message || undefined);
+            form.reset();
+          } else {
+            show(
+              error,
+              (data && data.message) ||
+                "Die Anfrage konnte nicht gesendet werden. Bitte schreiben Sie uns an info@amwagence.de."
+            );
+          }
+        })
+        .catch(() => {
+          show(
+            error,
+            "Verbindung fehlgeschlagen. Bitte prüfen Sie Ihre Internetverbindung oder schreiben Sie an info@amwagence.de."
+          );
+        })
+        .then(() => setBusy(false));
     });
   }
 

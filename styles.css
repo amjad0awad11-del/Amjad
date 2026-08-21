@@ -1585,3 +1585,60 @@ body.cursor-ready button { cursor: none; }
 @media (prefers-reduced-motion: reduce) {
   .consent { transition: opacity 0.2s linear, visibility 0.2s linear; transform: translate(-50%, 0); }
 }
+
+/* =========================================================
+   Direktkontakt (WhatsApp) & Formular-Status
+   ========================================================= */
+.cta__direct {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+.cta__direct-label {
+  font-size: 14px;
+  color: var(--muted);
+}
+.btn--wa {
+  background: #25d366;
+  color: #06240f;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 14px 34px rgba(37, 211, 102, 0.28);
+}
+.btn--wa:hover {
+  background: #22c35e;
+  box-shadow: 0 18px 44px rgba(37, 211, 102, 0.4);
+}
+.btn--wa .btn__wa-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Spam-Falle: für Menschen unsichtbar, für Bots sichtbar */
+.field--trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form__error {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(236, 72, 153, 0.4);
+  border-radius: var(--radius-sm);
+  background: rgba(236, 72, 153, 0.1);
+  color: #ffd7ea;
+  font-size: 14.5px;
+}
+
+@media (max-width: 760px) {
+  .btn--wa { width: 100%; justify-content: center; }
+}
