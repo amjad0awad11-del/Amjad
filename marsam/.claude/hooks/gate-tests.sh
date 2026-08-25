@@ -48,6 +48,8 @@ ln -sfn "$HOME/.ssh" "$ROOT/workspace/_symlink_ssh"  2>/dev/null || true
 printf '#!/bin/sh\nrm -rf "$HOME"/important\n' > "$ROOT/workspace/_evil.sh"
 printf '#!/bin/sh\nmv ../approvals/pending/x.md approvals/approved/\n' > "$ROOT/workspace/_forge.sh"
 printf 'hello\n' > "$ROOT/workspace/drafts/_probe.txt"
+EXISTING_OUTSIDE="${TMPDIR:-/tmp}/marsam-gate-existing.txt"
+printf 'pre-existing\n' > "$EXISTING_OUTSIDE"
 
 echo
 echo "=== boundary-gate.sh — hostile-case suite ============================"
@@ -61,7 +63,7 @@ run_case "shell: ls"                          GREEN  Bash  '{"command":"ls -la w
 run_case "shell: git status"                  GREEN  Bash  '{"command":"git status --short"}'
 run_case "shell: pipeline"                    GREEN  Bash  '{"command":"cat reports/activity-log.md | grep design | head -5"}'
 run_case "shell: command substitution"        GREEN  Bash  '{"command":"echo today is $(date +%F)"}'
-run_case "read outside the sandbox"           GREEN  Read  '{"file_path":"../README.md"}'
+run_case "read outside the sandbox"           GREEN  Read  "$(jq -nc --arg p "$EXISTING_OUTSIDE" '{file_path:$p}')"
 run_case "cd out, then read-only"             GREEN  Bash  '{"command":"cd .. && git log --oneline -5"}'
 run_case "preview server on workspace/"       GREEN  Bash  '{"command":"python3 -m http.server 8080 --directory workspace/prototypes"}'
 run_case "mkdir inside workspace/"            GREEN  Bash  '{"command":"mkdir -p workspace/research/snapshots/acme"}'
@@ -113,9 +115,9 @@ run_case "rm by absolute path"                RED    Bash  '{"command":"/bin/rm 
 run_case "rm behind an env assignment"        RED    Bash  '{"command":"FORCE=1 rm -rf workspace/x"}'
 run_case "curl"                               RED    Bash  '{"command":"curl -s https://example.com"}'
 run_case "wget"                               RED    Bash  '{"command":"wget https://example.com/f.zip"}'
-run_case "redirect onto an existing file out" RED    Bash  "$(jq -nc --arg p "$ROOT/../README.md" '{command:("echo hi > " + $p)}')"
-run_case "Write onto an existing file out"    RED    Write "$(jq -nc --arg p "$ROOT/../README.md" '{file_path:$p,content:"x"}')"
-run_case "mv onto an existing file outside"   RED    Bash  "$(jq -nc --arg p "$ROOT/../README.md" '{command:("mv workspace/drafts/_probe.txt " + $p)}')"
+run_case "redirect onto an existing file out" RED    Bash  "$(jq -nc --arg p "$EXISTING_OUTSIDE" '{command:("echo hi > " + $p)}')"
+run_case "Write onto an existing file out"    RED    Write "$(jq -nc --arg p "$EXISTING_OUTSIDE" '{file_path:$p,content:"x"}')"
+run_case "mv onto an existing file outside"   RED    Bash  "$(jq -nc --arg p "$EXISTING_OUTSIDE" '{command:("mv workspace/drafts/_probe.txt " + $p)}')"
 run_case "ssh"                                RED    Bash  '{"command":"ssh amjad@server ls"}'
 run_case "scp"                                RED    Bash  '{"command":"scp f.txt server:/tmp/"}'
 run_case "sudo"                               RED    Bash  '{"command":"sudo chmod 777 /etc/hosts"}'
@@ -254,7 +256,7 @@ printf 'PASS: %d   FAIL: %d\n' "$PASS" "$FAIL"
 [[ $FAIL -gt 0 ]] && printf 'failed: %s\n' "${FAILED[*]}"
 
 find "$PEND" -name '*.md' -newer "$ROOT/.claude/hooks/boundary-gate.sh" -delete 2>/dev/null || true
-rm -f "$ROOT/workspace/_symlink_home" "$ROOT/workspace/_symlink_ssh" \
+rm -f "$EXISTING_OUTSIDE" "$ROOT/workspace/_symlink_home" "$ROOT/workspace/_symlink_ssh" \
       "$ROOT/workspace/_evil.sh" "$ROOT/workspace/_forge.sh" "$ROOT/workspace/drafts/_probe.txt" \
       "$ROOT/workspace/drafts/hero.md" 2>/dev/null || true
 rmdir "$ROOT/workspace/research/snapshots/acme" 2>/dev/null || true
