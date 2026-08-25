@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[PLACEHOLDER PROTOTYPE] Scroll-driven hero + product reveal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     MARSAM PROTOTYPE — NOT BRAND WORK
+     Neutral greys + system font only. memory/brand.md is empty,
+     so no colour, type or voice decisions were invented here.
+     All copy in [brackets] is a placeholder label, not real copy.
+     Re-skin: swap CSS custom properties in style.css :root, and
+     swap the font-family declarations. Structure/animation logic
+     does not need to change.
+     ============================================================ -->
+
+<div class="fps-badge" id="fpsBadge" hidden>-- fps</div>
+
+<!-- ================= SECTION 1: HERO ================= -->
+<!-- Purpose: orient the visitor in <1s — what this is, one action to take.
+     Animation: a single staggered entrance (headline -> subhead -> CTA) on
+     load only, no scroll trigger. Signals "the page is ready" and sets
+     reading order. Cheap (3 elements, one pass, never repeats). -->
+<header class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">[PLACEHOLDER — CATEGORY LABEL]</p>
+    <h1 class="hero-title">[Placeholder Product Name]</h1>
+    <p class="hero-sub">[Placeholder one-line value proposition — what this product does and why it's worth a second look.]</p>
+    <a class="hero-cta" href="#reveal">[Placeholder CTA — "See details"]</a>
+  </div>
+  <p class="scroll-hint">[scroll to explore]</p>
+</header>
+
+<!-- ================= SECTION 2: PINNED PRODUCT REVEAL ================= -->
+<!-- Purpose: this is the actual work being demonstrated. As the user scrolls,
+     the product stays put and feature callouts appear one at a time, timed
+     to scroll position. This directs attention to ONE detail at a time
+     instead of dumping a wall of spec copy the user has to hunt through —
+     it turns "read four paragraphs" into "notice four things in sequence."
+     Reduced motion: no pin, no scrub. Callouts sit in normal stacked flow
+     below the product and are already laid out — see style.css .no-motion. -->
+<section class="reveal" id="reveal">
+  <div class="reveal-pin">
+    <div class="product-visual" aria-hidden="true">
+      <div class="product-shape">
+        <span>[placeholder product image]</span>
+      </div>
+    </div>
+
+    <ul class="callouts">
+      <li class="callout" data-index="0" style="--cx:14%; --cy:22%;">
+        <span class="callout-dot"></span>
+        <div class="callout-card">
+          <h3>[Placeholder feature 01]</h3>
+          <p>[One line describing this detail — replace with the real spec once brand.md is filled in.]</p>
+        </div>
+      </li>
+      <li class="callout" data-index="1" style="--cx:78%; --cy:18%;">
+        <span class="callout-dot"></span>
+        <div class="callout-card">
+          <h3>[Placeholder feature 02]</h3>
+          <p>[One line describing this detail.]</p>
+        </div>
+      </li>
+      <li class="callout" data-index="2" style="--cx:16%; --cy:74%;">
+        <span class="callout-dot"></span>
+        <div class="callout-card">
+          <h3>[Placeholder feature 03]</h3>
+          <p>[One line describing this detail.]</p>
+        </div>
+      </li>
+      <li class="callout" data-index="3" style="--cx:80%; --cy:72%;">
+        <span class="callout-dot"></span>
+        <div class="callout-card">
+          <h3>[Placeholder feature 04]</h3>
+          <p>[One line describing this detail.]</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= SECTION 3: RELATED PRODUCTS ================= -->
+<!-- Purpose: signal "these belong together, browse on" — a light stagger
+     as the grid enters view reads as one set arriving together rather than
+     four unrelated boxes popping in independently. Fires once, never
+     re-triggers on scroll-back, so it never gets in the way of reading. -->
+<section class="grid-section">
+  <h2>[Placeholder — "You might also like"]</h2>
+  <div class="product-grid">
+    <article class="product-card">
+      <div class="card-thumb"><span>[placeholder image]</span></div>
+      <h3>[Placeholder product 01]</h3>
+      <p class="card-price">[$0.00]</p>
+    </article>
+    <article class="product-card">
+      <div class="card-thumb"><span>[placeholder image]</span></div>
+      <h3>[Placeholder product 02]</h3>
+      <p class="card-price">[$0.00]</p>
+    </article>
+    <article class="product-card">
+      <div class="card-thumb"><span>[placeholder image]</span></div>
+      <h3>[Placeholder product 03]</h3>
+      <p class="card-price">[$0.00]</p>
+    </article>
+    <article class="product-card">
+      <div class="card-thumb"><span>[placeholder image]</span></div>
+      <h3>[Placeholder product 04]</h3>
+      <p class="card-price">[$0.00]</p>
+    </article>
+  </div>
+</section>
+
+<footer class="foot">
+  <p>[PLACEHOLDER PROTOTYPE — Marsam web-animator demo. Not real copy, not real brand. See RATIONALE.md]</p>
+</footer>
+
+<!-- GSAP 3.12.5 + ScrollTrigger, pinned CDN build (jsdelivr).
+     Not vendored locally: this prototype only runs with network access.
+     To make it work fully offline, download these two files into this
+     folder and swap the src= paths to the local copies. -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

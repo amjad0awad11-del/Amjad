@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# marsam-approve <proposal> [reason...]
+#
+# The approval gesture. Ticks the approve box, moves the proposal into
+# approvals/approved/, and appends the decision to approvals/DECISIONS.md.
+#
+# boundary-gate.sh deliberately stands aside for this script so that the call
+# reaches Claude Code's permission layer, where it is an `ask` — a human has to
+# accept the prompt. That prompt IS the authorisation.
+#
+#   NEVER choose "don't ask again" on this prompt. Doing so hands Marsam the
+#   ability to approve its own proposals, which is the one thing the whole
+#   design exists to prevent.
+#
+# You can also do this entirely by hand in your own shell:
+#   sed -i 's/- \[ \] approve/- [x] approve/' approvals/pending/<file>
+#   mv approvals/pending/<file> approvals/approved/
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+PEND="$ROOT/approvals/pending"; APPR="$ROOT/approvals/approved"
+DEC="$ROOT/approvals/DECISIONS.md"
+
+[[ $# -ge 1 ]] || { echo "usage: marsam-approve <proposal> [reason...]" >&2; exit 64; }
+arg="$1"; shift; reason="${*:-}"
+
+src="$arg"
+[[ -f "$src" ]] || src="$PEND/$arg"
+[[ -f "$src" ]] || src="$PEND/$arg.md"
+[[ -f "$src" ]] || { echo "marsam-approve: no such proposal: $arg" >&2; exit 66; }
+case "$(cd "$(dirname "$src")" && pwd -P)" in
+  "$PEND") ;;
+  *) echo "marsam-approve: $src is not in approvals/pending/" >&2; exit 65 ;;
+esac
+
+base="$(basename "$src")"
+echo "──────────────────────────────────────────────────────────────"
+sed -n '1,12p' "$src"
+echo "──────────────────────────────────────────────────────────────"
+
+if ! grep -qs 'gate-fingerprint:' "$src"; then
+  echo "WARNING: this proposal carries no gate fingerprint, so the gate cannot" >&2
+  echo "         match it to a tool call. Marsam must attempt the action once so" >&2
+  echo "         the gate captures it, then you approve that stub." >&2
+fi
+
+mkdir -p "$APPR"
+python3 - "$src" <<'PY'
+import re,sys
+p=sys.argv[1]; s=open(p,encoding="utf-8").read()
+s=re.sub(r'^- \[ \] approve', '- [x] approve', s, count=1, flags=re.M)
+open(p,"w",encoding="utf-8").write(s)
+PY
+mv "$src" "$APPR/$base"
+
+ts="$(date '+%Y-%m-%d %H:%M')"
+[[ -f "$DEC" ]] || printf '# Decisions\n\nAppend-only. Every approval and rejection, with the reason.\n\n' > "$DEC"
+{
+  printf '## %s — APPROVED — `%s`\n' "$ts" "$base"
+  [[ -n "$reason" ]] && printf -- '- **Reason:** %s\n' "$reason"
+  printf -- '- **File:** approvals/approved/%s\n\n' "$base"
+} >> "$DEC"
+
+echo "APPROVED  $base"
+echo "  -> approvals/approved/$base   (single use: the gate consumes it on execution)"
+echo "  -> logged in approvals/DECISIONS.md"

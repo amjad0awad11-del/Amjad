@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# marsam-reject <proposal> <reason...>
+#
+# Records a rejection. The reason is not optional: rejection reasons are the
+# training signal. Marsam reads DECISIONS.md at session start and writes the
+# patterns it finds into memory/learned.md, so you should not have to reject the
+# same class of thing twice.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+PEND="$ROOT/approvals/pending"; REJ="$ROOT/approvals/rejected"
+DEC="$ROOT/approvals/DECISIONS.md"
+
+[[ $# -ge 2 ]] || { echo "usage: marsam-reject <proposal> <reason...>  (reason is required)" >&2; exit 64; }
+arg="$1"; shift; reason="$*"
+
+src="$arg"
+[[ -f "$src" ]] || src="$PEND/$arg"
+[[ -f "$src" ]] || src="$PEND/$arg.md"
+[[ -f "$src" ]] || { echo "marsam-reject: no such proposal: $arg" >&2; exit 66; }
+case "$(cd "$(dirname "$src")" && pwd -P)" in
+  "$PEND") ;;
+  *) echo "marsam-reject: $src is not in approvals/pending/" >&2; exit 65 ;;
+esac
+
+base="$(basename "$src")"
+mkdir -p "$REJ"
+python3 - "$src" "$reason" <<'PY'
+import re,sys
+p,reason=sys.argv[1],sys.argv[2]; s=open(p,encoding="utf-8").read()
+s=re.sub(r'^- \[[ xX]\] reject —.*$', '- [x] reject — '+reason, s, count=1, flags=re.M)
+if '- [x] reject' not in s: s=s.rstrip()+'\n- [x] reject — '+reason+'\n'
+open(p,"w",encoding="utf-8").write(s)
+PY
+mv "$src" "$REJ/$base"
+
+ts="$(date '+%Y-%m-%d %H:%M')"
+[[ -f "$DEC" ]] || printf '# Decisions\n\nAppend-only. Every approval and rejection, with the reason.\n\n' > "$DEC"
+{
+  printf '## %s — REJECTED — `%s`\n' "$ts" "$base"
+  printf -- '- **Reason:** %s\n' "$reason"
+  printf -- '- **File:** approvals/rejected/%s\n\n' "$base"
+} >> "$DEC"
+
+echo "REJECTED  $base"
+echo "  reason: $reason"
+echo "  -> logged in approvals/DECISIONS.md  (Marsam should fold this into memory/learned.md)"
