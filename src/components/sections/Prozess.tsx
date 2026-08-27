@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, EASE, START, DESKTOP_QUERY } from "@/lib/motion";
+import { gsap, ScrollTrigger, EASE, START, DESKTOP_QUERY } from "@/lib/motion";
 import { useGsap } from "@/lib/useGsap";
 import { RevealText } from "@/components/motion/RevealText";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -24,6 +24,48 @@ export function Prozess() {
       if (!root) return;
 
       const context = gsap.matchMedia();
+
+      // ---------------------------------------------------------------------
+      // Handheld: no pin, but the same idea — a sticky numeral that swaps as
+      // each step passes, so the section still has a spine on a phone.
+      // ---------------------------------------------------------------------
+      context.add(
+        { handheld: `(max-width: 1023px) and (prefers-reduced-motion: no-preference)` },
+        (state) => {
+          if (!state.conditions?.handheld) return;
+
+          const rail = root.querySelector<HTMLElement>("[data-step-rail]");
+          const numbers = gsap.utils.toArray<HTMLElement>("[data-rail-number]", root);
+          const steps = gsap.utils.toArray<HTMLElement>("[data-step]", root);
+          if (!rail || numbers.length === 0) return;
+
+          gsap.set(numbers.slice(1), { autoAlpha: 0, yPercent: 40 });
+
+          const show = (active: number) => {
+            numbers.forEach((numeral, index) => {
+              gsap.to(numeral, {
+                autoAlpha: index === active ? 1 : 0,
+                yPercent: index === active ? 0 : index < active ? -40 : 40,
+                duration: 0.5,
+                ease: EASE.expo,
+                overwrite: true,
+              });
+            });
+          };
+
+          const triggers = steps.map((step, index) =>
+            ScrollTrigger.create({
+              trigger: step,
+              start: "top 62%",
+              end: "bottom 62%",
+              onEnter: () => show(index),
+              onEnterBack: () => show(index),
+            })
+          );
+
+          return () => triggers.forEach((trigger) => trigger.kill());
+        }
+      );
 
       context.add(
         { desktop: `${DESKTOP_QUERY} and (prefers-reduced-motion: no-preference)` },
@@ -136,6 +178,26 @@ export function Prozess() {
             </div>
           </div>
 
+          {/* Handheld spine — the mobile stand-in for the pinned numeral. */}
+          <div
+            data-step-rail
+            aria-hidden="true"
+            className="sticky top-[calc(var(--header-h)+8px)] z-10 -mb-6 h-[clamp(72px,16vw,120px)] lg:hidden"
+          >
+            <div className="relative h-full">
+              {prozess.steps.map((step) => (
+                <span
+                  key={step.no}
+                  data-rail-number
+                  className="absolute inset-0 t-display leading-none"
+                  style={{ color: "var(--accent)", fontSize: "clamp(3.5rem,15vw,7rem)" }}
+                >
+                  {step.no}
+                </span>
+              ))}
+            </div>
+          </div>
+
           <div className="relative lg:col-span-8">
             <span
               className="absolute left-0 top-0 hidden h-full w-px lg:block"
@@ -148,10 +210,14 @@ export function Prozess() {
               />
             </span>
 
-            <ol className="flex flex-col gap-12 lg:pl-10">
+            <ol className="flex flex-col gap-[clamp(72px,18vh,140px)] lg:gap-12 lg:pl-10">
               {prozess.steps.map((step) => (
                 <li key={step.no} data-step className="flex flex-col gap-3">
-                  <p data-step-no className="t-mono" style={{ color: "var(--accent)" }}>
+                  <p
+                    data-step-no
+                    className="sr-only lg:not-sr-only t-mono"
+                    style={{ color: "var(--accent)" }}
+                  >
                     {step.no}
                   </p>
                   <RevealText as="h3" className="t-h3">

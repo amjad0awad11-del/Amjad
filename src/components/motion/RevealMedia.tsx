@@ -53,15 +53,15 @@ export function RevealMedia({ children, className, delay = 0, fadeOnly = false }
       timeline.fromTo(
         frame,
         { clipPath: "inset(0 0 100% 0)" },
-        { clipPath: "inset(0 0 0% 0)", duration: DUR.slow, ease: EASE.expo }
+        { clipPath: "inset(0 0 0% 0)", duration: DUR.slow, ease: EASE.heavy }
       );
 
       if (inner) {
         inner.style.willChange = "transform";
         timeline.fromTo(
           inner,
-          { scale: 1.22 },
-          { scale: 1, duration: DUR.slow, ease: EASE.expo },
+          { scale: 1.35 },
+          { scale: 1, duration: DUR.slow, ease: EASE.heavy },
           0
         );
       }

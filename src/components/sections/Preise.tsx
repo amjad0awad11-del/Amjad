@@ -95,7 +95,7 @@ function PlanCard({ plan }: { plan: Plan }) {
         <span
           className={clsx(
             "min-w-0 break-words",
-            isPlaceholder(plan.price) ? "t-h3 opacity-70" : "t-h2"
+            isPlaceholder(plan.price) ? "t-h3 underline decoration-dashed underline-offset-4" : "t-h2"
           )}
           data-placeholder={isPlaceholder(plan.price) ? "price" : undefined}
         >

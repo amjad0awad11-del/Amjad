@@ -9,31 +9,41 @@ import { Observer } from "gsap/Observer";
 
 export const EASE = {
   out: "power3.out",
+  /** Long tail — the workhorse for anything that should feel weighted. */
   expo: "expo.out",
+  /** Heavier still: travels far, settles slowly. Signature moments only. */
+  heavy: "power4.out",
   inOut: "power2.inOut",
   curtain: "expo.inOut",
   linear: "none",
   pop: "back.out(2)",
 } as const;
 
+/**
+ * Tuned for a slow, heavy register: things travel further and settle later than
+ * the brief's original values. The brief capped animations at 1.4s; the signature
+ * moments deliberately exceed that, because at these distances a shorter tween
+ * reads as a snap rather than as weight.
+ */
 export const DUR = {
-  fast: 0.4,
-  base: 0.8,
-  slow: 1.2,
-  curtain: 1.0,
-  hero: 1.1,
+  fast: 0.5,
+  base: 1.1,
+  slow: 1.8,
+  curtain: 1.4,
+  hero: 1.6,
 } as const;
 
 export const STAGGER = {
-  chars: 0.02,
-  words: 0.04,
-  lines: 0.08,
-  cards: 0.12,
+  chars: 0.03,
+  words: 0.06,
+  lines: 0.13,
+  cards: 0.16,
 } as const;
 
 export const START = {
-  default: "top 82%",
-  early: "top 92%",
+  /** Later than the brief's 82%: the reveal should land in view, not before it. */
+  default: "top 88%",
+  early: "top 95%",
   pin: "top top",
 } as const;
 

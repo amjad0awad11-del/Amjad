@@ -112,7 +112,7 @@ export function Stimmen() {
                 as="blockquote"
                 className={
                   isPlaceholder(active.quote)
-                    ? "t-h3 max-w-[24ch] opacity-70"
+                    ? "t-h3 max-w-[24ch]"
                     : "t-h2 max-w-[24ch]"
                 }
                 immediate

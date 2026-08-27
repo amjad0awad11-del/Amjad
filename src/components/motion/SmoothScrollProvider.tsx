@@ -43,9 +43,10 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     }
 
     const lenis = new Lenis({
-      lerp: 0.09,
-      duration: 1.2,
+      lerp: 0.065,
+      duration: 1.6,
       smoothWheel: true,
+      // Touch keeps its native feel; syncing it makes phones feel laggy.
       syncTouch: false,
     });
     lenisRef.current = lenis;

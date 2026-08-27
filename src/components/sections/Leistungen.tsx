@@ -109,7 +109,7 @@ export function Leistungen() {
               key={item.no}
               data-preview-index={index}
               data-service-row
-              className="sticky top-[var(--header-h)] border-t last:border-b lg:static"
+              className="border-t last:border-b"
               style={{ borderColor: "var(--hairline)" }}
             >
               <div

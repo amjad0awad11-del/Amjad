@@ -84,13 +84,18 @@ export function RevealText({
 
       const isHero = variant === "hero";
 
-      gsap.set(inners, { yPercent: isHero ? 112 : 100, rotate: isHero ? 2 : 0 });
+      gsap.set(inners, {
+        yPercent: isHero ? 118 : 105,
+        rotate: isHero ? 3 : 0,
+        scale: isHero ? 1.06 : 1,
+      });
 
       const tween = gsap.to(inners, {
         yPercent: 0,
         rotate: 0,
+        scale: 1,
         duration: isHero ? DUR.hero : DUR.base,
-        ease: EASE.expo,
+        ease: isHero ? EASE.heavy : EASE.expo,
         stagger: STAGGER.lines,
         delay,
         onComplete: () => {

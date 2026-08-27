@@ -53,6 +53,11 @@ export function Preloader({ onDone }: { onDone: () => void }) {
 
     lock(LOCK);
 
+    // Handheld gets a much shorter hold: the overlay is what Lighthouse
+    // measures as the largest paint, and four seconds on cellular is a cost the
+    // visitor pays for a flourish.
+    const brisk = window.matchMedia("(max-width: 1023px)").matches;
+
     const context = gsap.context(() => {
       const letters = gsap.utils.toArray<HTMLElement>("[data-preloader-letter]");
       const wordmark = root.querySelector<HTMLElement>("[data-preloader-mark]");
@@ -72,12 +77,12 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         .fromTo(
           wordmark,
           { scale: 1.6, letterSpacing: "0.3em" },
-          { scale: 1, letterSpacing: "-0.04em", duration: 1.6, ease: EASE.expo },
+          { scale: 1, letterSpacing: "-0.04em", duration: brisk ? 0.9 : 1.6, ease: EASE.expo },
           0
         )
         .to(letters, {
           yPercent: 0,
-          duration: DUR.base,
+          duration: brisk ? 0.6 : DUR.base,
           ease: EASE.expo,
           stagger: STAGGER.chars * 4,
         }, 0)
@@ -86,7 +91,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
           progress,
           {
             value: 100,
-            duration: 2,
+            duration: brisk ? 0.9 : 2,
             ease: EASE.inOut,
             snap: { value: 1 },
             onUpdate: () => {

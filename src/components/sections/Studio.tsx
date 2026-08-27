@@ -17,7 +17,11 @@ function Stat({ value, label }: { value: string; label: string }) {
       <dt className="t-mono t-muted">{label}</dt>
       <dd
         className={placeholder ? "t-h3 m-0 break-words" : "t-h2 m-0"}
-        style={{ color: "var(--accent)", opacity: placeholder ? 0.7 : 1 }}
+        style={{
+          color: "var(--accent)",
+          textDecoration: placeholder ? "underline dashed" : undefined,
+          textUnderlineOffset: placeholder ? "0.2em" : undefined,
+        }}
         data-placeholder={placeholder ? "stat" : undefined}
       >
         {match ? (

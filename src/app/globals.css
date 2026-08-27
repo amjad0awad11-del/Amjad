@@ -348,25 +348,41 @@
      Grain + glow (A31)
      ========================================================================== */
 
+  /* mix-blend-mode promotes the whole page into a blended composite layer.
+     Worth it on a desktop GPU, not on a phone — handhelds get the same grain
+     as a plain low-opacity overlay. */
   .grain {
     position: fixed;
     inset: 0;
     z-index: 90;
     pointer-events: none;
-    opacity: 0.04;
-    mix-blend-mode: overlay;
+    opacity: 0.035;
     background-image: url("/images/noise.png");
     background-size: 128px 128px;
     background-repeat: repeat;
   }
 
+  @media (min-width: 1024px) {
+    .grain {
+      opacity: 0.04;
+      mix-blend-mode: overlay;
+    }
+  }
+
+  /* A radial gradient is already soft, so the blur(120px) that used to sit on
+     top of it bought nothing visually and cost a full-screen GPU filter on
+     every frame — the single most expensive rule in the stylesheet on mobile. */
   .glow {
     position: absolute;
     border-radius: 50%;
     pointer-events: none;
-    filter: blur(120px);
-    opacity: 0.22;
-    background: radial-gradient(circle at center, var(--amber) 0%, transparent 70%);
+    opacity: 0.3;
+    background: radial-gradient(
+      circle at center,
+      color-mix(in srgb, var(--amber) 62%, transparent) 0%,
+      color-mix(in srgb, var(--amber) 26%, transparent) 34%,
+      transparent 68%
+    );
     will-change: transform;
   }
 

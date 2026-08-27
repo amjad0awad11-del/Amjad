@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap, ScrollTrigger, EASE, START, clamp, DESKTOP_QUERY, prefersReducedMotion } from "@/lib/motion";
 import { useGsap } from "@/lib/useGsap";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -19,6 +19,25 @@ type WorkItem = (typeof arbeiten.items)[number];
 function WorkCard({ item, index }: { item: WorkItem; index: number }) {
   const scope = useRef<HTMLLIElement>(null);
   const video = useRef<HTMLVideoElement>(null);
+  // The first two mount immediately; the rest wait until they are close.
+  const [mounted, setMounted] = useState(index < 2);
+
+  useEffect(() => {
+    const element = scope.current;
+    if (!element) return;
+
+    // Mount well before the card arrives so it is ready when it does.
+    const prepare = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setMounted(true);
+        prepare.disconnect();
+      },
+      { rootMargin: "600px" }
+    );
+    prepare.observe(element);
+    return () => prepare.disconnect();
+  }, []);
 
   useEffect(() => {
     const element = scope.current;
@@ -39,7 +58,7 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
     );
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [mounted]);
 
   useEffect(() => {
     const element = scope.current;
@@ -80,7 +99,7 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
     <li
       ref={scope}
       data-work-card
-      className="relative flex shrink-0 flex-col"
+      className="relative flex shrink-0 snap-center flex-col lg:snap-align-none"
       data-cursor="media"
       tabIndex={0}
       aria-label={item.alt}
@@ -90,17 +109,19 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
         className="relative aspect-[9/16] h-[clamp(360px,54vh,640px)] w-[clamp(240px,25vw,400px)] overflow-hidden rounded-[var(--r-media)] lg:h-full lg:w-auto"
         style={{ backgroundColor: "color-mix(in srgb, var(--cream) 7%, transparent)" }}
       >
-        <video
-          ref={video}
-          className="h-full w-full object-cover"
-          src={item.media}
-          muted
-          loop
-          playsInline
-          preload={index < 2 ? "metadata" : "none"}
-          aria-hidden="true"
-          tabIndex={-1}
-        />
+        {mounted && (
+          <video
+            ref={video}
+            className="h-full w-full object-cover"
+            src={item.media}
+            muted
+            loop
+            playsInline
+            preload={index < 2 ? "metadata" : "none"}
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+        )}
 
         <div className="absolute inset-x-0 bottom-0 overflow-hidden">
           <div
@@ -145,6 +166,66 @@ export function Arbeiten() {
 
       const context = gsap.matchMedia();
 
+      // ---------------------------------------------------------------------
+      // Touch and narrow screens: no pin (a pin fights the address bar and the
+      // browser's own scrolling), but the same depth treatment, driven by the
+      // native horizontal scroll so it stays completely in the user's hands.
+      // ---------------------------------------------------------------------
+      context.add(
+        { handheld: `(max-width: 1023px) and (prefers-reduced-motion: no-preference)` },
+        (state) => {
+          if (!state.conditions?.handheld) return;
+          const viewport = track.parentElement;
+          if (!viewport) return;
+
+          const cards = gsap.utils.toArray<HTMLElement>("[data-work-card]", root);
+          const frames = cards.map((card) => card.firstElementChild as HTMLElement);
+
+          // Offsets are measured once and on resize; reading them per scroll
+          // event forces a layout on a device that can least afford one.
+          let centres: number[] = [];
+          let half = 0;
+          const measure = () => {
+            half = viewport.clientWidth / 2;
+            centres = cards.map((card) => card.offsetLeft + card.offsetWidth / 2);
+          };
+
+          let queued = false;
+          const shape = () => {
+            queued = false;
+            if (half === 0) return;
+            const left = viewport.scrollLeft;
+            for (let i = 0; i < cards.length; i += 1) {
+              const offset = (centres[i] - left - half) / half;
+              const near = 1 - Math.min(Math.abs(offset), 1);
+              gsap.set(cards[i], { scale: 0.88 + near * 0.12 });
+              gsap.set(frames[i], { opacity: 0.5 + near * 0.5 });
+            }
+          };
+          const onScroll = () => {
+            if (queued) return;
+            queued = true;
+            requestAnimationFrame(shape);
+          };
+          const onResize = () => {
+            measure();
+            onScroll();
+          };
+
+          measure();
+          shape();
+          viewport.addEventListener("scroll", onScroll, { passive: true });
+          window.addEventListener("resize", onResize);
+
+          return () => {
+            viewport.removeEventListener("scroll", onScroll);
+            window.removeEventListener("resize", onResize);
+            gsap.set(cards, { clearProps: "transform" });
+            gsap.set(frames, { clearProps: "opacity" });
+          };
+        }
+      );
+
       context.add(
         { desktop: `${DESKTOP_QUERY} and (prefers-reduced-motion: no-preference)` },
         (state) => {
@@ -179,6 +260,7 @@ export function Arbeiten() {
           // x rather than read per frame — measuring each card mid-scroll forces
           // a layout on every write and was costing ~130ms of blocking time.
           const cards = gsap.utils.toArray<HTMLElement>("[data-work-card]", root);
+          const frames = cards.map((card) => card.firstElementChild as HTMLElement);
           let metrics: { centre: number }[] = [];
           const measure = () => {
             metrics = cards.map((card) => ({
@@ -197,15 +279,15 @@ export function Arbeiten() {
               // gsap.set, not quickSetter: quickSetter cannot take the `scale`
               // shorthand and throws on the expanded scaleX,scaleY name.
               gsap.set(cards[i], {
-                rotationY: clamp(offset * -16, -16, 16),
-                scale: 0.86 + near * 0.14,
-                z: near * 90,
-                opacity: 0.45 + near * 0.55,
+                rotationY: clamp(offset * -22, -22, 22),
+                scale: 0.82 + near * 0.18,
+                z: near * 140,
               });
+              gsap.set(frames[i], { opacity: 0.45 + near * 0.55 });
             }
           };
 
-          gsap.set(track, { perspective: 1400, transformStyle: "preserve-3d" });
+          gsap.set(track, { perspective: 1100, transformStyle: "preserve-3d" });
           const depth = ScrollTrigger.create({
             ...scrub,
             onUpdate: shape,
@@ -220,7 +302,8 @@ export function Arbeiten() {
           return () => {
             depth.kill();
             tween.kill();
-            gsap.set(cards, { clearProps: "transform,opacity" });
+            gsap.set(cards, { clearProps: "transform" });
+            gsap.set(frames, { clearProps: "opacity" });
           };
         }
       );
@@ -246,7 +329,10 @@ export function Arbeiten() {
         </div>
       </div>
 
-      <div className="mt-14 min-h-0 overflow-x-auto lg:mt-10 lg:flex-1 lg:overflow-visible">
+      <div
+        className="mt-14 min-h-0 snap-x snap-mandatory overflow-x-auto scroll-smooth lg:mt-10 lg:flex-1 lg:snap-none lg:overflow-visible"
+        style={{ scrollbarWidth: "none" }}
+      >
         <ul
           data-work-track
           className="flex h-full gap-[var(--gutter)] px-[var(--page-x)] pb-2 lg:w-max"

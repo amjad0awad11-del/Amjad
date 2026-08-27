@@ -64,12 +64,12 @@ export function ScrollProgress({ reduced }: { reduced: boolean }) {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed right-0 top-0 z-[95] hidden h-full w-[var(--page-x)] lg:flex lg:flex-col lg:items-center lg:justify-center"
+      className="pointer-events-none fixed right-0 top-0 z-[95] flex h-full w-[max(14px,var(--page-x))] flex-col items-center justify-center"
       data-qa-transient
     >
       <div className="flex flex-col items-center gap-5">
         {/* Vertical text needs a tall mask; a short one clips the label to two glyphs. */}
-        <span className="block h-32 overflow-hidden">
+        <span className="hidden h-32 overflow-hidden lg:block">
           <span
             ref={labelRef}
             className="t-mono block whitespace-nowrap"
@@ -78,7 +78,7 @@ export function ScrollProgress({ reduced }: { reduced: boolean }) {
             {label}
           </span>
         </span>
-        <span className="relative block h-32 w-px" style={{ backgroundColor: "var(--hairline)" }}>
+        <span className="relative block h-24 w-px lg:h-32" style={{ backgroundColor: "var(--hairline)" }}>
           <span
             ref={bar}
             className="absolute inset-0 block origin-top"
