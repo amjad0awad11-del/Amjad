@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef } from "react";
 import { gsap, EASE, prefersReducedMotion } from "@/lib/motion";
 
 /**
@@ -26,16 +26,11 @@ export function AccordionItem({
   const icon = useRef<HTMLSpanElement>(null);
   const first = useRef(true);
   const id = useId();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const element = panel.current;
     const content = inner.current;
-    // Wait for the render that swaps height:auto for height:0 — otherwise that
-    // render lands after this effect and flattens the panel that should be open.
-    if (!element || !content || !mounted) return;
+    if (!element || !content) return;
 
     const reduced = prefersReducedMotion();
     const duration = first.current || reduced ? 0 : 0.5;
@@ -63,7 +58,7 @@ export function AccordionItem({
     }
 
     first.current = false;
-  }, [open, mounted]);
+  }, [open]);
 
   return (
     <li className="group relative border-t last:border-b" style={{ borderColor: "var(--hairline)" }}>
@@ -100,9 +95,10 @@ export function AccordionItem({
         id={`${id}-panel`}
         role="region"
         aria-labelledby={`${id}-button`}
-        // Before hydration every panel is open, so the answers are readable
-        // with JS disabled; the first effect closes the inactive ones instantly.
-        style={{ height: mounted ? 0 : "auto", overflow: "hidden" }}
+        // Every panel ships open, so answers are readable with JS disabled.
+        // GSAP takes ownership of the height on mount and closes the inactive
+        // ones instantly; React never rewrites this style, so nothing fights it.
+        style={{ overflow: "hidden" }}
       >
         <div ref={inner} className="t-body t-muted pb-8 pl-4 pr-8">
           {answer}

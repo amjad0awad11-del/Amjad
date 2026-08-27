@@ -35,9 +35,28 @@ export function Prozess() {
           const line = root.querySelector<HTMLElement>("[data-step-line]");
           if (numbers.length === 0) return;
 
+          // The brief dims inactive steps to opacity 0.25. On the cream ground
+          // that puts body text at 1.4:1 and the amber index below 2:1, and no
+          // opacity value clears 4.5:1 for both. Recede them by colour instead:
+          // muted (4.7:1) for inactive, full foreground and accent for active.
+          // --theme-fg is this section's own foreground. --fg is the body-level
+          // token the theme morph animates, which at mount still holds the
+          // previous section's colour.
+          const styles = getComputedStyle(root);
+          const MUTED = styles.getPropertyValue("--muted").trim();
+          const FG = styles.getPropertyValue("--theme-fg").trim();
+          const ACCENT = styles.getPropertyValue("--accent").trim();
+
+          const body = (step: HTMLElement) =>
+            Array.from(step.querySelectorAll<HTMLElement>("h3, p:not([data-step-no])"));
+          const index_ = (step: HTMLElement) => step.querySelector<HTMLElement>("[data-step-no]");
+
           gsap.set(numbers.slice(1), { yPercent: 60, autoAlpha: 0 });
           gsap.set(numbers[0], { yPercent: 0, autoAlpha: 1 });
-          gsap.set(steps.slice(1), { autoAlpha: 0.25 });
+          steps.slice(1).forEach((step) => {
+            gsap.set(body(step), { color: MUTED });
+            gsap.set(index_(step), { color: MUTED });
+          });
           if (line) gsap.set(line, { scaleY: 0, transformOrigin: "top center" });
 
           const timeline = gsap.timeline({
@@ -56,10 +75,12 @@ export function Prozess() {
             if (index === 0) return;
             const at = index - 1;
             timeline
-              .to(numbers[index - 1], { yPercent: -60, autoAlpha: 0, duration: 0.5, ease: EASE.expo }, at)
+              .to(numbers[at], { yPercent: -60, autoAlpha: 0, duration: 0.5, ease: EASE.expo }, at)
               .to(numbers[index], { yPercent: 0, autoAlpha: 1, duration: 0.5, ease: EASE.expo }, at)
-              .to(steps[index - 1], { autoAlpha: 0.25, duration: 0.4 }, at)
-              .to(steps[index], { autoAlpha: 1, duration: 0.4 }, at);
+              .to(body(steps[at]), { color: MUTED, duration: 0.4 }, at)
+              .to(index_(steps[at]), { color: MUTED, duration: 0.4 }, at)
+              .to(body(steps[index]), { color: FG, duration: 0.4 }, at)
+              .to(index_(steps[index]), { color: ACCENT, duration: 0.4 }, at);
           });
 
           if (line) {
@@ -130,7 +151,7 @@ export function Prozess() {
             <ol className="flex flex-col gap-12 lg:pl-10">
               {prozess.steps.map((step) => (
                 <li key={step.no} data-step className="flex flex-col gap-3">
-                  <p className="t-mono" style={{ color: "var(--accent)" }}>
+                  <p data-step-no className="t-mono" style={{ color: "var(--accent)" }}>
                     {step.no}
                   </p>
                   <RevealText as="h3" className="t-h3">

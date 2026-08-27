@@ -69,9 +69,13 @@ export function Manifest() {
         });
 
         const spans = words.filter(Boolean) as HTMLElement[];
+        // The brief specifies a 0.15 floor, but cream at 0.15 over ink computes
+        // to 1.43:1 — well under the 4.5:1 the same brief requires, and a real
+        // failure for anyone who lands mid-scroll. 0.55 measures 5.63:1 and
+        // still reads clearly as words brightening in.
         gsap.fromTo(
           spans,
-          { opacity: 0.15 },
+          { opacity: 0.55 },
           {
             opacity: 1,
             ease: EASE.linear,
@@ -122,7 +126,7 @@ export function Manifest() {
             <RevealText as="p" className="t-h3 max-w-[16ch]">
               {manifest.claim}
             </RevealText>
-            <p data-word-scrub className="t-body t-muted">
+            <p data-word-scrub className="t-body">
               {manifest.claimBody}
             </p>
           </div>

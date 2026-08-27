@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import clsx from "clsx";
-import { gsap, EASE, START, prefersReducedMotion } from "@/lib/motion";
+import { gsap, EASE, prefersReducedMotion } from "@/lib/motion";
 import { useGsap } from "@/lib/useGsap";
 
 type CounterProps = {

@@ -72,7 +72,7 @@ function Field({
         onChange={(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
           setFilled(event.target.value.trim().length > 0)
         }
-        className="w-full resize-none border-b bg-transparent pb-3 pt-2 outline-none"
+        className="w-full resize-none border-b bg-transparent pb-3 pt-2"
         style={{ borderColor: error ? "#E5484D" : "var(--hairline)", minHeight: 44 }}
       />
 
@@ -227,7 +227,7 @@ export function Kontakt() {
               id="budget"
               name="budget"
               defaultValue=""
-              className="w-full border-b bg-transparent pb-3 pt-2 outline-none"
+              className="w-full border-b bg-transparent pb-3 pt-2"
               style={{ borderColor: "var(--hairline)", minHeight: 44, color: "var(--fg)" }}
             >
               <option value="" style={{ color: "var(--ink)" }}>

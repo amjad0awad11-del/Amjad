@@ -1,6 +1,6 @@
 "use client";
 
-import { createElement, useRef } from "react";
+import { useRef } from "react";
 import type { ElementType, ReactNode } from "react";
 import SplitType from "split-type";
 import clsx from "clsx";
@@ -112,9 +112,11 @@ export function RevealText({
     [play, variant, delay, immediate]
   );
 
-  return createElement(
-    as,
-    { ref: scope, className: clsx(className), id },
-    children
+  const Tag = as;
+
+  return (
+    <Tag ref={scope} className={clsx(className)} id={id}>
+      {children}
+    </Tag>
   );
 }

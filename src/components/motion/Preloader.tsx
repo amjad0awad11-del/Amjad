@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { gsap, DUR, EASE, STAGGER, prefersReducedMotion, refreshScrollTrigger } from "@/lib/motion";
 import { useSmoothScroll } from "@/components/motion/SmoothScrollProvider";
 import { preloader, a11y } from "@/content/de";
@@ -21,7 +21,6 @@ const LOCK = "preloader";
 export function Preloader({ onDone }: { onDone: () => void }) {
   const { lock, unlock } = useSmoothScroll();
   const scope = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState<boolean | null>(null);
   const finished = useRef(false);
 
   const finish = useCallback(() => {
@@ -36,28 +35,23 @@ export function Preloader({ onDone }: { onDone: () => void }) {
     unlock(LOCK);
     refreshScrollTrigger();
     onDone();
-    setActive(false);
   }, [onDone, unlock]);
 
   useEffect(() => {
-    // The blocking script in <head> already decided this, before first paint.
+    // The blocking script in <head> already decided this, before first paint,
+    // and the .amw-preload class is what shows the overlay. Keeping that the
+    // single source of truth means no React state and no mount-time re-render.
     const shouldRun = document.documentElement.classList.contains("amw-preload");
+    const root = scope.current;
 
-    if (!shouldRun || prefersReducedMotion()) {
-      setActive(false);
+    if (!shouldRun || prefersReducedMotion() || !root) {
       finished.current = true;
+      document.documentElement.classList.remove("amw-preload");
       onDone();
       return;
     }
 
-    setActive(true);
     lock(LOCK);
-  }, [lock, onDone]);
-
-  useEffect(() => {
-    if (active !== true) return;
-    const root = scope.current;
-    if (!root) return;
 
     const context = gsap.context(() => {
       const letters = gsap.utils.toArray<HTMLElement>("[data-preloader-letter]");
@@ -104,17 +98,14 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         );
     }, root);
 
-    return () => context.revert();
-  }, [active, finish]);
-
-  // Never strand the user behind the overlay if a tween fails to complete.
-  useEffect(() => {
-    if (active !== true) return;
+    // Never strand the user behind the overlay if a tween fails to complete.
     const failsafe = window.setTimeout(finish, 6000);
-    return () => window.clearTimeout(failsafe);
-  }, [active, finish]);
 
-  if (active === false) return null;
+    return () => {
+      window.clearTimeout(failsafe);
+      context.revert();
+    };
+  }, [lock, onDone, finish]);
 
   return (
     <div

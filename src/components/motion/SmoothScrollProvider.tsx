@@ -1,22 +1,10 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger, registerGsap, prefersReducedMotion } from "@/lib/motion";
 
 type ScrollApi = {
-  /** The live Lenis instance, or null under reduced motion (native scroll). */
-  lenis: Lenis | null;
-  /** True once the scroll engine is wired up. */
-  ready: boolean;
   /** Smooth-scrolls to a selector or element, clearing the fixed header. */
   scrollTo: (target: string | HTMLElement, offset?: number) => void;
   /**
@@ -43,14 +31,12 @@ const HEADER_OFFSET = -80;
 export function SmoothScrollProvider({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<Lenis | null>(null);
   const locksRef = useRef<Set<string>>(new Set());
-  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     registerGsap();
 
     // Reduced motion: no Lenis at all, the browser keeps native scrolling.
     if (prefersReducedMotion()) {
-      setReady(true);
       return () => {
         ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       };
@@ -74,16 +60,28 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     // Anything still holding a lock when the engine starts keeps it.
     if (locksRef.current.size > 0) lenis.stop();
 
-    setReady(true);
-
     // Late-arriving fonts change line boxes, which moves every trigger.
     let cancelled = false;
     document.fonts?.ready.then(() => {
       if (!cancelled) ScrollTrigger.refresh();
     });
 
+    // A resize invalidates every pin distance. ScrollTrigger refreshes itself on
+    // window resize, but not when only the visual viewport changes (mobile
+    // browser chrome sliding away), which is exactly when a pin drifts.
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const onViewportChange = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => ScrollTrigger.refresh(), 180);
+    };
+    window.visualViewport?.addEventListener("resize", onViewportChange);
+    window.addEventListener("orientationchange", onViewportChange);
+
     return () => {
       cancelled = true;
+      clearTimeout(resizeTimer);
+      window.visualViewport?.removeEventListener("resize", onViewportChange);
+      window.removeEventListener("orientationchange", onViewportChange);
       lenis.off("scroll", onScroll);
       gsap.ticker.remove(raf);
       lenis.destroy();
@@ -137,9 +135,11 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     window.scrollTo({ top, behavior: "auto" });
   }, []);
 
+  // Only the callbacks are exposed. Handing out lenisRef.current would mean
+  // reading a ref during render and pinning a stale instance in the context.
   const value = useMemo<ScrollApi>(
-    () => ({ lenis: lenisRef.current, ready, scrollTo, lock, unlock }),
-    [ready, scrollTo, lock, unlock]
+    () => ({ scrollTo, lock, unlock }),
+    [scrollTo, lock, unlock]
   );
 
   return <ScrollContext.Provider value={value}>{children}</ScrollContext.Provider>;

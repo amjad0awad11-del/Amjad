@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import { gsap, DUR, EASE, prefersReducedMotion } from "@/lib/motion";
+import { gsap, EASE, prefersReducedMotion } from "@/lib/motion";
 
 /**
  * A26 — amber curtain between routes.

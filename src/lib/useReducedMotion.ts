@@ -1,38 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 /**
- * Tracks `prefers-reduced-motion: reduce` reactively.
+ * Subscribes to a media query without a mount-time setState, so there is no
+ * cascading render and the server snapshot stays explicit.
  *
- * Returns `null` until the media query has been read on the client, so
- * components can avoid committing to a motion path during hydration.
+ * Returns `null` on the server and during the first hydration pass, letting
+ * components hold off on committing to a motion path until the query is known.
  */
-export function useReducedMotion(): boolean | null {
-  const [reduced, setReduced] = useState<boolean | null>(null);
+function useMatchMedia(query: string): boolean | null {
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      const mql = window.matchMedia(query);
+      mql.addEventListener("change", onChange);
+      return () => mql.removeEventListener("change", onChange);
+    },
+    [query]
+  );
 
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(query.matches);
-    const onChange = (event: MediaQueryListEvent) => setReduced(event.matches);
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, []);
+  const getSnapshot = useCallback(() => window.matchMedia(query).matches, [query]);
+  const getServerSnapshot = useCallback(() => null, []);
 
-  return reduced;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
-/** Tracks a media query (used for the ≥1024px desktop motion path). */
+/** Tracks `prefers-reduced-motion: reduce`. */
+export function useReducedMotion(): boolean | null {
+  return useMatchMedia("(prefers-reduced-motion: reduce)");
+}
+
+/** Tracks an arbitrary media query (used for the ≥1024px desktop motion path). */
 export function useMediaQuery(query: string): boolean | null {
-  const [matches, setMatches] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const mql = window.matchMedia(query);
-    setMatches(mql.matches);
-    const onChange = (event: MediaQueryListEvent) => setMatches(event.matches);
-    mql.addEventListener("change", onChange);
-    return () => mql.removeEventListener("change", onChange);
-  }, [query]);
-
-  return matches;
+  return useMatchMedia(query);
 }

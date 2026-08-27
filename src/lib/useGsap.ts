@@ -22,6 +22,5 @@ export function useGsap(
     registerGsap();
     const context = gsap.context(factory, element);
     return () => context.revert();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 }
