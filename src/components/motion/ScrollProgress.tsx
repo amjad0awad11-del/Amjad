@@ -67,8 +67,9 @@ export function ScrollProgress({ reduced }: { reduced: boolean }) {
       className="pointer-events-none fixed right-0 top-0 z-[95] hidden h-full w-[var(--page-x)] lg:flex lg:flex-col lg:items-center lg:justify-center"
       data-qa-transient
     >
-      <div className="flex flex-col items-center gap-4">
-        <span className="block h-4 overflow-hidden">
+      <div className="flex flex-col items-center gap-5">
+        {/* Vertical text needs a tall mask; a short one clips the label to two glyphs. */}
+        <span className="block h-32 overflow-hidden">
           <span
             ref={labelRef}
             className="t-mono block whitespace-nowrap"

@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import { gsap, EASE } from "@/lib/motion";
+import { useGsap } from "@/lib/useGsap";
 import { MagneticButton } from "@/components/motion/MagneticButton";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 import { useSmoothScroll } from "@/components/motion/SmoothScrollProvider";
@@ -20,20 +21,39 @@ type ButtonProps = {
 /**
  * A17 — roll-up label inside a magnetic wrapper.
  *
- * The label is stacked twice: on hover the top copy rolls out of the mask and
+ * The label is stacked twice: on hover the top copy rolls out of its mask and
  * the duplicate rolls in behind it, while an amber fill wipes up from the
- * bottom. The duplicate is aria-hidden so the accessible name stays singular.
+ * bottom. The duplicate is aria-hidden, so the accessible name stays singular.
+ *
+ * Once the fill is in, the label switches to the background colour — cream on
+ * amber only reaches 2.2:1, ink on amber reaches 10.2:1.
  */
 export function Button({ label, href, variant = "solid", className, onClick }: ButtonProps) {
   const scope = useRef<HTMLSpanElement>(null);
   const reduced = useReducedMotion();
+  const [active, setActive] = useState(false);
   const { scrollTo } = useSmoothScroll();
   const isAnchor = href.startsWith("#");
+  const filled = variant === "solid" || active;
+
+  // The duplicate label is offset in CSS so it does not stack without JS.
+  // GSAP has to restate that in its own units, or it reads the CSS translate as
+  // pixels and the yPercent tween becomes a no-op.
+  useGsap(
+    () => {
+      const bottom = scope.current?.querySelector("[data-label-bottom]");
+      if (bottom) gsap.set(bottom, { yPercent: 100, y: 0, clearProps: "" });
+    },
+    scope,
+    []
+  );
 
   const play = (direction: 1 | -1) => {
+    setActive(direction === 1);
     if (reduced !== false) return;
     const element = scope.current;
     if (!element) return;
+
     const top = element.querySelector("[data-label-top]");
     const bottom = element.querySelector("[data-label-bottom]");
     const fill = element.querySelector("[data-fill]");
@@ -43,20 +63,18 @@ export function Button({ label, href, variant = "solid", className, onClick }: B
     if (fill) {
       gsap.to(fill, {
         scaleY: direction === 1 ? 1 : 0,
+        transformOrigin: direction === 1 ? "bottom center" : "top center",
         duration: 0.45,
         ease: EASE.inOut,
-        transformOrigin: direction === 1 ? "bottom center" : "top center",
       });
     }
   };
 
   const styles = clsx(
-    "relative isolate inline-flex items-center justify-center overflow-hidden rounded-[var(--r-pill)]",
-    "px-7 py-3.5 t-mono transition-colors duration-300",
-    "min-h-[44px]",
-    variant === "solid" && "bg-[var(--accent)] text-[var(--bg)]",
-    variant === "outline" && "border border-[var(--hairline)] text-[var(--fg)]",
-    variant === "ghost" && "text-[var(--fg)]",
+    "relative isolate inline-flex min-h-[44px] items-center justify-center overflow-hidden",
+    "rounded-[var(--r-pill)] px-7 py-3.5 t-mono transition-colors duration-300",
+    variant === "solid" && "bg-[var(--accent)]",
+    variant === "outline" && "border border-[var(--hairline)]",
     className
   );
 
@@ -91,12 +109,15 @@ export function Button({ label, href, variant = "solid", className, onClick }: B
     onMouseLeave: () => play(-1),
     onFocus: () => play(1),
     onBlur: () => play(-1),
+    style: { color: filled ? "var(--bg)" : "var(--fg)" },
+    className: styles,
+    "data-cursor": "link",
   };
 
   if (onClick) {
     return (
       <MagneticButton>
-        <button type="button" onClick={onClick} className={styles} data-cursor="link" {...handlers}>
+        <button type="button" onClick={onClick} {...handlers}>
           {inner}
         </button>
       </MagneticButton>
@@ -108,8 +129,6 @@ export function Button({ label, href, variant = "solid", className, onClick }: B
       <MagneticButton>
         <a
           href={href}
-          className={styles}
-          data-cursor="link"
           {...handlers}
           onClick={(event) => {
             const target = document.querySelector(href);
@@ -126,7 +145,7 @@ export function Button({ label, href, variant = "solid", className, onClick }: B
 
   return (
     <MagneticButton>
-      <Link href={href} className={styles} data-cursor="link" {...handlers}>
+      <Link href={href} {...handlers}>
         {inner}
       </Link>
     </MagneticButton>
