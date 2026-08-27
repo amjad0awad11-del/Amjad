@@ -1,0 +1,404 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   AMW — Design tokens
+   Brand palette, fluid type scale, grid and the three section themes.
+   ========================================================================== */
+
+:root {
+  /* Brand palette */
+  --ink: #0b0b0d;
+  --cream: #f4f0e8;
+  --amber: #efb03c;
+  --amber-dk: #c98f26;
+  --ash: #6e6e73;
+  --line: rgba(244, 240, 232, 0.14);
+  --line-dk: rgba(11, 11, 13, 0.12);
+
+  /* Contrast-safe derivatives.
+     The raw --ash fails 4.5:1 on both --ink (3.80:1) and --cream (4.48:1), and
+     --amber-dk only reaches 2.48:1 on --cream. These are the text-safe values
+     the themes below actually use; --ash / --amber-dk stay for borders,
+     dividers and large display accents where the 4.5:1 rule does not apply. */
+  --ash-on-dark: #8a8a91;   /* 5.74:1 on --ink   */
+  --ash-on-light: #6a6a70;  /* 4.73:1 on --cream */
+  --ash-on-amber: #4a4335;  /* 5.10:1 on --amber */
+  --amber-on-light: #7a5310; /* 6.02:1 on --cream */
+
+  /* Active theme — animated by the section theme morph (A14). */
+  --bg: var(--ink);
+  --fg: var(--cream);
+  --accent: var(--amber);
+  --muted: var(--ash-on-dark);
+  --hairline: var(--line);
+  --focus: var(--amber);
+
+  /* Fluid type scale */
+  --fs-display: clamp(3.2rem, 11vw, 12rem);
+  --fs-h2: clamp(2.2rem, 6vw, 5.5rem);
+  --fs-h3: clamp(1.4rem, 2.4vw, 2.2rem);
+  --fs-body: clamp(1rem, 1.15vw, 1.2rem);
+  --fs-mono: 0.75rem;
+
+  /* Layout */
+  --page-x: clamp(20px, 4vw, 80px);
+  --gutter: clamp(16px, 2vw, 32px);
+  --max-w: 1680px;
+  --section-y: clamp(96px, 14vh, 220px);
+  --header-h: 76px;
+
+  /* Radii */
+  --r-pill: 999px;
+  --r-media: 12px;
+}
+
+/* Section themes. Applied as data attributes; the morph tweens --bg/--fg. */
+[data-theme="dark"] {
+  --theme-bg: var(--ink);
+  --theme-fg: var(--cream);
+  --theme-accent: var(--amber);
+  --theme-muted: var(--ash-on-dark);
+  --theme-hairline: var(--line);
+  --theme-focus: var(--amber);
+}
+
+[data-theme="light"] {
+  --theme-bg: var(--cream);
+  --theme-fg: var(--ink);
+  --theme-accent: var(--amber-on-light);
+  --theme-muted: var(--ash-on-light);
+  --theme-hairline: var(--line-dk);
+  --theme-focus: var(--amber-on-light);
+}
+
+[data-theme="amber"] {
+  --theme-bg: var(--amber);
+  --theme-fg: var(--ink);
+  --theme-accent: var(--ink);
+  --theme-muted: var(--ash-on-amber);
+  --theme-hairline: rgba(11, 11, 13, 0.22);
+  --theme-focus: var(--ink);
+}
+
+/* Sections paint their own ground so the page reads correctly before the
+   morph runs and if JS never loads at all. */
+[data-theme] {
+  background-color: var(--theme-bg);
+  color: var(--theme-fg);
+  --accent: var(--theme-accent);
+  --muted: var(--theme-muted);
+  --hairline: var(--theme-hairline);
+  --focus: var(--theme-focus);
+}
+
+/* Registering these as <color> lets both GSAP and the browser interpolate
+   them smoothly instead of snapping between values. */
+@property --bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #0b0b0d;
+}
+
+@property --fg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f4f0e8;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-cream: var(--cream);
+  --color-amber: var(--amber);
+  --color-amber-dk: var(--amber-dk);
+  --color-fg: var(--fg);
+  --color-bg: var(--bg);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --font-display: var(--font-amw), "General Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ==========================================================================
+   Reset & base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: auto;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-amw), "General Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+/* Lenis owns the scroll position while it is running. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+ul,
+ol,
+dl,
+dd {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+img,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   Focus — always visible, always theme-aware
+   ========================================================================== */
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  padding: 12px 20px;
+  background: var(--amber);
+  color: var(--ink);
+  font-size: var(--fs-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transform: translateY(-120%);
+  transition: transform 0.2s ease;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* ==========================================================================
+   Typography utilities
+   ========================================================================== */
+
+.t-display {
+  font-size: var(--fs-display);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.t-h2 {
+  font-size: var(--fs-h2);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+.t-h3 {
+  font-size: var(--fs-h3);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+
+.t-body {
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  max-width: 62ch;
+}
+
+.t-mono {
+  font-size: var(--fs-mono);
+  line-height: 1.2;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.t-muted {
+  color: var(--muted);
+}
+
+.t-accent {
+  color: var(--accent);
+}
+
+/* ==========================================================================
+   Layout utilities
+   ========================================================================== */
+
+.wrap {
+  width: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding-inline: var(--page-x);
+}
+
+.section-y {
+  padding-block: var(--section-y);
+}
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--gutter);
+}
+
+.hairline {
+  border: 0;
+  border-top: 1px solid var(--hairline);
+}
+
+/* ==========================================================================
+   Link underline (A27) — draws from the left, retracts to the right
+   ========================================================================== */
+
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -0.12em;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.35s cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* ==========================================================================
+   Grain + glow (A31)
+   ========================================================================== */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("/images/noise.png");
+  background-size: 128px 128px;
+  background-repeat: repeat;
+}
+
+.glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(120px);
+  opacity: 0.22;
+  background: radial-gradient(circle at center, var(--amber) 0%, transparent 70%);
+  will-change: transform;
+}
+
+/* ==========================================================================
+   Motion helpers
+   ========================================================================== */
+
+/* Masked line wrapper used by RevealText (A6/A10). */
+.reveal-line {
+  overflow: hidden;
+  display: block;
+}
+
+.media-frame {
+  overflow: hidden;
+  border-radius: var(--r-media);
+  background-color: color-mix(in srgb, var(--fg) 8%, transparent);
+}
+
+/* Only while a tween is in flight — never left on permanently. */
+.is-animating {
+  will-change: transform, opacity;
+}
+
+/* ==========================================================================
+   Reduced motion (§4.4)
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .link-underline::after {
+    transition: none;
+  }
+
+  .glow {
+    display: none;
+  }
+}
