@@ -5,6 +5,12 @@ import { Manifest } from "@/components/sections/Manifest";
 import { Leistungen } from "@/components/sections/Leistungen";
 import { Arbeiten } from "@/components/sections/Arbeiten";
 import { Prozess } from "@/components/sections/Prozess";
+import { Vergleich } from "@/components/sections/Vergleich";
+import { Preise } from "@/components/sections/Preise";
+import { Stimmen } from "@/components/sections/Stimmen";
+import { Studio } from "@/components/sections/Studio";
+import { Faq } from "@/components/sections/Faq";
+import { Kontakt } from "@/components/sections/Kontakt";
 import { hasAsset } from "@/lib/assets";
 import { hero, arbeiten } from "@/content/de";
 
@@ -23,11 +29,12 @@ export default function Home() {
       <Leistungen />
       <Arbeiten videoFlags={workVideoFlags} />
       <Prozess />
-      <section data-theme="dark" id="kontakt" className="section-y">
-        <div className="wrap">
-          <h2 className="t-h2">Kontakt</h2>
-        </div>
-      </section>
+      <Vergleich />
+      <Preise />
+      <Stimmen />
+      <Studio />
+      <Faq />
+      <Kontakt />
     </Shell>
   );
 }
