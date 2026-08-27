@@ -119,265 +119,277 @@
 
 /* ==========================================================================
    Reset & base
+   Layered so Tailwind utilities can still override element defaults —
+   unlayered CSS outranks everything in @layer utilities.
    ========================================================================== */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+@layer base {
 
-html {
-  -webkit-text-size-adjust: 100%;
-  scroll-behavior: auto;
-}
 
-body {
-  margin: 0;
-  background-color: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-amw), "General Sans", "Helvetica Neue", Arial, sans-serif;
-  font-size: var(--fs-body);
-  line-height: 1.5;
-  font-weight: 400;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: clip;
-}
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-/* Lenis owns the scroll position while it is running. */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: auto;
+  }
 
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
+  body {
+    margin: 0;
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-amw), "General Sans", "Helvetica Neue", Arial, sans-serif;
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
 
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
+  /* Lenis owns the scroll position while it is running. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
 
-h1,
-h2,
-h3,
-h4,
-p,
-figure,
-blockquote,
-ul,
-ol,
-dl,
-dd {
-  margin: 0;
-}
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
 
-ul,
-ol {
-  padding: 0;
-  list-style: none;
-}
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
 
-img,
-video,
-svg {
-  display: block;
-  max-width: 100%;
-}
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote,
+  ul,
+  ol,
+  dl,
+  dd {
+    margin: 0;
+  }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
-  color: inherit;
-  background: none;
-  border: none;
-}
+  ul,
+  ol {
+    padding: 0;
+    list-style: none;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
+  img,
+  video,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* ==========================================================================
+     Focus — always visible, always theme-aware
+     ========================================================================== */
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .skip-link {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    padding: 12px 20px;
+    background: var(--amber);
+    color: var(--ink);
+    font-size: var(--fs-mono);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    transform: translateY(-120%);
+    transition: transform 0.2s ease;
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
 }
 
 /* ==========================================================================
-   Focus — always visible, always theme-aware
+   Project classes
    ========================================================================== */
 
-:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 3px;
-  border-radius: 2px;
-}
+@layer components {
+  /* ==========================================================================
+     Typography utilities
+     ========================================================================== */
 
-.skip-link {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 200;
-  padding: 12px 20px;
-  background: var(--amber);
-  color: var(--ink);
-  font-size: var(--fs-mono);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  transform: translateY(-120%);
-  transition: transform 0.2s ease;
-}
+  .t-display {
+    font-size: var(--fs-display);
+    line-height: 0.88;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
 
-.skip-link:focus-visible {
-  transform: translateY(0);
-}
+  .t-h2 {
+    font-size: var(--fs-h2);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    font-weight: 700;
+  }
 
-/* ==========================================================================
-   Typography utilities
-   ========================================================================== */
+  .t-h3 {
+    font-size: var(--fs-h3);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
 
-.t-display {
-  font-size: var(--fs-display);
-  line-height: 0.88;
-  letter-spacing: -0.04em;
-  font-weight: 700;
-  text-transform: uppercase;
-}
+  .t-body {
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    max-width: 62ch;
+  }
 
-.t-h2 {
-  font-size: var(--fs-h2);
-  line-height: 0.95;
-  letter-spacing: -0.03em;
-  font-weight: 700;
-}
+  .t-mono {
+    font-size: var(--fs-mono);
+    line-height: 1.2;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
 
-.t-h3 {
-  font-size: var(--fs-h3);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  font-weight: 500;
-}
+  .t-muted {
+    color: var(--muted);
+  }
 
-.t-body {
-  font-size: var(--fs-body);
-  line-height: 1.5;
-  max-width: 62ch;
-}
+  .t-accent {
+    color: var(--accent);
+  }
 
-.t-mono {
-  font-size: var(--fs-mono);
-  line-height: 1.2;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-}
+  /* ==========================================================================
+     Layout utilities
+     ========================================================================== */
 
-.t-muted {
-  color: var(--muted);
-}
+  .wrap {
+    width: 100%;
+    max-width: var(--max-w);
+    margin-inline: auto;
+    padding-inline: var(--page-x);
+  }
 
-.t-accent {
-  color: var(--accent);
-}
+  .section-y {
+    padding-block: var(--section-y);
+  }
 
-/* ==========================================================================
-   Layout utilities
-   ========================================================================== */
+  .grid-12 {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gutter);
+  }
 
-.wrap {
-  width: 100%;
-  max-width: var(--max-w);
-  margin-inline: auto;
-  padding-inline: var(--page-x);
-}
+  .hairline {
+    border: 0;
+    border-top: 1px solid var(--hairline);
+  }
 
-.section-y {
-  padding-block: var(--section-y);
-}
+  /* ==========================================================================
+     Link underline (A27) — draws from the left, retracts to the right
+     ========================================================================== */
 
-.grid-12 {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: var(--gutter);
-}
+  .link-underline {
+    position: relative;
+    display: inline-block;
+  }
 
-.hairline {
-  border: 0;
-  border-top: 1px solid var(--hairline);
-}
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.12em;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.35s cubic-bezier(0.45, 0, 0.55, 1);
+  }
 
-/* ==========================================================================
-   Link underline (A27) — draws from the left, retracts to the right
-   ========================================================================== */
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left center;
+  }
 
-.link-underline {
-  position: relative;
-  display: inline-block;
-}
+  /* ==========================================================================
+     Grain + glow (A31)
+     ========================================================================== */
 
-.link-underline::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -0.12em;
-  width: 100%;
-  height: 1px;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: right center;
-  transition: transform 0.35s cubic-bezier(0.45, 0, 0.55, 1);
-}
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    pointer-events: none;
+    opacity: 0.04;
+    mix-blend-mode: overlay;
+    background-image: url("/images/noise.png");
+    background-size: 128px 128px;
+    background-repeat: repeat;
+  }
 
-.link-underline:hover::after,
-.link-underline:focus-visible::after {
-  transform: scaleX(1);
-  transform-origin: left center;
-}
+  .glow {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(120px);
+    opacity: 0.22;
+    background: radial-gradient(circle at center, var(--amber) 0%, transparent 70%);
+    will-change: transform;
+  }
 
-/* ==========================================================================
-   Grain + glow (A31)
-   ========================================================================== */
+  /* ==========================================================================
+     Motion helpers
+     ========================================================================== */
 
-.grain {
-  position: fixed;
-  inset: 0;
-  z-index: 90;
-  pointer-events: none;
-  opacity: 0.04;
-  mix-blend-mode: overlay;
-  background-image: url("/images/noise.png");
-  background-size: 128px 128px;
-  background-repeat: repeat;
-}
+  /* Masked line wrapper used by RevealText (A6/A10). */
+  .reveal-line {
+    overflow: hidden;
+    display: block;
+  }
 
-.glow {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  filter: blur(120px);
-  opacity: 0.22;
-  background: radial-gradient(circle at center, var(--amber) 0%, transparent 70%);
-  will-change: transform;
-}
+  .media-frame {
+    overflow: hidden;
+    border-radius: var(--r-media);
+    background-color: color-mix(in srgb, var(--fg) 8%, transparent);
+  }
 
-/* ==========================================================================
-   Motion helpers
-   ========================================================================== */
-
-/* Masked line wrapper used by RevealText (A6/A10). */
-.reveal-line {
-  overflow: hidden;
-  display: block;
-}
-
-.media-frame {
-  overflow: hidden;
-  border-radius: var(--r-media);
-  background-color: color-mix(in srgb, var(--fg) 8%, transparent);
-}
-
-/* Only while a tween is in flight — never left on permanently. */
-.is-animating {
-  will-change: transform, opacity;
+  /* Only while a tween is in flight — never left on permanently. */
+  .is-animating {
+    will-change: transform, opacity;
+  }
 }
 
 /* ==========================================================================
