@@ -13,23 +13,20 @@ import { Studio } from "@/components/sections/Studio";
 import { Faq } from "@/components/sections/Faq";
 import { Kontakt } from "@/components/sections/Kontakt";
 import { hasAsset } from "@/lib/assets";
-import { hero, arbeiten } from "@/content/de";
+import { showreel } from "@/content/de";
 
 export default function Home() {
-  // Resolved at build time: a missing clip degrades to its poster (see lib/assets).
-  const heroHasVideo = hasAsset(hero.video);
-  const workVideoFlags = arbeiten.items.map(
-    (item) => item.kind === "video" && hasAsset(item.media)
-  );
+  // Resolved at build time — the lightbox falls back to a still if the clip is missing.
+  const hasShowreel = hasAsset(showreel.src);
 
   return (
     <Shell>
       <JsonLd />
-      <Hero hasVideo={heroHasVideo} />
+      <Hero hasShowreel={hasShowreel} />
       <Ticker />
       <Manifest />
       <Leistungen />
-      <Arbeiten videoFlags={workVideoFlags} />
+      <Arbeiten />
       <Prozess />
       <Vergleich />
       <Preise />

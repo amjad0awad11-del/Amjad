@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap, DUR, EASE, STAGGER, prefersReducedMotion, simpleFade } from "@/lib/motion";
 import { useGsap } from "@/lib/useGsap";
 import { useHeroReady } from "@/components/motion/HeroGate";
@@ -11,12 +11,113 @@ import { Button } from "@/components/ui/Button";
 import { hero } from "@/content/de";
 
 /**
+ * The creative wall behind the headline.
+ *
+ * Four vertical clips in columns that drift at different speeds and phases, so
+ * the background reads as a living showreel rather than one looping backdrop.
+ * Playback starts only once the preloader has cleared, which keeps four video
+ * decodes off the critical path — the headline stays the LCP element.
+ */
+function CreativeWall({ ready }: { ready: boolean }) {
+  const scope = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ready) return;
+    const root = scope.current;
+    if (!root) return;
+    // Autoplay can be refused; the first frame still stands in for the clip.
+    root.querySelectorAll("video").forEach((video) => {
+      // Skip the columns CSS has hidden — otherwise they still download.
+      if (video.offsetParent === null) return;
+      video.load();
+      void video.play().catch(() => undefined);
+    });
+  }, [ready]);
+
+  useGsap(
+    () => {
+      const columns = gsap.utils.toArray<HTMLElement>("[data-wall-col]");
+      if (columns.length === 0) return;
+
+      if (prefersReducedMotion()) {
+        gsap.set(columns, { autoAlpha: 1 });
+        return;
+      }
+
+      // Rise into place behind the headline.
+      gsap.fromTo(
+        columns,
+        { autoAlpha: 0, yPercent: 14, scale: 1.08 },
+        {
+          autoAlpha: 1,
+          yPercent: 0,
+          scale: 1,
+          duration: DUR.slow * 1.3,
+          ease: EASE.expo,
+          stagger: 0.08,
+        }
+      );
+
+      // Each column breathes on its own clock, so the wall never pulses in sync.
+      columns.forEach((column, index) => {
+        gsap.to(column, {
+          yPercent: index % 2 === 0 ? -6 : 6,
+          duration: 14 + index * 3,
+          ease: "sine.inOut",
+          repeat: -1,
+          yoyo: true,
+          delay: index * 1.4,
+        });
+      });
+    },
+    scope,
+    [ready]
+  );
+
+  return (
+    <div
+      ref={scope}
+      aria-hidden="true"
+      className="absolute inset-0 grid grid-cols-2 items-center gap-3 overflow-hidden px-3 sm:gap-4 md:grid-cols-4 md:px-6"
+    >
+      {hero.wall.slice(0, 4).map((src, index) => (
+        <div
+          key={src}
+          data-wall-col
+          className={`relative aspect-[9/16] w-full overflow-hidden rounded-[var(--r-media)] ${
+            index > 1 ? "hidden md:block" : ""
+          }`}
+          style={{
+            backgroundColor: "color-mix(in srgb, var(--cream) 6%, transparent)",
+            // A gentle stagger down the row so the wall is not a flat band.
+            transform: `translateY(${index % 2 === 0 ? -4 : 4}%)`,
+          }}
+        >
+          {ready && (
+            <video
+              className="h-full w-full object-cover"
+              src={src}
+              muted
+              loop
+              playsInline
+              preload="none"
+              tabIndex={-1}
+            />
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
  * S2 — Hero.
  *
- * A6 headline reveal, A7 media intro plus scroll-out, A8 scroll cue, A31 glow
- * and the A32 showreel trigger. The whole timeline waits on the preloader.
+ * The headline drives in from oversize word by word (A6), the creative wall
+ * settles behind it (A7), and the whole block scales away on scroll. Scroll cue
+ * A8, glow A31, showreel trigger A32.
  */
-export function Hero({ hasVideo }: { hasVideo: boolean }) {
+export function Hero({ hasShowreel }: { hasShowreel: boolean }) {
   const scope = useRef<HTMLElement>(null);
   const ready = useHeroReady();
   const [reelOpen, setReelOpen] = useState(false);
@@ -26,7 +127,7 @@ export function Hero({ hasVideo }: { hasVideo: boolean }) {
       const root = scope.current;
       if (!root || !ready) return;
 
-      const media = root.querySelector<HTMLElement>("[data-hero-media]");
+      const stage = root.querySelector<HTMLElement>("[data-hero-stage]");
       const eyebrow = root.querySelector<HTMLElement>("[data-hero-eyebrow]");
       const tail = gsap.utils.toArray<HTMLElement>("[data-hero-tail]");
       const cue = root.querySelector<HTMLElement>("[data-hero-cue]");
@@ -38,42 +139,25 @@ export function Hero({ hasVideo }: { hasVideo: boolean }) {
 
       const timeline = gsap.timeline();
 
-      // A7 — media settles out of an overscale as the page arrives.
-      if (media) {
-        timeline.fromTo(
-          media,
-          { scale: 1.14 },
-          { scale: 1, duration: DUR.slow * 1.4, ease: EASE.expo },
-          0
-        );
-      }
-
       timeline.fromTo(
         eyebrow,
-        { autoAlpha: 0, y: 12 },
+        { autoAlpha: 0, y: 14 },
         { autoAlpha: 1, y: 0, duration: DUR.base, ease: EASE.out },
-        0
+        0.1
       );
 
-      // Sub-headline, CTAs and badges follow the headline lines.
       timeline.fromTo(
         tail,
-        { autoAlpha: 0, y: 20 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: DUR.base,
-          ease: EASE.out,
-          stagger: STAGGER.words,
-        },
-        STAGGER.words * 4 + 0.5
+        { autoAlpha: 0, y: 24 },
+        { autoAlpha: 1, y: 0, duration: DUR.base, ease: EASE.out, stagger: STAGGER.words },
+        0.9
       );
 
-      // A8 — scroll cue bobs, then fades out once the hero starts leaving.
       if (cue) {
-        timeline.fromTo(cue, { autoAlpha: 0 }, { autoAlpha: 1, duration: DUR.fast }, 1.1);
+        timeline.fromTo(cue, { autoAlpha: 0 }, { autoAlpha: 1, duration: DUR.fast }, 1.3);
         gsap.to(cue.querySelector("[data-cue-line]"), {
-          y: 10,
+          scaleY: 0.35,
+          transformOrigin: "top center",
           duration: 1.4,
           ease: EASE.inOut,
           repeat: -1,
@@ -86,13 +170,13 @@ export function Hero({ hasVideo }: { hasVideo: boolean }) {
         });
       }
 
-      // A7 — scroll-out.
-      if (media) {
-        gsap.to(media, {
-          scale: 0.92,
-          borderRadius: 24,
-          opacity: 0.45,
-          yPercent: -8,
+      // The whole hero recedes as the page moves on, rather than just fading.
+      if (stage) {
+        gsap.to(stage, {
+          scale: 0.9,
+          yPercent: -6,
+          opacity: 0.3,
+          borderRadius: 28,
           ease: EASE.linear,
           scrollTrigger: { trigger: root, start: "top top", end: "bottom top", scrub: true },
         });
@@ -111,39 +195,19 @@ export function Hero({ hasVideo }: { hasVideo: boolean }) {
         aria-labelledby="hero-title"
         className="relative flex min-h-[100dvh] flex-col justify-end overflow-hidden"
       >
-        <div className="absolute inset-0 -z-10">
-          <div data-hero-media className="absolute inset-0 overflow-hidden will-change-transform">
-            {hasVideo ? (
-              <video
-                className="h-full w-full object-cover"
-                src={hero.video}
-                poster={hero.poster}
-                autoPlay
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                aria-label={hero.videoAlt}
-              />
-            ) : (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={hero.poster}
-                alt=""
-                className="h-full w-full object-cover"
-                width={1920}
-                height={1080}
-                fetchPriority="high"
-              />
-            )}
-          </div>
-          {/* 55% ink veil so the headline clears contrast over any frame. */}
+        <div data-hero-stage className="absolute inset-0 -z-10 overflow-hidden will-change-transform">
+          <CreativeWall ready={ready} />
+          {/* Heavy at the bottom where the headline sits, light at the top so the
+              creatives stay visible. */}
           <div
-            className="absolute inset-0"
-            style={{ backgroundColor: "color-mix(in srgb, var(--ink) 55%, transparent)" }}
             aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(to top, var(--ink) 12%, color-mix(in srgb, var(--ink) 74%, transparent) 52%, color-mix(in srgb, var(--ink) 46%, transparent) 100%)",
+            }}
           />
-          <Glow className="left-[-10%] top-[10%] h-[60vmax] w-[60vmax]" />
+          <Glow className="left-[-10%] top-[6%] h-[62vmax] w-[62vmax]" />
         </div>
 
         <div className="wrap pb-[clamp(28px,6vh,72px)] pt-[calc(var(--header-h)+40px)]">
@@ -202,12 +266,12 @@ export function Hero({ hasVideo }: { hasVideo: boolean }) {
           aria-hidden="true"
           className="pointer-events-none absolute bottom-[clamp(28px,6vh,72px)] left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 xl:flex"
         >
-          <span data-cue-line className="block h-8 w-px" style={{ backgroundColor: "var(--amber)" }} />
+          <span data-cue-line className="block h-10 w-px origin-top" style={{ backgroundColor: "var(--amber)" }} />
           <span className="t-mono t-muted">{hero.scrollCue}</span>
         </div>
       </section>
 
-      <ShowreelLightbox open={reelOpen} onClose={() => setReelOpen(false)} hasVideo={hasVideo} />
+      <ShowreelLightbox open={reelOpen} onClose={() => setReelOpen(false)} hasVideo={hasShowreel} />
     </>
   );
 }

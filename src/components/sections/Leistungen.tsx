@@ -1,5 +1,8 @@
 "use client";
 
+import { useRef } from "react";
+import { gsap, DUR, EASE, DESKTOP_QUERY } from "@/lib/motion";
+import { useGsap } from "@/lib/useGsap";
 import { RevealText } from "@/components/motion/RevealText";
 import { HoverPreview } from "@/components/motion/HoverPreview";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -13,6 +16,73 @@ import { leistungen } from "@/content/de";
  * nothing is hover-only.
  */
 export function Leistungen() {
+  const scope = useRef<HTMLElement>(null);
+
+  useGsap(
+    () => {
+      const root = scope.current;
+      if (!root) return;
+
+      const context = gsap.matchMedia();
+
+      // Desktop: each row rises and settles as the one before it recedes, so the
+      // list reads as cards stacking rather than five equal blocks.
+      context.add(
+        { desktop: `${DESKTOP_QUERY} and (prefers-reduced-motion: no-preference)` },
+        (state) => {
+          if (!state.conditions?.desktop) return;
+          const rows = gsap.utils.toArray<HTMLElement>("[data-service-row]", root);
+
+          rows.forEach((row, index) => {
+            gsap.fromTo(
+              row,
+              { yPercent: 8, autoAlpha: 0, scale: 0.98 },
+              {
+                yPercent: 0,
+                autoAlpha: 1,
+                scale: 1,
+                duration: DUR.base,
+                ease: EASE.expo,
+                scrollTrigger: { trigger: row, start: "top 88%", once: true },
+              }
+            );
+
+            // The row dims and drops back as it leaves the top of the viewport.
+            // immediateRender:false matters here — without it GSAP captures the
+            // start value while the entrance above still holds the row at
+            // opacity 0, and the row never becomes visible again.
+            if (index < rows.length - 1) {
+              gsap.fromTo(
+                row,
+                { opacity: 1, scale: 1 },
+                {
+                  opacity: 0.35,
+                  scale: 0.97,
+                  ease: EASE.linear,
+                  immediateRender: false,
+                  scrollTrigger: {
+                    trigger: row,
+                    start: "top 22%",
+                    end: "bottom 12%",
+                    scrub: true,
+                  },
+                }
+              );
+            }
+          });
+
+          return () => {
+            gsap.set(rows, { clearProps: "transform,opacity" });
+          };
+        }
+      );
+
+      return () => context.revert();
+    },
+    scope,
+    []
+  );
+
   const previews = leistungen.items.map((item) => ({
     src: item.preview.replace("/media/", "/images/").replace(".mp4", ".jpg"),
     alt: item.previewAlt,
@@ -20,6 +90,7 @@ export function Leistungen() {
 
   return (
     <section
+      ref={scope}
       id={leistungen.id}
       data-theme="light"
       aria-labelledby="leistungen-title"
@@ -37,10 +108,14 @@ export function Leistungen() {
             <li
               key={item.no}
               data-preview-index={index}
-              className="border-t last:border-b"
+              data-service-row
+              className="sticky top-[var(--header-h)] border-t last:border-b lg:static"
               style={{ borderColor: "var(--hairline)" }}
             >
-              <div className="grid gap-6 py-10 lg:grid-cols-12 lg:gap-8">
+              <div
+                className="grid gap-6 py-10 lg:grid-cols-12 lg:gap-8"
+                style={{ backgroundColor: "var(--theme-bg)" }}
+              >
                 <p className="t-mono t-muted lg:col-span-1">{item.no}</p>
 
                 <div className="lg:col-span-4">

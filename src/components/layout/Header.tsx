@@ -70,7 +70,10 @@ export function Header() {
     scrollTo(href);
   };
 
-  const linkHref = (href: string) => (onHome ? href : `/${href}`);
+  // Only in-page anchors get rewritten off the home page; absolute URLs
+  // such as the WhatsApp CTA must pass through as they are.
+  const linkHref = (href: string) =>
+    onHome || !href.startsWith("#") ? href : `/${href}`;
 
   return (
     <>

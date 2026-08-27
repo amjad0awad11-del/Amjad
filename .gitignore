@@ -41,8 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 # AMW
-/public/media/*.mp4
-/public/media/*.webm
+# Real client videos are committed; only scratch QA output is ignored.
 .qa/
 
 # Vercel

@@ -7,6 +7,17 @@
  */
 
 export type NavLink = { label: string; href: string };
+
+/** Digits only, with country code — wa.me rejects "+" and spaces. */
+export const WHATSAPP_NUMBER = "4915562753949";
+
+/**
+ * Opens WhatsApp straight into a chat with AMW, first message pre-filled so the
+ * visitor only has to hit send.
+ */
+export const WHATSAPP_CTA = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  "Hallo AMW, ich habe eure Website gesehen und interessiere mich für Meta Ads."
+)}`;
 export type Fact = { value: string; label: string };
 
 export const meta = {
@@ -18,8 +29,8 @@ export const meta = {
   locale: "de_DE",
   lang: "de",
   ogImageAlt: "AMW — Creative Performance Studio für Meta Ads",
-  email: "[[EMAIL]]",
-  whatsapp: "https://wa.me/15562753949",
+  email: "info@amwagence.de",
+  whatsapp: "https://wa.me/4915562753949",
   instagram: "[[INSTAGRAM_URL]]",
   calendly: "[[CALENDLY_URL]]",
   serviceTypes: [
@@ -66,7 +77,7 @@ export const header = {
     { label: "Preise", href: "#preise" },
     { label: "Kontakt", href: "#kontakt" },
   ] as NavLink[],
-  cta: { label: "Erstgespräch buchen", href: "#kontakt" } as NavLink,
+  cta: { label: "Erstgespräch buchen", href: WHATSAPP_CTA } as NavLink,
   localeLabel: "DE",
 } as const;
 
@@ -82,8 +93,8 @@ export const menu = {
   ] as NavLink[],
   metaTitle: "Direkt",
   meta: [
-    { label: "WhatsApp", href: "https://wa.me/15562753949" },
-    { label: "[[EMAIL]]", href: "mailto:[[EMAIL]]" },
+    { label: "WhatsApp", href: "https://wa.me/4915562753949" },
+    { label: "info@amwagence.de", href: "mailto:info@amwagence.de" },
     { label: "Instagram", href: "[[INSTAGRAM_URL]]" },
     { label: "Impressum", href: "/impressum" },
   ] as NavLink[],
@@ -94,17 +105,25 @@ export const hero = {
   eyebrow: "AMW — Creative Performance Studio · Meta Ads",
   h1: ["Creatives, die verkaufen.", "Nicht nur gefallen."],
   sub: "Wir entwickeln Videos, Statics und Strategien für Meta Ads — geschrieben für den Hook, gebaut fürs Testing, gemessen am Ergebnis.",
-  ctaPrimary: { label: "Projekt starten", href: "#kontakt" } as NavLink,
+  ctaPrimary: { label: "Per WhatsApp schreiben", href: WHATSAPP_CTA } as NavLink,
   ctaSecondary: { label: "Showreel ansehen", href: "#showreel" } as NavLink,
   badges: ["Keine Setup-Gebühr", "Keine Mindestlaufzeit", "Monatlich kündbar"],
   scrollCue: "Scrollen",
-  video: "/media/hero.mp4",
+  /** The hero wall plays the same creatives shown in the work gallery. */
+  wall: [
+    "/media/work-1.mp4",
+    "/media/work-2.mp4",
+    "/media/work-3.mp4",
+    "/media/work-4.mp4",
+    "/media/work-5.mp4",
+    "/media/work-6.mp4",
+  ],
+  wallAlt: "Ausschnitte aus AMW-Creatives für Meta Ads",
   poster: "/media/hero-poster.jpg",
-  videoAlt: "Hintergrundvideo: Ausschnitte aus AMW-Creatives für Meta Ads",
 } as const;
 
 export const showreel = {
-  src: "/media/hero.mp4",
+  src: "/media/work-1.mp4",
   poster: "/media/hero-poster.jpg",
   title: "AMW Showreel",
   caption: "Ausschnitt aus laufenden Kampagnen.",
@@ -195,63 +214,75 @@ export const arbeiten = {
   items: [
     {
       client: "[[KUNDE_1]]",
-      category: "Supplements",
-      type: "Video Ads",
+      category: "Beauty",
+      type: "Video Ad",
       year: "2026",
       media: "/media/work-1.mp4",
-      poster: "/images/work-1.jpg",
       kind: "video" as const,
-      alt: "Creative-Beispiel aus einer Supplements-Kampagne",
+      alt: "Creative-Beispiel: vertikales Video-Ad aus einer Beauty-Kampagne",
     },
     {
       client: "[[KUNDE_2]]",
-      category: "Beauty",
-      type: "UGC-Serie",
+      category: "Skincare",
+      type: "Video Ad",
       year: "2026",
       media: "/media/work-2.mp4",
-      poster: "/images/work-2.jpg",
       kind: "video" as const,
-      alt: "Creative-Beispiel aus einer Beauty-UGC-Serie",
+      alt: "Creative-Beispiel: vertikales Video-Ad aus einer Skincare-Kampagne",
     },
     {
       client: "[[KUNDE_3]]",
-      category: "Skincare",
-      type: "Static-Kampagne",
-      year: "2025",
-      media: "/images/work-3.jpg",
-      poster: "/images/work-3.jpg",
-      kind: "image" as const,
-      alt: "Creative-Beispiel aus einer Skincare-Static-Kampagne",
+      category: "Fragrance",
+      type: "Video Ad",
+      year: "2026",
+      media: "/media/work-3.mp4",
+      kind: "video" as const,
+      alt: "Creative-Beispiel: vertikales Video-Ad aus einer Duft-Kampagne",
     },
     {
       client: "[[KUNDE_4]]",
-      category: "Home",
-      type: "Full-Funnel",
-      year: "2025",
+      category: "UGC",
+      type: "UGC-Video",
+      year: "2026",
       media: "/media/work-4.mp4",
-      poster: "/images/work-4.jpg",
       kind: "video" as const,
-      alt: "Creative-Beispiel aus einer Full-Funnel-Kampagne für Home-Produkte",
+      alt: "Creative-Beispiel: UGC-Video im Creator-Look",
     },
     {
       client: "[[KUNDE_5]]",
-      category: "Fashion",
-      type: "Animation",
-      year: "2025",
+      category: "Beauty",
+      type: "Video Ad",
+      year: "2026",
       media: "/media/work-5.mp4",
-      poster: "/images/work-5.jpg",
       kind: "video" as const,
-      alt: "Creative-Beispiel: animiertes Fashion-Creative",
+      alt: "Creative-Beispiel: vertikales Video-Ad aus einer Beauty-Kampagne",
     },
     {
       client: "[[KUNDE_6]]",
-      category: "Food",
-      type: "Creative Strategy",
-      year: "2025",
-      media: "/images/work-6.jpg",
-      poster: "/images/work-6.jpg",
-      kind: "image" as const,
-      alt: "Creative-Beispiel aus einer Food-Kampagne",
+      category: "Skincare",
+      type: "UGC-Video",
+      year: "2026",
+      media: "/media/work-6.mp4",
+      kind: "video" as const,
+      alt: "Creative-Beispiel: UGC-Video aus einer Skincare-Kampagne",
+    },
+    {
+      client: "[[KUNDE_7]]",
+      category: "Fragrance",
+      type: "UGC-Video",
+      year: "2026",
+      media: "/media/work-7.mp4",
+      kind: "video" as const,
+      alt: "Creative-Beispiel: UGC-Video aus einer Duft-Kampagne",
+    },
+    {
+      client: "[[KUNDE_8]]",
+      category: "Beauty",
+      type: "Video Ad",
+      year: "2026",
+      media: "/media/work-8.mp4",
+      kind: "video" as const,
+      alt: "Creative-Beispiel: vertikales Video-Ad aus einer Beauty-Kampagne",
     },
   ],
 } as const;
@@ -525,8 +556,8 @@ export const kontakt = {
   },
   directTitle: "Direkt",
   direct: [
-    { label: "WhatsApp", value: "Direkt schreiben", href: "https://wa.me/15562753949" },
-    { label: "E-Mail", value: "[[EMAIL]]", href: "mailto:[[EMAIL]]" },
+    { label: "WhatsApp", value: "Direkt schreiben", href: WHATSAPP_CTA },
+    { label: "E-Mail", value: "info@amwagence.de", href: "mailto:info@amwagence.de" },
     { label: "Termin", value: "Erstgespräch buchen", href: "[[CALENDLY_URL]]" },
   ],
 } as const;
@@ -551,7 +582,7 @@ export const footer = {
   socialTitle: "Social",
   social: [
     { label: "Instagram", href: "[[INSTAGRAM_URL]]" },
-    { label: "WhatsApp", href: "https://wa.me/15562753949" },
+    { label: "WhatsApp", href: WHATSAPP_CTA },
   ] as NavLink[],
   clockLabel: "Berlin",
   copyright: "© 2026 AMW. Alle Rechte vorbehalten.",

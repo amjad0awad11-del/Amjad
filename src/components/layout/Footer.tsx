@@ -60,7 +60,10 @@ export function Footer({ onHome }: { onHome: boolean }) {
     []
   );
 
-  const linkHref = (href: string) => (onHome ? href : `/${href}`);
+  // Only in-page anchors get rewritten off the home page; absolute URLs
+  // such as the WhatsApp CTA must pass through as they are.
+  const linkHref = (href: string) =>
+    onHome || !href.startsWith("#") ? href : `/${href}`;
 
   const handleAnchor = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (!onHome) return;

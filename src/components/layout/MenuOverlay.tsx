@@ -156,7 +156,7 @@ export function MenuOverlay({
             {menu.links.map((item) => (
               <li key={item.href} className="overflow-hidden">
                 <a
-                  href={onHome ? item.href : `/${item.href}`}
+                  href={onHome || !item.href.startsWith("#") ? item.href : `/${item.href}`}
                   data-cursor="link"
                   onClick={(event) => go(event, item.href)}
                   className="block"

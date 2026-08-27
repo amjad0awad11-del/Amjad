@@ -71,6 +71,9 @@ const IGNORE = [
 
 async function auditPage(context, route, viewport, { reduced }) {
   const page = await context.newPage();
+  // newPage() inherits the context viewport, so each page must be sized itself
+  // — otherwise every run silently measures the context's original size.
+  await page.setViewportSize({ width: viewport.width, height: viewport.height });
   const label = `${viewport.name}${reduced ? " (reduced)" : ""}`;
 
   const expects404 = route === "/gibt-es-nicht";
@@ -198,10 +201,7 @@ async function main() {
         viewport: VIEWPORTS[3],
       });
       for (const viewport of reduced ? [VIEWPORTS[3]] : VIEWPORTS) {
-        await context.setViewportSize?.({ width: viewport.width, height: viewport.height });
         for (const route of ROUTES) {
-          const page = context.pages()[0];
-          if (page) await page.setViewportSize({ width: viewport.width, height: viewport.height });
           await auditPage(context, route, viewport, { reduced });
         }
       }

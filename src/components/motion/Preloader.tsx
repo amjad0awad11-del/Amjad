@@ -55,6 +55,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
 
     const context = gsap.context(() => {
       const letters = gsap.utils.toArray<HTMLElement>("[data-preloader-letter]");
+      const wordmark = root.querySelector<HTMLElement>("[data-preloader-mark]");
       const counterEl = root.querySelector<HTMLElement>("[data-preloader-count]");
       const subline = root.querySelector<HTMLElement>("[data-preloader-sub]");
       const panels = gsap.utils.toArray<HTMLElement>("[data-preloader-panel]");
@@ -65,13 +66,21 @@ export function Preloader({ onDone }: { onDone: () => void }) {
 
       const timeline = gsap.timeline({ onComplete: finish });
 
+      // The mark drives up from oversize before the curtain splits, so the
+      // opening reads as a title card rather than a spinner.
       timeline
+        .fromTo(
+          wordmark,
+          { scale: 1.6, letterSpacing: "0.3em" },
+          { scale: 1, letterSpacing: "-0.04em", duration: 1.6, ease: EASE.expo },
+          0
+        )
         .to(letters, {
           yPercent: 0,
           duration: DUR.base,
           ease: EASE.expo,
           stagger: STAGGER.chars * 4,
-        })
+        }, 0)
         .to(subline, { autoAlpha: 1, duration: DUR.fast, ease: EASE.out }, "-=0.4")
         .to(
           progress,
@@ -88,13 +97,18 @@ export function Preloader({ onDone }: { onDone: () => void }) {
         )
         .to([counterEl, subline], { autoAlpha: 0, duration: 0.3, ease: EASE.out })
         .to(
+          [wordmark, panels],
+          { scale: 1.08, duration: DUR.curtain, ease: EASE.curtain },
+          "-=0.1"
+        )
+        .to(
           panels,
           {
             yPercent: (index) => (index === 0 ? -101 : 101),
             duration: DUR.curtain,
             ease: EASE.curtain,
           },
-          "-=0.1"
+          "<"
         );
     }, root);
 
@@ -130,7 +144,7 @@ export function Preloader({ onDone }: { onDone: () => void }) {
 
       <div className="pointer-events-none absolute inset-0 grid place-items-center">
         <div className="flex flex-col items-center gap-5">
-          <span className="flex overflow-hidden" style={{ color: "var(--cream)" }}>
+          <span data-preloader-mark className="flex overflow-hidden" style={{ color: "var(--cream)" }}>
             {preloader.wordmark.split("").map((letter, index) => (
               <span key={`${letter}-${index}`} className="overflow-hidden">
                 <span data-preloader-letter className="block t-display">
