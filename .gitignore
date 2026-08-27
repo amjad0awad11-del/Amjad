@@ -43,3 +43,4 @@ next-env.d.ts
 # AMW
 /public/media/*.mp4
 /public/media/*.webm
+.qa/

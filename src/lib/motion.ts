@@ -50,6 +50,13 @@ export function registerGsap() {
 }
 
 /**
+ * Registration has to happen at module evaluation, not in a provider effect:
+ * child layout effects run before parent passive effects, so a component's
+ * first ScrollTrigger would otherwise be created against an unlinked plugin.
+ */
+registerGsap();
+
+/**
  * The single reduced-motion guard (§4.4). Components call this first and, when
  * it returns true, fall back to `simpleFade` instead of building a timeline.
  */
