@@ -23,9 +23,9 @@ export type Fact = { value: string; label: string };
 export const meta = {
   siteName: "AMW",
   domain: "https://amwagence.de",
-  title: "AMW — Creative Performance Studio für Meta Ads",
+  title: "AMW — Creative Performance Studio für Beauty & Fragrance",
   description:
-    "AMW entwickelt Video- und Bild-Creatives, UGC und Ads-Management für Meta. Ohne Setup-Gebühr, ohne Mindestlaufzeit, monatlich kündbar.",
+    "AMW entwickelt Video- und Bild-Creatives, UGC und Ads-Management für Beauty-, Skincare- und Fragrance-Marken auf Meta. Ohne Setup-Gebühr, ohne Mindestlaufzeit, monatlich kündbar.",
   locale: "de_DE",
   lang: "de",
   ogImageAlt: "AMW — Creative Performance Studio für Meta Ads",
@@ -34,7 +34,7 @@ export const meta = {
   instagram: "[[INSTAGRAM_URL]]",
   calendly: "[[CALENDLY_URL]]",
   serviceTypes: [
-    "Meta Ads",
+    "Meta Ads für Beauty-Marken",
     "Video Creatives",
     "Static Creatives",
     "UGC-Content",
@@ -63,7 +63,7 @@ export const a11y = {
 
 export const preloader = {
   wordmark: "AMW",
-  subline: "Creative Performance Studio",
+  subline: "Beauty · Skincare · Fragrance",
   counterLabel: "Ladefortschritt",
 } as const;
 
@@ -102,9 +102,9 @@ export const menu = {
 
 export const hero = {
   id: "hero",
-  eyebrow: "AMW — Creative Performance Studio · Meta Ads",
+  eyebrow: "AMW — Creative Performance Studio · Beauty & Fragrance",
   h1: ["Creatives, die verkaufen.", "Nicht nur gefallen."],
-  sub: "Wir entwickeln Videos, Statics und Strategien für Meta Ads — geschrieben für den Hook, gebaut fürs Testing, gemessen am Ergebnis.",
+  sub: "Wir entwickeln Video- und Bild-Creatives für Beauty-, Skincare- und Fragrance-Marken auf Meta — vom ersten Hook bis zum Kauf.",
   ctaPrimary: { label: "Per WhatsApp schreiben", href: WHATSAPP_CTA } as NavLink,
   ctaSecondary: { label: "Showreel ansehen", href: "#showreel" } as NavLink,
   badges: ["Keine Setup-Gebühr", "Keine Mindestlaufzeit", "Monatlich kündbar"],
@@ -131,12 +131,13 @@ export const showreel = {
 
 export const ticker = {
   items: [
-    "Meta Ads",
+    "Beauty",
+    "Skincare",
+    "Fragrance",
     "Video Creatives",
-    "Statics",
     "UGC",
+    "Meta Ads",
     "Creative Strategy",
-    "Ads Management",
   ],
   separator: "✦",
 } as const;
@@ -145,10 +146,10 @@ export const manifest = {
   id: "haltung",
   label: "01 — Haltung",
   lead: "Ein Creative ist kein Kunstwerk. Es ist eine Behauptung — und die wird im Ad-Konto bewiesen.",
-  body: "Wir starten nicht mit dem Schnitt, sondern mit der Frage, warum jemand stehenbleiben sollte. Daraus entstehen Winkel, aus Winkeln Varianten, aus Varianten Zahlen. Was funktioniert, wird ausgebaut. Was nicht funktioniert, wird abgeschaltet — ohne Diskussion über Geschmack.",
-  claim: "Ein Kanal. Voll ausgereizt.",
+  body: "Schöne Produktbilder hat in dieser Kategorie jeder. Was fehlt, ist der Grund, warum jemand stehenbleibt: die Textur in Großaufnahme, der Moment vor dem Spiegel, das Versprechen in drei Sekunden. Daraus entstehen Winkel, aus Winkeln Varianten, aus Varianten Zahlen. Was funktioniert, wird ausgebaut. Was nicht funktioniert, wird abgeschaltet.",
+  claim: "Eine Kategorie. Ein Kanal.",
   claimBody:
-    "Statt fünf Plattformen halbherzig zu bespielen, holen wir aus Meta alles raus, was drin ist.",
+    "Wir arbeiten nur mit Beauty, Skincare und Fragrance — und nur auf Meta. Zwei Entscheidungen, die jede dritte davon überflüssig machen.",
   facts: [
     { value: "0 €", label: "Setup-Gebühr" },
     { value: "2–4", label: "Wochen bis zu ersten Signalen" },
@@ -159,12 +160,12 @@ export const manifest = {
 export const leistungen = {
   id: "leistungen",
   label: "02 — Leistungen",
-  title: "Alles, was eine Meta-Anzeige braucht. Aus einer Hand.",
+  title: "Alles, was eine Beauty-Anzeige braucht. Aus einer Hand.",
   items: [
     {
       no: "01",
       title: "Video Ads für Meta",
-      text: "Hook, Story, Angebot — in dieser Reihenfolge. Vertikale Videos, die in den ersten drei Sekunden gewinnen. Inklusive Schnitt, Untertiteln, Sound-Design und Varianten fürs Testing.",
+      text: "Hook, Textur, Angebot — in dieser Reihenfolge. Vertikale Videos, die in den ersten drei Sekunden gewinnen: Close-ups, die die Konsistenz zeigen, Anwendung statt Aufzählung, Untertitel für den Feed ohne Ton.",
       tags: ["9:16", "4:5", "Untertitel", "Hook-Varianten"],
       preview: "/media/leistung-1.mp4",
       previewAlt: "Vorschau: vertikales Video-Creative für Meta Ads",
@@ -172,15 +173,15 @@ export const leistungen = {
     {
       no: "02",
       title: "Statics & Bilder",
-      text: "Produktshots, Vergleichsgrafiken, Claim-Statics, Before/After. Aus einem Produktfoto werden zwanzig testbare Varianten — jede mit eigener Botschaft.",
-      tags: ["1:1", "4:5", "Carousel", "Bildserien"],
+      text: "Produktshots, Vorher/Nachher, Inhaltsstoff-Grafiken, Claim-Statics. Aus einem Produktfoto werden zwanzig testbare Varianten — jede mit eigener Botschaft.",
+      tags: ["1:1", "4:5", "Carousel", "Vorher/Nachher"],
       preview: "/media/leistung-2.mp4",
       previewAlt: "Vorschau: statische Bild-Creatives in mehreren Formaten",
     },
     {
       no: "03",
       title: "UGC & KI-Creatives",
-      text: "Creator-Optik ohne Casting-Chaos: KI-generierte UGC-Videos in Studioqualität, auf Deutsch vertont, in Tagen statt Wochen.",
+      text: "Creator-Optik ohne Casting-Chaos: Badezimmerspiegel, Morgenroutine, ehrliche erste Reaktion. KI-generierte UGC-Videos in Studioqualität, auf Deutsch vertont, in Tagen statt Wochen.",
       tags: ["UGC", "KI-Video", "Voice-over DE"],
       preview: "/media/leistung-3.mp4",
       previewAlt: "Vorschau: UGC-Video im Creator-Look",
@@ -196,8 +197,8 @@ export const leistungen = {
     {
       no: "05",
       title: "Creative Strategy",
-      text: "Angebot, Zielgruppe, Winkel. Wir schreiben die Hypothesen, bevor die Kamera läuft — und leiten daraus den Creative-Plan für den Monat ab.",
-      tags: ["Angle Research", "Messaging", "Creative-Plan"],
+      text: "Verkauft das Produkt über Ritual, Inhaltsstoff oder Ergebnis? Wir schreiben die Hypothesen, bevor die Kamera läuft — und leiten daraus den Creative-Plan für den Monat ab.",
+      tags: ["Angle Research", "Claims", "Creative-Plan"],
       preview: "/media/leistung-5.mp4",
       previewAlt: "Vorschau: Creative-Plan mit Winkeln und Hypothesen",
     },
@@ -208,7 +209,7 @@ export const arbeiten = {
   id: "arbeiten",
   label: "03 — Arbeiten",
   title: "Ausgewählte Creatives.",
-  note: "Ausschnitt aus laufenden Kampagnen. Weitere Beispiele im Erstgespräch.",
+  note: "Ausschnitt aus laufenden Beauty- und Fragrance-Kampagnen. Weitere Beispiele im Erstgespräch.",
   cursorLabel: "Ansehen",
   dragHint: "Ziehen",
   items: [
@@ -295,12 +296,12 @@ export const prozess = {
     {
       no: "01",
       title: "Analyse & Strategie",
-      text: "Wir schauen ins Konto, ins Produkt und in den Markt: Was verkauft heute, was wurde nie getestet? Ergebnis ist ein Creative-Plan mit klaren Hypothesen.",
+      text: "Wir schauen ins Konto, ins Produkt und ins Regal daneben: Was verkauft heute, welcher Winkel wurde nie getestet, was behaupten die anderen? Ergebnis ist ein Creative-Plan mit klaren Hypothesen.",
     },
     {
       no: "02",
       title: "Kreation & Setup",
-      text: "Skripte, Produktion, Schnitt, Statics. Parallel dazu: Kampagnenstruktur, Tracking und Naming sauber aufgesetzt.",
+      text: "Skripte, Produktion, Schnitt, Statics — Textur, Licht und Ton so, wie die Kategorie es verlangt. Parallel dazu: Kampagnenstruktur, Tracking und Naming sauber aufgesetzt.",
     },
     {
       no: "03",
@@ -310,7 +311,7 @@ export const prozess = {
     {
       no: "04",
       title: "Skalierung",
-      text: "Gewinner ausbauen, Verlierer abschalten, Frequenz und Creative-Fatigue im Blick behalten. Monatliches Reporting in Klartext.",
+      text: "Gewinner ausbauen, Verlierer abschalten, Frequenz und Creative-Fatigue im Blick behalten — in Beauty ist ein Creative schneller verbraucht als anderswo. Monatliches Reporting in Klartext.",
     },
   ],
 } as const;
@@ -324,13 +325,13 @@ export const vergleich = {
   rows: [
     {
       label: "Fokus",
-      amw: "Nur Meta — dafür voll ausgereizt",
-      agency: "Multi-Channel-Baukasten",
+      amw: "Nur Beauty, nur Meta — dafür voll ausgereizt",
+      agency: "Jede Branche, jeder Kanal",
       freelancer: "Hängt an einer Person",
     },
     {
       label: "Creatives",
-      amw: "Video, Static und UGC inhouse",
+      amw: "Video, Static und UGC inhouse — für diese Kategorie gebaut",
       agency: "Produktion oft extern",
       freelancer: "Meist nur ein Format",
     },
@@ -353,10 +354,10 @@ export const vergleich = {
       freelancer: "Selten",
     },
     {
-      label: "Tracking",
-      amw: "Setup und Prüfung inklusive",
-      agency: "Zusatzleistung",
-      freelancer: "Oft nicht abgedeckt",
+      label: "Kategorie-Wissen",
+      amw: "Claims, Texturen, Rituale — täglich im Konto",
+      agency: "Wird pro Kunde neu gelernt",
+      freelancer: "Hängt am Portfolio",
     },
     {
       label: "Reporting",
@@ -451,16 +452,16 @@ export const stimmen = {
 export const studio = {
   id: "studio",
   label: "08 — Studio",
-  title: "Klein, schnell, verantwortlich.",
-  body: "AMW ist ein kompaktes Team aus Strategie, Kreation und Media-Buying. Kein Account-Management-Turm, keine Weiterreichung: Die Leute, die deine Ads bauen, sitzen auch in der Auswertung. Wir arbeiten mit wenigen Kunden gleichzeitig — weil Testing Aufmerksamkeit braucht, keine Kapazitätsplanung.",
+  title: "Klein, schnell, spezialisiert.",
+  body: "AMW ist ein kompaktes Team aus Strategie, Kreation und Media-Buying — und wir arbeiten ausschließlich mit Beauty-, Skincare- und Fragrance-Marken. Kein Account-Management-Turm, keine Weiterreichung: Die Leute, die deine Ads bauen, sitzen auch in der Auswertung. Wenige Kunden gleichzeitig, weil Testing Aufmerksamkeit braucht, keine Kapazitätsplanung.",
   values: [
     {
-      title: "Zahlen vor Geschmack",
-      text: "Entschieden wird im Ad-Konto, nicht im Meeting.",
+      title: "Schön reicht nicht",
+      text: "Ästhetik bringt dich in den Feed. Bewiesen wird im Ad-Konto.",
     },
     {
       title: "Tempo vor Perfektion",
-      text: "Lieber zehn getestete Varianten als ein perfektes Video.",
+      text: "Lieber zehn getestete Varianten als ein perfekter Spot.",
     },
     {
       title: "Klartext vor Buzzwords",
@@ -499,11 +500,15 @@ export const faq = {
     },
     {
       q: "Brauche ich eigenes Video- oder Bildmaterial?",
-      a: "Nein. Wir arbeiten mit deinen Produktfotos, produzieren KI-UGC oder organisieren echten Content. Vorhandenes Material nutzen wir natürlich mit.",
+      a: "Nein. Wir arbeiten mit deinen Produktfotos, produzieren KI-UGC oder organisieren echten Content. Vorhandenes Kampagnenmaterial nutzen wir natürlich mit.",
     },
     {
       q: "Wem gehören die Creatives?",
       a: "Dir. Nach Bezahlung gehen alle Nutzungsrechte an den Creatives an dich über.",
+    },
+    {
+      q: "Arbeitet ihr nur mit Beauty-Marken?",
+      a: "Unser Fokus liegt auf Beauty, Skincare und Fragrance — dort kennen wir die Claims, die Texturen und die Regeln. Passt dein Produkt nicht ganz in diese Kategorie, sag trotzdem Bescheid: Wenn wir die richtige Adresse sind, sagen wir es. Wenn nicht, auch.",
     },
     {
       q: "Arbeitet ihr auch mit TikTok oder Google?",
@@ -564,7 +569,7 @@ export const kontakt = {
 
 export const footer = {
   wordmark: "AMW",
-  tagline: "Creative Performance Studio · Meta Ads",
+  tagline: "Creative Performance Studio · Beauty & Fragrance",
   navTitle: "Seite",
   nav: [
     { label: "Leistungen", href: "#leistungen" },
