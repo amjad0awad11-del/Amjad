@@ -75,11 +75,26 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+/**
+ * Runs before first paint so the preloader overlay is painted with the page
+ * rather than after hydration — otherwise the hero flashes for a frame before
+ * the overlay covers it. Adds `amw-preload` only for the first visit in a
+ * session, with motion enabled.
+ */
+const PRELOAD_FLAG = `(function(){try{
+  var seen = sessionStorage.getItem("amw:preloaded") === "1";
+  var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!seen && !reduced) document.documentElement.classList.add("amw-preload");
+}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang={meta.lang} className={amw.variable}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: PRELOAD_FLAG }} />
+      </head>
       <body>{children}</body>
     </html>
   );

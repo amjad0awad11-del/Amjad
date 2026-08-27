@@ -93,7 +93,7 @@ async function auditPage(context, route, viewport, { reduced }) {
   });
 
   const response = await page.goto(`${BASE}${route}`, {
-    waitUntil: "networkidle",
+    waitUntil: "load",
     timeout: 30000,
   });
 

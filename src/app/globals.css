@@ -402,3 +402,23 @@ a {
     display: none;
   }
 }
+
+/* ==========================================================================
+   Preloader gate (A1)
+   The overlay ships in the server-rendered HTML and is hidden unless the
+   blocking script in <head> decided this is a first visit, so the hero never
+   flashes before it appears.
+   ========================================================================== */
+
+.preloader {
+  display: none;
+}
+
+html.amw-preload .preloader {
+  display: block;
+}
+
+/* Hold the page still underneath while the overlay is up. */
+html.amw-preload body {
+  overflow: hidden;
+}
