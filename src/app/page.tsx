@@ -1,4 +1,5 @@
 import { Shell } from "@/components/layout/Shell";
+import { JsonLd } from "@/components/JsonLd";
 import { Hero } from "@/components/sections/Hero";
 import { Ticker } from "@/components/sections/Ticker";
 import { Manifest } from "@/components/sections/Manifest";
@@ -23,6 +24,7 @@ export default function Home() {
 
   return (
     <Shell>
+      <JsonLd />
       <Hero hasVideo={heroHasVideo} />
       <Ticker />
       <Manifest />

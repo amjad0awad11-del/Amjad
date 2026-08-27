@@ -73,11 +73,15 @@ async function auditPage(context, route, viewport, { reduced }) {
   const page = await context.newPage();
   const label = `${viewport.name}${reduced ? " (reduced)" : ""}`;
 
+  const expects404 = route === "/gibt-es-nicht";
+
   page.on("console", (message) => {
     const type = message.type();
     if (type !== "error" && type !== "warning") return;
     const text = message.text();
     if (IGNORE.some((pattern) => pattern.test(text))) return;
+    // The 404 route is supposed to 404; its own document request is not a bug.
+    if (expects404 && /status of 404/.test(text)) return;
     note(route, label, `console.${type}`, text.slice(0, 220));
   });
   page.on("pageerror", (error) => note(route, label, "pageerror", String(error).slice(0, 220)));
@@ -87,7 +91,7 @@ async function auditPage(context, route, viewport, { reduced }) {
     note(route, label, "requestfailed", `${request.url()} — ${failure}`);
   });
   page.on("response", (response) => {
-    if (response.status() >= 400 && !route.includes("gibt-es-nicht")) {
+    if (response.status() >= 400 && !expects404) {
       note(route, label, `http${response.status()}`, response.url());
     }
   });
@@ -97,13 +101,23 @@ async function auditPage(context, route, viewport, { reduced }) {
     timeout: 30000,
   });
 
-  const expected = route === "/gibt-es-nicht" ? 404 : 200;
+  const expected = expects404 ? 404 : 200;
   if (response && response.status() !== expected) {
     note(route, label, "status", `expected ${expected}, got ${response.status()}`);
   }
 
   // Let the preloader finish and entrance timelines settle.
-  await page.waitForTimeout(reduced ? 600 : 3800);
+  await page.waitForTimeout(reduced ? 500 : 2600);
+
+  // Walk the whole page so every scroll-triggered reveal has actually fired
+  // before we judge what is visible, then return to the top.
+  const pageHeight = await page.evaluate(() => document.body.scrollHeight);
+  for (let y = 0; y < pageHeight; y += Math.round(viewport.height * 0.7)) {
+    await page.evaluate((value) => window.scrollTo(0, value), y);
+    await page.waitForTimeout(reduced ? 60 : 130);
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(400);
 
   const overflow = await page.evaluate(() => {
     const docWidth = document.documentElement.clientWidth;
@@ -161,9 +175,20 @@ async function auditPage(context, route, viewport, { reduced }) {
   await page.close();
 }
 
+async function serverIsUp() {
+  try {
+    const response = await fetch(BASE, { signal: AbortSignal.timeout(1500) });
+    return response.ok || response.status === 404;
+  } catch {
+    return false;
+  }
+}
+
 async function main() {
-  console.log("Starte Produktions-Server …");
-  const server = await startServer();
+  const reuse = await serverIsUp();
+  if (reuse) console.log(`Nutze laufenden Server auf ${BASE} …`);
+  else console.log("Starte Produktions-Server …");
+  const server = reuse ? null : await startServer();
 
   const browser = await chromium.launch(launchOptions);
   try {
@@ -184,7 +209,7 @@ async function main() {
     }
   } finally {
     await browser.close();
-    server.kill("SIGTERM");
+    server?.kill("SIGTERM");
   }
 
   if (problems.length === 0) {
@@ -205,7 +230,9 @@ async function main() {
   process.exitCode = 1;
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+main()
+  .then(() => process.exit(process.exitCode ?? 0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
