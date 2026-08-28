@@ -46,3 +46,6 @@ next-env.d.ts
 
 # Vercel
 .vercel
+
+# Cloned reference repo (remotion-dev/skills) - has its own git history
+/skills
