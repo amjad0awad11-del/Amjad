@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMW — Kreativagentur für Marken in Bewegung</title>
-    <meta name="description" content="AMW ist eine Kreativ- und Performance-Agentur. Strategie, Gestaltung und Mediabuying aus einem Haus — für Marken, die man nicht überscrollt.">
+    <title>AMW — Creative Performance Studio für Beauty &amp; Fragrance</title>
+    <meta name="description" content="AMW entwickelt Video- und Bild-Creatives, UGC und Ads-Management für Beauty-, Skincare- und Fragrance-Marken auf Meta. Ohne Setup-Gebühr, ohne Mindestlaufzeit, monatlich kündbar.">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Italiana&family=Outfit:wght@300;400;600&family=Playfair+Display:ital,wght@1,500&display=swap');
@@ -143,14 +143,18 @@
             transition: clip-path 1.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
             opacity: 0;
         }
-        #slide-2-img img {
+        #slide-2-img video {
+            position: absolute;
+            top: 0; left: 0;
             width: 100%; height: 100%;
             object-fit: cover;
+            opacity: 0;
             transform: scale(1.15);
-            transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease;
         }
+        #slide-2-img video.visible { opacity: 1; }
         #slide-2-img.active { clip-path: inset(0 0 0 0); opacity: 1; }
-        #slide-2-img.active img { transform: scale(1); }
+        #slide-2-img.active video.visible { transform: scale(1); }
 
         #slide-2 .slide-title { margin-left: calc(25vw + 40px); }
         #slide-2 .slide-desc {
@@ -254,46 +258,51 @@
         <div class="main-header">
             <div class="brand">AMW</div>
             <nav class="header-nav">
-                <a href="#slide-1" class="nav-link">Marke</a>
+                <a href="#slide-1" class="nav-link">Studio</a>
                 <span class="nav-dot"></span>
-                <a href="#slide-2" class="nav-link">Kreation</a>
+                <a href="#slide-2" class="nav-link">Leistungen</a>
                 <span class="nav-dot"></span>
-                <a href="#slide-3" class="nav-link">Performance</a>
+                <a href="#slide-3" class="nav-link">Arbeiten</a>
                 <span class="nav-dot"></span>
-                <a href="#slide-4" class="nav-link">Wachstum</a>
+                <a href="#slide-4" class="nav-link">Kontakt</a>
             </nav>
             <div class="header-actions">
-                <a href="#" class="contact-btn">Kontakt <span class="btn-circle"></span></a>
+                <a href="https://wa.me/4915562753949?text=Hallo%20AMW%2C%20ich%20habe%20eure%20Website%20gesehen%20und%20interessiere%20mich%20f%C3%BCr%20Meta%20Ads." class="contact-btn" target="_blank" rel="noopener">Erstgespräch <span class="btn-circle"></span></a>
             </div>
         </div>
 
         <div class="slide" id="slide-1">
-            <h2 class="slide-title">Marken <br>in Bewegung</h2>
+            <h2 class="slide-title">Creatives, die <br>verkaufen.</h2>
             <div class="desc-row">
-                <p class="slide-desc col-1">Wir bauen Marken, die man nicht überscrollt. Aus Strategie, Gestaltung und Daten entsteht ein Auftritt, der im Feed genauso trägt wie im Regal.</p>
-                <p class="slide-desc col-2">Von der ersten Idee bis zur ausgespielten Kampagne: ein Team, ein Takt, eine Handschrift. Kreation, die verkauft — Performance, die gut aussieht.</p>
+                <p class="slide-desc col-1">AMW ist ein Creative Performance Studio für Beauty, Skincare und Fragrance. Video- und Bild-Creatives für Meta — vom ersten Hook bis zum Kauf.</p>
+                <p class="slide-desc col-2">Eine Kategorie, ein Kanal. Keine Setup-Gebühr, keine Mindestlaufzeit, monatlich kündbar. Erste Signale nach zwei bis vier Wochen, stabile Ergebnisse nach 30 bis 90 Tagen.</p>
             </div>
         </div>
 
         <div class="slide" id="slide-2">
-            <h2 class="slide-title">Kreation <br>mit Haltung</h2>
-            <p class="slide-desc">Konzept, Film und Design aus einem Haus. Jedes Motiv entsteht für eine Plattform, eine Zielgruppe und ein Ziel — nichts davon ist Dekoration.</p>
+            <h2 class="slide-title">Video, Static <br>und UGC</h2>
+            <p class="slide-desc">Vertikale Videos, die in den ersten drei Sekunden gewinnen. Aus einem Produktfoto zwanzig testbare Statics. UGC in Creator-Optik, auf Deutsch vertont.</p>
         </div>
 
         <div class="slide" id="slide-3">
-            <h2 class="slide-title">Performance</h2>
-            <p class="slide-desc">Meta, TikTok, Google. Wir testen täglich, skalieren wöchentlich und berichten in Zahlen, die im Konto ankommen — nicht nur im Dashboard.</p>
+            <h2 class="slide-title">Arbeiten</h2>
+            <p class="slide-desc">Ausschnitt aus laufenden Beauty- und Fragrance-Kampagnen: vertikale Video-Ads und UGC. Weitere Beispiele im Erstgespräch.</p>
         </div>
 
         <div class="slide" id="slide-4">
-            <h2 class="slide-title">Messbares <br>Wachstum</h2>
-            <p class="slide-desc">Aus Aufmerksamkeit wird Umsatz. Wir begleiten Marken über Jahre statt über Kampagnen — mit klaren Zielen, offenen Zahlen und kurzen Wegen.</p>
+            <h2 class="slide-title">Reden <br>wir.</h2>
+            <p class="slide-desc">Kampagnenstruktur, Testing-Framework, Tracking und tägliche Steuerung. Erstgespräch per WhatsApp oder info@amwagence.de.</p>
         </div>
 
     </div>
 
     <div class="slide-image-mask" id="slide-2-img">
-        <img src="https://api.getlayers.ai/storage/v1/object/public/public/assets/laocoon-59f84455c6/1.png" alt="Kampagnenmotiv aus dem Studio">
+        <video data-clip="work-1.mp4" muted loop playsinline preload="metadata"
+               aria-label="Creative-Beispiel: vertikales Video-Ad aus einer Beauty-Kampagne"></video>
+        <video data-clip="work-3.mp4" muted loop playsinline preload="metadata"
+               aria-label="Creative-Beispiel: vertikales Video-Ad aus einer Duft-Kampagne"></video>
+        <video data-clip="work-6.mp4" muted loop playsinline preload="metadata"
+               aria-label="Creative-Beispiel: UGC-Video aus einer Skincare-Kampagne"></video>
     </div>
 
     <div class="grid-horizontal-line"></div>
@@ -348,6 +357,15 @@
         const sparkData = [];
 
         const sizes = { width: window.innerWidth, height: window.innerHeight };
+
+        /* AMW creatives. Served from this origin wherever the repo is deployed
+           (/media/...), read straight from the working copy when the file is opened
+           from disk, and fetched from the main site if neither is present. */
+        const MEDIA_BASE = location.protocol === 'file:' ? 'public/media' : '/media';
+        const MEDIA_FALLBACK = 'https://amwagence.de/media';
+
+        let maskVideos = [];
+        let maskIndex = -2;   // -1 = mask hidden; -2 = not yet initialised
 
         /* ------------------------------------------------------------------
            Per-letter title split
@@ -775,6 +793,41 @@
         }
 
         /* ------------------------------------------------------------------
+           Creative mask: one clip per slide, only the visible one plays
+        ------------------------------------------------------------------ */
+        function setupMaskVideos() {
+            maskVideos = Array.from(document.querySelectorAll('#slide-2-img video'));
+            maskVideos.forEach((video) => {
+                const clip = video.dataset.clip;
+                video.src = `${MEDIA_BASE}/${clip}`;
+                video.addEventListener('error', () => {
+                    if (video.dataset.fallbackTried) return;
+                    video.dataset.fallbackTried = '1';
+                    video.src = `${MEDIA_FALLBACK}/${clip}`;
+                });
+            });
+        }
+
+        function showMaskClip(index) {
+            if (index === maskIndex) return;   // only touch the DOM on a change
+            maskIndex = index;
+
+            const mask = document.getElementById('slide-2-img');
+            if (mask) mask.classList.toggle('active', index >= 0);
+
+            maskVideos.forEach((video, i) => {
+                const visible = i === index;
+                video.classList.toggle('visible', visible);
+                if (visible) {
+                    const played = video.play();
+                    if (played) played.catch(() => {});   // autoplay refused: first frame still shows
+                } else {
+                    video.pause();
+                }
+            });
+        }
+
+        /* ------------------------------------------------------------------
            Slides + stories progress
         ------------------------------------------------------------------ */
         function updateSlides(scroll) {
@@ -796,15 +849,16 @@
 
             function isActive(val, start, end) { return val >= start && val <= end; }
 
+            const active2 = isActive(scroll, 0.28, 0.40);
+            const active3 = isActive(scroll, 0.56, 0.68);
+            const active4 = isActive(scroll, 0.84, 1.05);
+
             if (slide1) slide1.classList.toggle('active', isActive(scroll, -0.10, 0.12));
-            if (slide2) {
-                const active2 = isActive(scroll, 0.28, 0.40);
-                slide2.classList.toggle('active', active2);
-                const slide2Img = document.getElementById('slide-2-img');
-                if (slide2Img) slide2Img.classList.toggle('active', active2);
-            }
-            if (slide3) slide3.classList.toggle('active', isActive(scroll, 0.56, 0.68));
-            if (slide4) slide4.classList.toggle('active', isActive(scroll, 0.84, 1.05));
+            if (slide2) slide2.classList.toggle('active', active2);
+            if (slide3) slide3.classList.toggle('active', active3);
+            if (slide4) slide4.classList.toggle('active', active4);
+
+            showMaskClip(active2 ? 0 : active3 ? 1 : active4 ? 2 : -1);
         }
 
         /* ------------------------------------------------------------------
@@ -931,6 +985,7 @@
         ------------------------------------------------------------------ */
         function init() {
             splitTitlesIntoChars();
+            setupMaskVideos();
             createScene();
             createLights();
             createSparks();
