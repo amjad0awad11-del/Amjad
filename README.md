@@ -155,3 +155,29 @@ Motion-Schicht (GSAP + ScrollTrigger + Observer + Lenis) ≈ 64 KB — also rund
 ## Legacy
 
 Die vorherige statische Website liegt unverändert unter `legacy/`.
+
+## `index.html` — Einzeldatei-Fassung „Marken in Bewegung"
+
+Neben der Next.js-Anwendung liegt im Repository-Wurzelverzeichnis eine
+**vollständig eigenständige** Landingpage: `index.html`. Eine Datei, kein Build,
+kein Framework, kein Bundler — Doppelklick genügt.
+
+| Baustein | Umsetzung |
+|---|---|
+| 3D | Three.js r0.160 über Importmap von unpkg, dazu `GLTFLoader` |
+| Bühne | Bronzeskulptur auf schwarzem Grund, Kamera umkreist sie beim Scrollen um 360° |
+| Hintergrund | eigener Wellen-Shader, Palette wandert beim Scrollen von Bronze nach Saphirblau |
+| Partikel | 450 additive Funken mit prozedural erzeugter Textur, turbulenter bei schnellem Scrollen |
+| Text | vier Slides, Titel buchstabenweise mit Blur-Aufblendung (0,035 s Versatz) |
+| Bedienung | eigener Doppelring-Cursor, Rasterlinien mit driftenden Punkten, Stories-Fortschritt |
+| Schrift | Italiana (Display) und Outfit (Fließtext) von Google Fonts |
+
+Die Seite ist 900 vh hoch; sämtliche Bewegung hängt an der Scrollposition und
+wird per Lerp geglättet (Scroll 0.025, Maus 0.05, Cursor 0.2).
+
+**Inhalt:** deutsch, vier Stationen — Marke, Kreation, Performance, Wachstum.
+
+**Assets:** Modell und Editorial-Bild kommen aus dem Layers-Bucket
+(`ASSET_BASE_URL` oben im Script). Lässt sich das GLB nicht laden — offline,
+gesperrter Host —, tritt eine prozedural erzeugte Bronzeform an seine Stelle,
+damit die Bühne nie leer bleibt.
