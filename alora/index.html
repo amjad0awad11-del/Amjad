@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alora — Flüssige Kräuterauszüge</title>
+<meta name="description" content="Alora ist ein flüssiger Kräuterauszug aus Löwenzahn, Rotklee, Labkraut und Klettenwurzel. Zweimal täglich zehn Tropfen unter die Zunge — alkoholfrei, vegan, ohne Zusatzstoffe. 60 ml reichen für rund zwei Monate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#10231A;
+  --green:#1F4D3A;
+  --green-deep:#123124;
+  --green-soft:#3D6B54;
+  --cream:#F5F1E6;
+  --cream-2:#EDE6D6;
+  --cream-3:#E4DBC6;
+  --sage:#C9D6BE;
+  --accent:#B1C361;
+  --gold:#B8893B;
+  --gold-lite:#D9B978;
+  --muted:#6B7A6F;
+  --line:rgba(31,77,58,.14);
+  --f-display:'Fraunces','Iowan Old Style',Palatino,Georgia,serif;
+  --f-body:'Outfit',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --sp-1:8px; --sp-2:16px; --sp-3:24px; --sp-4:40px;
+  --sp-5:64px; --sp-6:96px; --sp-7:140px;
+  --pad:clamp(20px,5vw,72px);
+  --maxw:1440px;
+  --r:14px;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--f-body);
+  font-size:17px;line-height:1.75;font-weight:300;
+  color:var(--ink);background:var(--cream);
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+img{max-width:100%;display:block;height:auto}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:4px}
+
+/* ---------- type ---------- */
+.display{font-family:var(--f-display);font-weight:400;line-height:.98;letter-spacing:-.02em;font-variation-settings:'SOFT' 20,'WONK' 1}
+h1.display{font-size:clamp(3.2rem,8.6vw,7.5rem)}
+h2.display{font-size:clamp(2.3rem,5.4vw,4.4rem);line-height:1.02}
+h3.display{font-size:clamp(1.5rem,2.4vw,2.1rem);line-height:1.12}
+.ital{font-style:italic;font-weight:300}
+.eyebrow{
+  font-size:11px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--green-soft);display:flex;align-items:center;gap:10px;
+}
+.eyebrow::before{content:"";width:26px;height:1px;background:var(--green-soft);opacity:.5;flex:none}
+.lead{font-size:clamp(1.02rem,1.32vw,1.19rem);line-height:1.72;color:#3A4A3F;max-width:52ch}
+.small{font-size:13.5px;line-height:1.62;color:var(--muted)}
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--pad)}
+section{position:relative}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  min-height:52px;padding:0 28px;border-radius:100px;
+  font-size:13px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
+  transition:transform .45s var(--ease),background .35s,color .35s,box-shadow .45s var(--ease);
+  will-change:transform;
+}
+.btn-primary{background:var(--green);color:var(--cream);box-shadow:0 2px 0 rgba(16,35,26,.12)}
+.btn-primary:hover{background:var(--green-deep);transform:translateY(-2px);box-shadow:0 14px 34px -14px rgba(18,49,36,.65)}
+.btn-ghost{border:1px solid var(--line);color:var(--green)}
+.btn-ghost:hover{background:rgba(31,77,58,.05);transform:translateY(-2px)}
+.btn .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55}
+
+/* ---------- announcement + header ---------- */
+.announce{
+  background:var(--green-deep);color:var(--cream);
+  font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:400;
+  height:38px;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  position:relative;z-index:60;
+}
+.announce-track{display:flex;flex-direction:column;height:38px}
+.announce-item{flex:none;height:38px;display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;opacity:.92}
+header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(245,241,230,0);
+  backdrop-filter:blur(0px);
+  transition:background .5s var(--ease),backdrop-filter .5s,border-color .5s,box-shadow .5s;
+  border-bottom:1px solid transparent;
+}
+header.stuck{
+  background:rgba(245,241,230,.86);backdrop-filter:blur(14px) saturate(1.3);
+  border-bottom-color:var(--line);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:24px;height:74px}
+.brand{
+  font-family:var(--f-display);font-size:26px;font-weight:500;letter-spacing:.01em;
+  color:var(--green);line-height:1;
+  display:inline-flex;align-items:center;min-height:44px;
+}
+.brand sup{font-family:var(--f-body);font-size:9px;letter-spacing:.14em;vertical-align:super;opacity:.55;font-weight:500}
+.nav-links{display:none;gap:32px;align-items:center}
+.nav-links a{
+  font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:var(--green);
+  position:relative;padding:14px 0;display:inline-flex;align-items:center;min-height:44px;
+}
+.nav-links a::after{
+  content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--green);
+  transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease);
+}
+.nav-links a:hover::after{transform:scaleX(1);transform-origin:left}
+.nav-right{display:flex;align-items:center;gap:14px}
+.cart-btn{
+  display:inline-flex;align-items:center;gap:9px;min-height:44px;padding:0 18px;border-radius:100px;
+  border:1px solid var(--line);font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--green);
+  transition:background .3s,transform .4s var(--ease);
+}
+.cart-btn:hover{background:rgba(31,77,58,.05);transform:translateY(-1px)}
+.cart-count{
+  background:var(--green);color:var(--cream);font-size:10px;min-width:18px;height:18px;
+  border-radius:9px;display:grid;place-items:center;font-weight:500;
+}
+@media(min-width:940px){ .nav-links{display:flex} }
+
+/* ---------- hero ---------- */
+.hero{
+  position:relative;min-height:calc(100svh - 112px);
+  display:flex;align-items:center;padding-block:clamp(48px,7vw,80px) clamp(56px,8vw,110px);
+  overflow:hidden;
+}
+.hero-grid{
+  display:grid;grid-template-columns:1fr;gap:clamp(36px,5vw,56px);
+  align-items:center;width:100%;position:relative;z-index:3;
+}
+@media(min-width:900px){ .hero-grid{grid-template-columns:1.05fr .95fr} }
+.hero-copy{max-width:640px}
+.hero h1{margin:22px 0 26px;color:var(--green-deep)}
+.hero .lead{margin-bottom:34px}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:38px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center}
+.hero-meta span{
+  font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.hero-meta svg{width:14px;height:14px;flex:none;color:var(--accent)}
+/* bottle stage */
+.stage{position:relative;display:grid;place-items:center;min-height:clamp(380px,52vw,640px)}
+.stage-halo{
+  position:absolute;width:min(78%,460px);aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle at 50% 45%,rgba(177,195,97,.30),rgba(201,214,190,.22) 42%,transparent 70%);
+  filter:blur(14px);
+}
+.stage-ring{
+  position:absolute;width:min(74%,430px);aspect-ratio:1;border-radius:50%;
+  border:1px solid rgba(31,77,58,.16);
+}
+.stage-ring.r2{width:min(92%,530px);border-color:rgba(31,77,58,.09)}
+.bottle{
+  position:relative;z-index:2;width:auto;height:clamp(330px,44vw,560px);
+  filter:drop-shadow(0 42px 46px rgba(18,49,36,.26));
+  will-change:transform;
+}
+/* floating botanical line art */
+.leaf-art{position:absolute;pointer-events:none;color:var(--green);opacity:.16;z-index:1}
+.leaf-1{top:4%;left:-4%;width:clamp(110px,17vw,215px)}
+.leaf-2{bottom:2%;right:-3%;width:clamp(120px,19vw,240px);transform:scaleX(-1)}
+.hero-bg-word{
+  position:absolute;left:50%;bottom:5%;transform:translateX(-50%);
+  font-family:var(--f-display);font-size:clamp(5rem,17vw,14.5rem);line-height:1;
+  color:var(--green);opacity:.042;white-space:nowrap;pointer-events:none;z-index:1;font-style:italic;
+}
+/* it would sit on top of the CTAs on small screens */
+@media(max-width:900px){ .hero-bg-word{display:none} }
+
+/* per-char reveal — words stay unbreakable so lines never split mid-word */
+.split .word{display:inline-block;white-space:nowrap}
+.split .char{
+  display:inline-block;opacity:0;transform:translateY(.42em);filter:blur(11px);
+  transition:opacity .9s var(--ease),transform .9s var(--ease),filter .9s var(--ease);
+}
+.split.in .char{opacity:1;transform:translateY(0);filter:blur(0)}
+/* generic reveal */
+.rev{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.rev.in{opacity:1;transform:none}
+.bot-card.rev{transition-delay:calc(var(--i,0) * .09s)}
+
+/* ---------- marquee ---------- */
+.marquee{
+  background:var(--green-deep);color:var(--cream);padding:17px 0;overflow:hidden;
+  border-block:1px solid rgba(245,241,230,.1);
+}
+.mq-track{display:flex;gap:0;width:max-content;animation:mq 34s linear infinite}
+.mq-group{display:flex;align-items:center;gap:44px;padding-right:44px}
+.mq-group span{
+  font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;white-space:nowrap;opacity:.85;font-weight:400;
+}
+.mq-group i{width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.8;flex:none}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ---------- problem ---------- */
+.problem{padding-block:clamp(70px,11vw,150px);background:var(--cream)}
+.problem-grid{display:grid;grid-template-columns:1fr;gap:clamp(38px,6vw,80px);align-items:center}
+@media(min-width:900px){ .problem-grid{grid-template-columns:.95fr 1.05fr} }
+.pain-list{list-style:none;margin-top:34px;display:grid;gap:0}
+.pain-list li{
+  display:flex;gap:20px;align-items:flex-start;padding:20px 0;border-top:1px solid var(--line);
+}
+.pain-list li:last-child{border-bottom:1px solid var(--line)}
+.pain-n{
+  font-family:var(--f-display);font-size:13px;color:var(--gold);flex:none;
+  width:26px;padding-top:5px;font-variant-numeric:tabular-nums;
+}
+.pain-t{font-size:16.5px;line-height:1.62;color:#33443A}
+.pain-t b{font-weight:500;color:var(--green-deep)}
+.scene-frame{
+  position:relative;border-radius:280px 280px 18px 18px;overflow:hidden;
+  aspect-ratio:4/5;background:var(--cream-2);
+  clip-path:inset(0 0 100% 0);transition:clip-path 1.5s var(--ease);
+}
+.scene-frame.in{clip-path:inset(0 0 0 0)}
+.scene-frame img{width:100%;height:100%;object-fit:cover;transform:scale(1.14);transition:transform 1.7s var(--ease)}
+.scene-frame.in img{transform:scale(1)}
+.scene-cap{
+  position:absolute;left:18px;bottom:18px;right:18px;
+  background:rgba(245,241,230,.9);backdrop-filter:blur(8px);
+  border-radius:10px;padding:13px 16px;font-size:12.5px;line-height:1.5;color:var(--green-deep);
+}
+
+/* ---------- mechanism ---------- */
+.mech{background:var(--green-deep);color:var(--cream);position:relative;overflow:hidden}
+.mech::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(70% 50% at 78% 18%,rgba(177,195,97,.13),transparent 62%),
+             radial-gradient(60% 46% at 12% 88%,rgba(184,137,59,.12),transparent 60%);
+}
+.mech-inner{
+  position:relative;z-index:2;
+  min-height:100svh;display:flex;flex-direction:column;justify-content:center;
+  /* top padding clears the sticky header while this section is pinned */
+  padding-block:clamp(84px,10vh,118px) clamp(30px,4vh,58px);
+}
+.mech-head{padding:0 0 clamp(14px,2.2vh,30px);max-width:600px}
+/* sized against viewport HEIGHT too, so the pinned layout survives short laptops */
+.mech-head h2{font-size:clamp(1.85rem,min(4.2vw,5.2vh),3.5rem)}
+.mech .eyebrow{color:var(--accent)}
+.mech .eyebrow::before{background:var(--accent)}
+.mech h2{color:var(--cream)}
+.mech-head p{color:rgba(245,241,230,.72);margin-top:16px;max-width:46ch;font-size:15px;line-height:1.62}
+.mech-stage{
+  display:grid;grid-template-columns:1fr;gap:clamp(26px,4vw,64px);
+  align-items:center;
+}
+@media(min-width:940px){ .mech-stage{grid-template-columns:1.02fr .98fr} }
+.mech-col{display:flex;flex-direction:column;justify-content:center}
+.mech-vis{
+  position:relative;aspect-ratio:1/1;width:100%;
+  max-width:min(58vh,500px);margin-inline:auto;
+  display:grid;place-items:center;
+}
+/* Mobile: no pin, so read top-to-bottom — heading, illustration, then steps. */
+@media(max-width:939px){
+  .mech-col{display:contents}
+  .mech-head{order:1}
+  .mech-vis{order:2;max-width:min(42vh,340px);margin-block:4px 22px}
+  .mech-steps{order:3}
+}
+.mech-vis svg{width:100%;height:100%;overflow:visible}
+.plate{fill:none;stroke:rgba(245,241,230,.13);stroke-width:1}
+.plate-2{stroke:rgba(245,241,230,.07);stroke-dasharray:2 7}
+.vessel-base{fill:none;stroke:rgba(245,241,230,.17);stroke-width:12;stroke-linecap:round}
+.vessel-sludge{fill:none;stroke:#5F543F;stroke-width:8;stroke-linecap:round;opacity:.95}
+.vessel-flow{fill:none;stroke:url(#goldgrad);stroke-width:8;stroke-linecap:round}
+.lnode{fill:#6B5B3E;stroke:rgba(245,241,230,.3);stroke-width:1.2}
+.lnode.sm{fill:rgba(245,241,230,.22);stroke:none}
+.node{fill:#6B5B3E;stroke:rgba(245,241,230,.3);stroke-width:1.5}
+.tick{stroke:rgba(245,241,230,.35);stroke-width:1}
+.node-lbl{font-family:var(--f-body);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;fill:rgba(245,241,230,.55)}
+.spark{fill:var(--gold-lite)}
+.mech-steps{display:grid;gap:0;align-content:center}
+.mstep{
+  padding:clamp(11px,1.6vh,19px) 0;border-top:1px solid rgba(245,241,230,.16);
+  opacity:.3;transition:opacity .6s var(--ease),filter .6s var(--ease);filter:blur(1px);
+}
+.mstep:last-child{border-bottom:1px solid rgba(245,241,230,.16)}
+.mstep.on{opacity:1;filter:none}
+/* Must sit AFTER the base .mstep rule — same specificity, later wins.
+   Condition is the inverse of the JS pin gate (min-width:940px)and(min-height:700px):
+   if the section can't pin, nothing dims the steps. */
+@media(max-width:939px),(max-height:699px){
+  .mstep{opacity:1;filter:none}
+}
+.mstep-k{
+  font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);
+  display:flex;align-items:center;gap:10px;margin-bottom:9px;
+}
+.mstep h3{color:var(--cream);margin-bottom:6px;font-size:clamp(1.2rem,min(2.1vw,2.9vh),1.9rem)}
+.mstep p{color:rgba(245,241,230,.7);font-size:clamp(13.5px,min(1.05vw,1.95vh),15px);line-height:1.58;max-width:46ch}
+.mstep-k{margin-bottom:clamp(5px,.9vh,9px)}
+
+/* ---------- botanicals ---------- */
+.bot{padding-block:clamp(70px,11vw,150px);background:var(--cream-2)}
+.bot-head{display:grid;gap:24px;margin-bottom:clamp(40px,6vw,72px);max-width:680px}
+.bot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.bot-card{
+  background:var(--cream);padding:clamp(26px,3vw,38px);
+  display:flex;flex-direction:column;gap:16px;position:relative;
+  transition:background .55s var(--ease);min-height:290px;
+}
+.bot-card:hover{background:#FBF8EF}
+.bot-art{width:66px;height:66px;color:var(--green-soft);opacity:.85;transition:transform .8s var(--ease),color .5s}
+.bot-card:hover .bot-art{transform:translateY(-5px) rotate(-4deg);color:var(--gold)}
+.bot-card h3{font-family:var(--f-display);font-size:1.45rem;font-weight:400;color:var(--green-deep);line-height:1.15}
+.bot-lat{font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);font-style:normal}
+.bot-card p{font-size:14.5px;line-height:1.68;color:#4A5A50;margin-top:auto}
+.bot-note{
+  margin-top:28px;font-size:13px;color:var(--muted);max-width:70ch;line-height:1.66;
+}
+
+/* ---------- ritual ---------- */
+.ritual{padding-block:clamp(70px,11vw,150px);background:var(--cream)}
+.rit-grid{display:grid;grid-template-columns:1fr;gap:clamp(38px,5vw,70px);align-items:center}
+@media(min-width:900px){ .rit-grid{grid-template-columns:1fr 1fr} }
+.rit-steps{display:grid;gap:0;margin-top:32px}
+.rit-step{display:flex;gap:22px;padding:24px 0;border-top:1px solid var(--line);align-items:flex-start}
+.rit-step:last-child{border-bottom:1px solid var(--line)}
+.rit-num{
+  flex:none;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);
+  display:grid;place-items:center;font-family:var(--f-display);font-size:15px;color:var(--green);
+  background:var(--cream-2);
+}
+.rit-step h3{font-size:1.05rem;font-weight:500;color:var(--green-deep);margin-bottom:5px;font-family:var(--f-body)}
+.rit-step p{font-size:14.5px;color:#4A5A50;line-height:1.65}
+.rit-vis{position:relative;display:grid;place-items:center;padding:40px 0}
+.rit-vis .bottle{height:clamp(280px,36vw,440px)}
+.rit-dial{position:absolute;width:min(90%,400px);aspect-ratio:1;border-radius:50%;border:1px dashed rgba(31,77,58,.2)}
+
+/* ---------- compare ---------- */
+.cmp{padding-block:clamp(70px,11vw,150px);background:var(--green-deep);color:var(--cream)}
+.cmp .eyebrow{color:var(--accent)}
+.cmp .eyebrow::before{background:var(--accent)}
+.cmp h2{color:var(--cream);margin-top:20px}
+.cmp-scroll{overflow-x:auto;margin-top:clamp(36px,5vw,60px);-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;width:100%;min-width:640px}
+th,td{padding:19px 20px;text-align:left;border-bottom:1px solid rgba(245,241,230,.14);font-size:14.5px}
+thead th{
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:500;
+  color:rgba(245,241,230,.6);padding-bottom:14px;
+}
+thead th.hi{color:var(--accent)}
+tbody th{font-weight:400;color:rgba(245,241,230,.72);width:30%}
+td{color:rgba(245,241,230,.62)}
+td.hi{color:var(--cream);font-weight:400;background:rgba(177,195,97,.07)}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:none}
+.chk{display:inline-flex;align-items:center;gap:9px}
+.chk svg{width:15px;height:15px;flex:none;color:var(--accent)}
+
+/* ---------- reviews ---------- */
+.rev-sec{padding-block:clamp(70px,11vw,150px);background:var(--cream-2)}
+.rev-head{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:flex-end;margin-bottom:44px}
+.rev-empty{
+  border:1px dashed rgba(31,77,58,.3);border-radius:var(--r);
+  padding:clamp(38px,6vw,72px) clamp(24px,4vw,56px);text-align:center;background:var(--cream);
+}
+.rev-stars{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+.rev-stars svg{width:19px;height:19px;color:var(--cream-3)}
+.rev-empty h3{font-family:var(--f-display);font-size:1.65rem;font-weight:400;color:var(--green-deep);margin-bottom:12px}
+.rev-empty p{font-size:15px;color:var(--muted);max-width:44ch;margin-inline:auto;line-height:1.7}
+.rev-empty .btn{margin-top:26px}
+.rev-mount-note{
+  margin-top:22px;font-size:12px;color:var(--muted);text-align:center;letter-spacing:.02em;
+}
+
+/* ---------- faq ---------- */
+.faq{padding-block:clamp(70px,11vw,150px);background:var(--cream)}
+.faq-grid{display:grid;grid-template-columns:1fr;gap:clamp(30px,4vw,64px)}
+@media(min-width:900px){ .faq-grid{grid-template-columns:.8fr 1.2fr} }
+.acc{border-top:1px solid var(--line)}
+.acc-item{border-bottom:1px solid var(--line)}
+.acc-q{
+  width:100%;display:flex;justify-content:space-between;align-items:center;gap:24px;
+  padding:24px 0;text-align:left;font-size:16.5px;font-weight:400;color:var(--green-deep);
+  min-height:44px;transition:color .3s;
+}
+.acc-q:hover{color:var(--gold)}
+.acc-ico{
+  flex:none;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);
+  display:grid;place-items:center;position:relative;transition:background .4s,transform .5s var(--ease);
+}
+.acc-ico::before,.acc-ico::after{
+  content:"";position:absolute;background:var(--green);border-radius:2px;transition:transform .5s var(--ease);
+}
+.acc-ico::before{width:11px;height:1.4px}
+.acc-ico::after{width:1.4px;height:11px}
+.acc-item.open .acc-ico{background:var(--green);transform:rotate(90deg)}
+.acc-item.open .acc-ico::before,.acc-item.open .acc-ico::after{background:var(--cream)}
+.acc-item.open .acc-ico::after{transform:scaleY(0)}
+.acc-a{max-height:0;overflow:hidden;transition:max-height .6s var(--ease)}
+.acc-a p{padding:0 0 26px;font-size:15px;line-height:1.75;color:#4A5A50;max-width:62ch}
+
+/* ---------- cta + footer ---------- */
+.cta{
+  padding-block:clamp(70px,11vw,150px);background:var(--cream-2);
+  position:relative;overflow:hidden;
+}
+.cta-inner{display:grid;grid-template-columns:1fr;gap:clamp(34px,5vw,64px);align-items:center}
+@media(min-width:860px){ .cta-inner{grid-template-columns:1fr 1fr} }
+.cta h2{color:var(--green-deep);margin:20px 0 22px}
+.price-row{display:flex;align-items:baseline;gap:14px;margin:28px 0 8px;flex-wrap:wrap}
+.price{font-family:var(--f-display);font-size:2.6rem;color:var(--green-deep);line-height:1}
+.price-old{font-size:1.05rem;color:var(--muted);text-decoration:line-through}
+.price-save{
+  font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--green);
+  background:var(--accent);padding:5px 11px;border-radius:100px;font-weight:500;
+}
+.grundpreis{font-size:12.5px;color:var(--muted);margin-bottom:26px}
+.hinweis{
+  margin-top:30px;padding:16px 18px;border-left:2px solid var(--gold);
+  background:rgba(184,137,59,.07);border-radius:0 8px 8px 0;
+  font-size:12.5px;line-height:1.65;color:#4A5A50;max-width:56ch;
+}
+.cta-vis{position:relative;display:grid;place-items:center}
+.cta-vis .bottle{height:clamp(300px,38vw,470px)}
+footer{background:var(--green-deep);color:rgba(245,241,230,.72);padding-block:clamp(50px,7vw,90px) 34px}
+.f-top{display:grid;grid-template-columns:1fr;gap:clamp(34px,5vw,60px);padding-bottom:48px;border-bottom:1px solid rgba(245,241,230,.14)}
+@media(min-width:800px){ .f-top{grid-template-columns:1.4fr 1fr 1fr 1fr} }
+.f-brand{font-family:var(--f-display);font-size:30px;color:var(--cream);margin-bottom:14px}
+.f-top p{font-size:14px;line-height:1.7;max-width:34ch}
+.f-col h4{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:18px;font-weight:500}
+.f-col ul{list-style:none;display:grid;gap:11px}
+.f-col a{font-size:14px;transition:color .3s}
+.f-col a:hover{color:var(--cream)}
+.f-bot{
+  display:flex;flex-wrap:wrap;gap:16px 32px;justify-content:space-between;
+  padding-top:26px;font-size:12px;color:rgba(245,241,230,.5);
+}
+.f-legal{max-width:74ch;font-size:11.5px;line-height:1.65;color:rgba(245,241,230,.42);margin-top:18px}
+
+/* ---------- reduced motion ---------- */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .split .char,.rev{opacity:1!important;transform:none!important;filter:none!important}
+  .mstep{opacity:1!important;filter:none!important}
+  .scene-frame{clip-path:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="announce" aria-label="Hinweise">
+  <div class="announce-track" id="ann">
+    <div class="announce-item">Versandkostenfrei ab 49 €</div>
+    <div class="announce-item">Laborgeprüft &amp; abgefüllt in Deutschland</div>
+    <div class="announce-item">60 Tage Rückgaberecht</div>
+  </div>
+</div>
+
+<header id="hdr">
+  <div class="wrap nav">
+    <a href="#" class="brand" aria-label="Alora Startseite">Alora<sup>DE</sup></a>
+    <nav class="nav-links" aria-label="Hauptnavigation">
+      <a href="#problem">Warum Alora</a>
+      <a href="#mech">So funktioniert's</a>
+      <a href="#botanicals">Inhaltsstoffe</a>
+      <a href="#ritual">Ritual</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-right">
+      <a href="produkt.html" class="btn btn-primary" style="min-height:44px;padding:0 22px">Kaufen</a>
+      <button class="cart-btn" aria-label="Warenkorb, 0 Artikel">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="cart-count">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-bg-word" aria-hidden="true">Leichtigkeit</div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow rev">Flüssige Kräuterauszüge · 60 ml</p>
+      <h1 class="display split">Morgens wieder <span class="ital">du selbst.</span></h1>
+      <p class="lead rev">Vier Pflanzen, traditionell verwendet: Löwenzahn, Rotklee, Labkraut und Klettenwurzel — als flüssiger Auszug. Zweimal täglich zehn Tropfen unter die Zunge. Mehr ist nicht drin.</p>
+      <div class="hero-cta rev">
+        <a href="produkt.html" class="btn btn-primary">Jetzt entdecken <span class="dot"></span> 29,90 €</a>
+        <a href="#mech" class="btn btn-ghost">So funktioniert's</a>
+      </div>
+      <div class="hero-meta rev">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Alkoholfrei</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Vegan</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Laborgeprüft</span>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="stage-halo" aria-hidden="true"></div>
+      <div class="stage-ring r2" aria-hidden="true"></div>
+      <div class="stage-ring" aria-hidden="true"></div>
+      <svg class="leaf-art leaf-1" viewBox="0 0 200 260" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M100 250C100 250 100 140 100 12"/>
+        <path d="M100 200c-40 0-66-22-70-58 38-6 64 14 70 58Z"/>
+        <path d="M100 200c40 0 66-22 70-58-38-6-64 14-70 58Z"/>
+        <path d="M100 138c-34 0-56-19-60-50 33-5 55 12 60 50Z"/>
+        <path d="M100 138c34 0 56-19 60-50-33-5-55 12-60 50Z"/>
+        <path d="M100 84c-26 0-43-15-46-38 25-4 42 9 46 38Z"/>
+        <path d="M100 84c26 0 43-15 46-38-25-4-42 9-46 38Z"/>
+      </svg>
+      <svg class="leaf-art leaf-2" viewBox="0 0 200 240" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M96 236c0-70 6-124 22-166"/>
+        <ellipse cx="70" cy="176" rx="30" ry="17" transform="rotate(-28 70 176)"/>
+        <ellipse cx="128" cy="146" rx="30" ry="17" transform="rotate(24 128 146)"/>
+        <ellipse cx="82" cy="112" rx="27" ry="15" transform="rotate(-32 82 112)"/>
+        <ellipse cx="134" cy="84" rx="27" ry="15" transform="rotate(20 134 84)"/>
+        <circle cx="122" cy="44" r="21"/>
+        <path d="M122 23v42M101 44h42M107 29l30 30M137 29l-30 30"/>
+      </svg>
+      <img class="bottle" id="heroBottle" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNTAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCI+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdsYXNzIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMCI+CjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzRFMzMxNSIvPjxzdG9wIG9mZnNldD0iLjEzIiBzdG9wLWNvbG9yPSIjOEU2MDI3Ii8+PHN0b3Agb2Zmc2V0PSIuMzQiIHN0b3AtY29sb3I9IiNDNzlBNEUiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjQjc4QTNFIi8+PHN0b3Agb2Zmc2V0PSIuNzQiIHN0b3AtY29sb3I9IiM3QjUyMjIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0MDI5MEYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJjYXAiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIwIj4KPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDgxNTBGIi8+PHN0b3Agb2Zmc2V0PSIuMjYiIHN0b3AtY29sb3I9IiMxRjREM0EiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjMkU2QTRGIi8+PHN0b3Agb2Zmc2V0PSIuNzgiIHN0b3AtY29sb3I9IiMxNzNBMkIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwODE1MEYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJsYWJlbCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNERkQ3QzEiLz48c3RvcCBvZmZzZXQ9Ii4zMiIgc3RvcC1jb2xvcj0iI0Y3RjNFOCIvPjxzdG9wIG9mZnNldD0iLjciIHN0b3AtY29sb3I9IiNGMkVDREMiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNEOENGQjYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iYmx1cjYiIHg9Ii00MCUiIHk9Ii00MCUiIHdpZHRoPSIxODAlIiBoZWlnaHQ9IjE4MCUiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjYiLz48L2ZpbHRlcj4KPGZpbHRlciBpZD0iYmx1cjMiIHg9Ii00MCUiIHk9Ii00MCUiIHdpZHRoPSIxODAlIiBoZWlnaHQ9IjE4MCUiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjMiLz48L2ZpbHRlcj4KPC9kZWZzPgo8Zz4KPHJlY3QgeD0iMTUyIiB5PSIyNiIgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijg4IiByeD0iOCIgZmlsbD0idXJsKCNjYXApIi8+CjxnIHN0cm9rZT0iI0Y1RjFFNiIgc3Ryb2tlLXdpZHRoPSIxLjQiIG9wYWNpdHk9Ii4xNCI+CjxwYXRoIGQ9Ik0xNjggMzR2NzJNMTgwIDM0djcyTTE5MiAzNHY3Mk0yMDQgMzR2NzJNMjE2IDM0djcyTTIyOCAzNHY3MiIvPgo8L2c+CjxyZWN0IHg9IjE2MCIgeT0iMzQiIHdpZHRoPSIxMiIgaGVpZ2h0PSI3MiIgcng9IjYiIGZpbGw9IiNGNUYxRTYiIG9wYWNpdHk9Ii4xNiIgZmlsdGVyPSJ1cmwoI2JsdXIzKSIvPgo8cmVjdCB4PSIxNDUiIHk9IjEwNiIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyNCIgcng9IjYiIGZpbGw9InVybCgjY2FwKSIvPgo8cmVjdCB4PSIxNDUiIHk9IjEwNiIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyNCIgcng9IjYiIGZpbGw9IiMwODE1MEYiIG9wYWNpdHk9Ii4yOCIvPgo8cmVjdCB4PSIxNTYiIHk9IjExMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjE2IiByeD0iNSIgZmlsbD0iI0Y1RjFFNiIgb3BhY2l0eT0iLjE0Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI4aDUwdjM4YzAgMTAgNCAxNSAxMiAyMSA0MCAzMCA1NSA1NSA1NSA5MnYxNjhhMTQgMTQgMCAwIDEtMTQgMTRIMTIyYTE0IDE0IDAgMCAxLTE0LTE0VjI3OWMwLTM3IDE1LTYyIDU1LTkyIDgtNiAxMi0xMSAxMi0yMXoiIGZpbGw9InVybCgjZ2xhc3MpIi8+CjxwYXRoIGQ9Ik0xNzUgMTI4aDUwdjM4YzAgMTAgNCAxNSAxMiAyMSA0MCAzMCA1NSA1NSA1NSA5MnYxNjhhMTQgMTQgMCAwIDEtMTQgMTRIMTIyYTE0IDE0IDAgMCAxLTE0LTE0VjI3OWMwLTM3IDE1LTYyIDU1LTkyIDgtNiAxMi0xMSAxMi0yMXoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzMzMjAwQiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii41Ii8+CjxyZWN0IHg9IjEyNiIgeT0iMjA2IiB3aWR0aD0iMjAiIGhlaWdodD0iMjI0IiByeD0iMTAiIGZpbGw9IiNGOEVGRDkiIG9wYWNpdHk9Ii4yMiIgZmlsdGVyPSJ1cmwoI2JsdXI2KSIvPgo8cmVjdCB4PSIyNjgiIHk9IjIxMiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjIxNCIgcng9IjgiIGZpbGw9IiMyNDE1MDUiIG9wYWNpdHk9Ii4yNiIgZmlsdGVyPSJ1cmwoI2JsdXI2KSIvPgo8ZWxsaXBzZSBjeD0iMjAwIiBjeT0iNDUyIiByeD0iNzYiIHJ5PSIxMiIgZmlsbD0iIzJBMTkwNyIgb3BhY2l0eT0iLjMiIGZpbHRlcj0idXJsKCNibHVyMykiLz4KPHJlY3QgeD0iMTI0IiB5PSIyNTAiIHdpZHRoPSIxNTIiIGhlaWdodD0iMTcwIiByeD0iOSIgZmlsbD0idXJsKCNsYWJlbCkiLz4KPHJlY3QgeD0iMTI0IiB5PSIyNTAiIHdpZHRoPSIxNTIiIGhlaWdodD0iMTcwIiByeD0iOSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQjg4OTNCIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9Ii40NSIvPgo8dGV4dCB4PSIyMDAiIHk9IjMwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsJ0lvd2FuIE9sZCBTdHlsZScsUGFsYXRpbm8sc2VyaWYiIGZvbnQtc2l6ZT0iNDMiIGZpbGw9IiMxMjMxMjQiPkFsb3JhPC90ZXh0Pgo8cmVjdCB4PSIxNzAiIHk9IjMyMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjEiIGZpbGw9IiNCODg5M0IiIG9wYWNpdHk9Ii43Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iJ0hlbHZldGljYSBOZXVlJyxIZWx2ZXRpY2EsQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjMuMiIgZmlsbD0iIzNENkI1NCI+S1LDhFVURVJBVVNaVUc8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMzY4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iJ0hlbHZldGljYSBOZXVlJyxIZWx2ZXRpY2EsQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI3LjYiIGxldHRlci1zcGFjaW5nPSIxLjkiIGZpbGw9IiM2QjdBNkYiPkZMw5xTU0lHIMK3IFZJRVIgUEZMQU5aRU48L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwnSW93YW4gT2xkIFN0eWxlJyxQYWxhdGlubyxzZXJpZiIgZm9udC1zdHlsZT0iaXRhbGljIiBmb250LXNpemU9IjIxIiBmaWxsPSIjMTIzMTI0Ij42MCBtbDwvdGV4dD4KPC9nPgo8L3N2Zz4K" alt="Alora Flasche mit Pipette, 60 ml flüssige Kräuterauszüge" width="800" height="1000" fetchpriority="high">
+    </div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="mq-track">
+    <div class="mq-group">
+      <span>Alkoholfrei</span><i></i><span>Vegan</span><i></i><span>Ohne Zusatzstoffe</span><i></i>
+      <span>Laborgeprüft</span><i></i><span>Abgefüllt in Deutschland</span><i></i><span>60 ml · 2 Monate</span><i></i>
+    </div>
+    <div class="mq-group">
+      <span>Alkoholfrei</span><i></i><span>Vegan</span><i></i><span>Ohne Zusatzstoffe</span><i></i>
+      <span>Laborgeprüft</span><i></i><span>Abgefüllt in Deutschland</span><i></i><span>60 ml · 2 Monate</span><i></i>
+    </div>
+  </div>
+</div>
+
+<section class="problem" id="problem">
+  <div class="wrap problem-grid">
+    <div>
+      <p class="eyebrow rev">Kennst du das?</p>
+      <h2 class="display split" style="margin-top:22px;color:var(--green-deep)">Das Gesicht am <span class="ital">Morgen.</span></h2>
+      <ul class="pain-list">
+        <li class="rev"><span class="pain-n">01</span><span class="pain-t">Du wachst auf und das Gesicht ist <b>rund und weich</b>, die Lider schwer. Bis mittags dauert es, bis du dich wiedererkennst.</span></li>
+        <li class="rev"><span class="pain-n">02</span><span class="pain-t">Der Ring lässt sich <b>nicht über den Knöchel</b> schieben. Gestern ging er noch.</span></li>
+        <li class="rev"><span class="pain-n">03</span><span class="pain-t">Abends sind die <b>Knöchel verschwunden</b> — nach einem Tag, an dem du nichts anders gemacht hast als sonst.</span></li>
+        <li class="rev"><span class="pain-n">04</span><span class="pain-t">Die Beine fühlen sich <b>schwer</b> an. Jeder Schritt ein bisschen mehr Arbeit als er sein müsste.</span></li>
+      </ul>
+      <p class="small rev" style="margin-top:26px;max-width:50ch">Wenn dir das bekannt vorkommt, bist du damit nicht allein — und du musst dich nicht damit abfinden.</p>
+    </div>
+    <div class="scene-frame" id="sceneFrame">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMTAwIDExMDAiIHdpZHRoPSIxMTAwIiBoZWlnaHQ9IjExMDAiPjxkZWZzPjxsaW5lYXJHcmFkaWVudCBpZD0iZ2xhc3MiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIwIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM0RTMzMTUiLz48c3RvcCBvZmZzZXQ9Ii4xMyIgc3RvcC1jb2xvcj0iIzhFNjAyNyIvPjxzdG9wIG9mZnNldD0iLjM0IiBzdG9wLWNvbG9yPSIjQzc5QTRFIi8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iI0I3OEEzRSIvPjxzdG9wIG9mZnNldD0iLjc0IiBzdG9wLWNvbG9yPSIjN0I1MjIyIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNDAyOTBGIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImNhcCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzA4MTUwRiIvPjxzdG9wIG9mZnNldD0iLjI2IiBzdG9wLWNvbG9yPSIjMUY0RDNBIi8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iIzJFNkE0RiIvPjxzdG9wIG9mZnNldD0iLjc4IiBzdG9wLWNvbG9yPSIjMTczQTJCIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDgxNTBGIi8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9ImxhYmVsIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMCI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjREZEN0MxIi8+PHN0b3Agb2Zmc2V0PSIuMzIiIHN0b3AtY29sb3I9IiNGN0YzRTgiLz48c3RvcCBvZmZzZXQ9Ii43IiBzdG9wLWNvbG9yPSIjRjJFQ0RDIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRDhDRkI2Ii8+PC9saW5lYXJHcmFkaWVudD48bGluZWFyR3JhZGllbnQgaWQ9Im1hcmJsZSIgeDE9IjAiIHkxPSIwIiB4Mj0iLjYiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGM0VFRTEiLz48c3RvcCBvZmZzZXQ9Ii40NSIgc3RvcC1jb2xvcj0iI0VCRTREMyIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0RFRDVDMCIvPjwvbGluZWFyR3JhZGllbnQ+PHJhZGlhbEdyYWRpZW50IGlkPSJwb29sIiBjeD0iLjMiIGN5PSIuMTgiIHI9Ii44Ij48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNGRkZDRjIiIHN0b3Atb3BhY2l0eT0iLjg1Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkZGQ0YyIiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50PjxyYWRpYWxHcmFkaWVudCBpZD0idmlnIiBjeD0iLjUiIGN5PSIuNDYiIHI9Ii43MiI+PHN0b3Agb2Zmc2V0PSIuNTUiIHN0b3AtY29sb3I9IiMzQjMxMjIiIHN0b3Atb3BhY2l0eT0iMCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzNCMzEyMiIgc3RvcC1vcGFjaXR5PSIuMTYiLz48L3JhZGlhbEdyYWRpZW50PjxsaW5lYXJHcmFkaWVudCBpZD0icGV0YWwiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIwIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNDODhBMkMiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjRTJBRTRFIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRUZDQjdDIi8+PC9saW5lYXJHcmFkaWVudD48ZmlsdGVyIGlkPSJibHVyNiIgeD0iLTQwJSIgeT0iLTQwJSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMTgwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNiIvPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9ImJsdXIzIiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIzIi8+PC9maWx0ZXI+PGZpbHRlciBpZD0iYmx1cjI2IiB4PSItNDAlIiB5PSItNDAlIiB3aWR0aD0iMTgwJSIgaGVpZ2h0PSIxODAlIj48ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSIyNiIvPjwvZmlsdGVyPjxmaWx0ZXIgaWQ9ImJsdXIxNCIgeD0iLTQwJSIgeT0iLTQwJSIgd2lkdGg9IjE4MCUiIGhlaWdodD0iMTgwJSI+PGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iMTQiLz48L2ZpbHRlcj48L2RlZnM+PHJlY3Qgd2lkdGg9IjExMDAiIGhlaWdodD0iMTEwMCIgZmlsbD0idXJsKCNtYXJibGUpIi8+PGcgc3Ryb2tlPSIjOEM4MDY0IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxwYXRoIGQ9Ik0tMjAgMjUwQzE2MCAzMDAgMzAwIDIyMCA0NzAgMjY4IDY0MCAzMTYgNzgwIDI1MCAxMTIwIDMwMCIgc3Ryb2tlLW9wYWNpdHk9Ii4xMyIgc3Ryb2tlLXdpZHRoPSIzIi8+PHBhdGggZD0iTS0yMCAzMDBDMTQwIDM3MiAzMjAgMjkyIDUwMCAzMzYgNzAwIDM4NCA4NjAgMzIwIDExMjAgMzcyIiBzdHJva2Utb3BhY2l0eT0iLjA3IiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNLTIwIDY5MEMyMDAgNjQwIDM0MCA3MzAgNTIwIDcwMCA3MjAgNjY2IDkwMCA3MjYgMTEyMCA2OTAiIHN0cm9rZS1vcGFjaXR5PSIuMTAiIHN0cm9rZS13aWR0aD0iMi40Ii8+PHBhdGggZD0iTS0yMCA5NDBDMTgwIDk5MCAzODAgOTAwIDU2MCA5NDIgNzYwIDk4OCA5MjAgOTMwIDExMjAgOTY2IiBzdHJva2Utb3BhY2l0eT0iLjA4IiBzdHJva2Utd2lkdGg9IjIiLz48cGF0aCBkPSJNMjQwIC0yMEMzMDAgMTYwIDI1MCAzMDAgMzAwIDQ2MCIgc3Ryb2tlLW9wYWNpdHk9Ii4wNiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTkwMCAtMjBDODUwIDE4MCA5MzAgMzIwIDg4MCA1MjAiIHN0cm9rZS1vcGFjaXR5PSIuMDUiIHN0cm9rZS13aWR0aD0iMiIvPjwvZz48cmVjdCB3aWR0aD0iMTEwMCIgaGVpZ2h0PSIxMTAwIiBmaWxsPSJ1cmwoI3Bvb2wpIi8+PGVsbGlwc2UgY3g9IjYxMiIgY3k9Ijg0NiIgcng9IjI1MCIgcnk9IjQwIiBmaWxsPSIjNEEzRDI4IiBvcGFjaXR5PSIuMjIiIGZpbHRlcj0idXJsKCNibHVyMjYpIi8+PGVsbGlwc2UgY3g9IjU1NiIgY3k9Ijg0MCIgcng9IjE1MCIgcnk9IjIyIiBmaWxsPSIjM0MzMDIwIiBvcGFjaXR5PSIuMyIgZmlsdGVyPSJ1cmwoI2JsdXIxNCkiLz48cGF0aCBkPSJNMTg2IDk2MkMyNzIgOTQwIDM0NCA4OTggNDAwIDg0NCIgc3Ryb2tlPSIjNUY3NDU4IiBzdHJva2Utd2lkdGg9IjMiIGZpbGw9Im5vbmUiIG9wYWNpdHk9Ii41Ii8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMzMwIDg1Nikgcm90YXRlKC0yMCkiPjxlbGxpcHNlIGN4PSIwIiBjeT0iMCIgcng9IjEwNCIgcnk9IjM0IiBmaWxsPSIjOEZBNjg0Ii8+PGVsbGlwc2UgY3g9IjAiIGN5PSIwIiByeD0iMTA0IiByeT0iMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzVGNzQ1OCIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii41NSIvPjxwYXRoIGQ9Ik0tMTAwIDBIMTAwIiBzdHJva2U9IiM1Rjc0NTgiIHN0cm9rZS13aWR0aD0iMS42IiBvcGFjaXR5PSIuNSIvPjxwYXRoIGQ9Ik0tNDYgLTYgLTEwIDBNLTQ2IDYgLTEwIDBNNTIgLTcgMTIgME01MiA3IDEyIDAiIHN0cm9rZT0iIzVGNzQ1OCIgc3Ryb2tlLXdpZHRoPSIxLjIiIG9wYWNpdHk9Ii4zNSIgZmlsbD0ibm9uZSIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNDggOTI2KSByb3RhdGUoMTIpIj48ZWxsaXBzZSBjeD0iMCIgY3k9IjAiIHJ4PSI4OCIgcnk9IjI5IiBmaWxsPSIjN0U5NTczIi8+PGVsbGlwc2UgY3g9IjAiIGN5PSIwIiByeD0iODgiIHJ5PSIyOSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNTU2QjRGIiBzdHJva2Utd2lkdGg9IjEuNiIgb3BhY2l0eT0iLjU1Ii8+PHBhdGggZD0iTS04NCAwSDg0IiBzdHJva2U9IiM1NTZCNEYiIHN0cm9rZS13aWR0aD0iMS42IiBvcGFjaXR5PSIuNSIvPjxwYXRoIGQ9Ik0tMzkgLTYgLTggME0tMzkgNiAtOCAwTTQ0IC03IDEwIDBNNDQgNyAxMCAwIiBzdHJva2U9IiM1NTZCNEYiIHN0cm9rZS13aWR0aD0iMS4yIiBvcGFjaXR5PSIuMzUiIGZpbGw9Im5vbmUiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDE0IDkyNikgcm90YXRlKC04KSI+PGVsbGlwc2UgY3g9IjAiIGN5PSIwIiByeD0iNzQiIHJ5PSIyNSIgZmlsbD0iIzlBQUY4RSIvPjxlbGxpcHNlIGN4PSIwIiBjeT0iMCIgcng9Ijc0IiByeT0iMjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzZCODA2NCIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii41NSIvPjxwYXRoIGQ9Ik0tNzAgMEg3MCIgc3Ryb2tlPSIjNkI4MDY0IiBzdHJva2Utd2lkdGg9IjEuNiIgb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNLTMzIC02IC03IDBNLTMzIDYgLTcgME0zNyAtNyA4IDBNMzcgNyA4IDAiIHN0cm9rZT0iIzZCODA2NCIgc3Ryb2tlLXdpZHRoPSIxLjIiIG9wYWNpdHk9Ii4zNSIgZmlsbD0ibm9uZSIvPjwvZz48cGF0aCBkPSJNODEyIDg4NEM4MjIgOTQ2IDc5NiA5OTQgNzQ4IDEwMjIiIHN0cm9rZT0iIzVGNzQ1OCIgc3Ryb2tlLXdpZHRoPSIzLjQiIGZpbGw9Im5vbmUiIG9wYWNpdHk9Ii42Ii8+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzU0IDk5OCkgcm90YXRlKDI0KSI+PGVsbGlwc2UgY3g9IjAiIGN5PSIwIiByeD0iNTIiIHJ5PSIxOCIgZmlsbD0iIzhGQTY4NCIvPjxlbGxpcHNlIGN4PSIwIiBjeT0iMCIgcng9IjUyIiByeT0iMTgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzVGNzQ1OCIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii41NSIvPjxwYXRoIGQ9Ik0tNDggMEg0OCIgc3Ryb2tlPSIjNUY3NDU4IiBzdHJva2Utd2lkdGg9IjEuNiIgb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNLTIzIC02IC01IDBNLTIzIDYgLTUgME0yNiAtNyA2IDBNMjYgNyA2IDAiIHN0cm9rZT0iIzVGNzQ1OCIgc3Ryb2tlLXdpZHRoPSIxLjIiIG9wYWNpdHk9Ii4zNSIgZmlsbD0ibm9uZSIvPjwvZz48Zz48ZyB0cmFuc2Zvcm09InJvdGF0ZSgwLjAgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4ODQuMCIgY3k9Ijg2MCIgcng9IjQ3LjAiIHJ5PSIxNS4wIiBmaWxsPSJ1cmwoI3BldGFsKSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDI3LjcgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4ODQuMCIgY3k9Ijg2MCIgcng9IjQ3LjAiIHJ5PSIxNS4wIiBmaWxsPSJ1cmwoI3BldGFsKSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDU1LjQgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4ODQuMCIgY3k9Ijg2MCIgcng9IjQ3LjAiIHJ5PSIxNS4wIiBmaWxsPSJ1cmwoI3BldGFsKSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDgzLjEgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4ODQuMCIgY3k9Ijg2MCIgcng9IjQ3LjAiIHJ5PSIxNS4wIiBmaWxsPSJ1cmwoI3BldGFsKSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDExMC44IDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODg0LjAiIGN5PSI4NjAiIHJ4PSI0Ny4wIiByeT0iMTUuMCIgZmlsbD0idXJsKCNwZXRhbCkiIG9wYWNpdHk9Ii45NSIvPjwvZz48ZyB0cmFuc2Zvcm09InJvdGF0ZSgxMzguNSA4MTIgODYwKSI+PGVsbGlwc2UgY3g9Ijg4NC4wIiBjeT0iODYwIiByeD0iNDcuMCIgcnk9IjE1LjAiIGZpbGw9InVybCgjcGV0YWwpIiBvcGFjaXR5PSIuOTUiLz48L2c+PGcgdHJhbnNmb3JtPSJyb3RhdGUoMTY2LjIgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4ODQuMCIgY3k9Ijg2MCIgcng9IjQ3LjAiIHJ5PSIxNS4wIiBmaWxsPSJ1cmwoI3BldGFsKSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDE5My44IDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODg0LjAiIGN5PSI4NjAiIHJ4PSI0Ny4wIiByeT0iMTUuMCIgZmlsbD0idXJsKCNwZXRhbCkiIG9wYWNpdHk9Ii45NSIvPjwvZz48ZyB0cmFuc2Zvcm09InJvdGF0ZSgyMjEuNSA4MTIgODYwKSI+PGVsbGlwc2UgY3g9Ijg4NC4wIiBjeT0iODYwIiByeD0iNDcuMCIgcnk9IjE1LjAiIGZpbGw9InVybCgjcGV0YWwpIiBvcGFjaXR5PSIuOTUiLz48L2c+PGcgdHJhbnNmb3JtPSJyb3RhdGUoMjQ5LjIgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4ODQuMCIgY3k9Ijg2MCIgcng9IjQ3LjAiIHJ5PSIxNS4wIiBmaWxsPSJ1cmwoI3BldGFsKSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDI3Ni45IDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODg0LjAiIGN5PSI4NjAiIHJ4PSI0Ny4wIiByeT0iMTUuMCIgZmlsbD0idXJsKCNwZXRhbCkiIG9wYWNpdHk9Ii45NSIvPjwvZz48ZyB0cmFuc2Zvcm09InJvdGF0ZSgzMDQuNiA4MTIgODYwKSI+PGVsbGlwc2UgY3g9Ijg4NC4wIiBjeT0iODYwIiByeD0iNDcuMCIgcnk9IjE1LjAiIGZpbGw9InVybCgjcGV0YWwpIiBvcGFjaXR5PSIuOTUiLz48L2c+PGcgdHJhbnNmb3JtPSJyb3RhdGUoMzMyLjMgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4ODQuMCIgY3k9Ijg2MCIgcng9IjQ3LjAiIHJ5PSIxNS4wIiBmaWxsPSJ1cmwoI3BldGFsKSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDE0LjAgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4NTguMCIgY3k9Ijg2MCIgcng9IjM1LjAiIHJ5PSIxMy4wIiBmaWxsPSIjRUFDMDY5IiBvcGFjaXR5PSIuOTUiLz48L2c+PGcgdHJhbnNmb3JtPSJyb3RhdGUoNDYuNyA4MTIgODYwKSI+PGVsbGlwc2UgY3g9Ijg1OC4wIiBjeT0iODYwIiByeD0iMzUuMCIgcnk9IjEzLjAiIGZpbGw9IiNFQUMwNjkiIG9wYWNpdHk9Ii45NSIvPjwvZz48ZyB0cmFuc2Zvcm09InJvdGF0ZSg3OS41IDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODU4LjAiIGN5PSI4NjAiIHJ4PSIzNS4wIiByeT0iMTMuMCIgZmlsbD0iI0VBQzA2OSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDExMi4yIDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODU4LjAiIGN5PSI4NjAiIHJ4PSIzNS4wIiByeT0iMTMuMCIgZmlsbD0iI0VBQzA2OSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDE0NC45IDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODU4LjAiIGN5PSI4NjAiIHJ4PSIzNS4wIiByeT0iMTMuMCIgZmlsbD0iI0VBQzA2OSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDE3Ny42IDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODU4LjAiIGN5PSI4NjAiIHJ4PSIzNS4wIiByeT0iMTMuMCIgZmlsbD0iI0VBQzA2OSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDIxMC40IDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODU4LjAiIGN5PSI4NjAiIHJ4PSIzNS4wIiByeT0iMTMuMCIgZmlsbD0iI0VBQzA2OSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDI0My4xIDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODU4LjAiIGN5PSI4NjAiIHJ4PSIzNS4wIiByeT0iMTMuMCIgZmlsbD0iI0VBQzA2OSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDI3NS44IDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODU4LjAiIGN5PSI4NjAiIHJ4PSIzNS4wIiByeT0iMTMuMCIgZmlsbD0iI0VBQzA2OSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDMwOC41IDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODU4LjAiIGN5PSI4NjAiIHJ4PSIzNS4wIiByeT0iMTMuMCIgZmlsbD0iI0VBQzA2OSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDM0MS4zIDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODU4LjAiIGN5PSI4NjAiIHJ4PSIzNS4wIiByeT0iMTMuMCIgZmlsbD0iI0VBQzA2OSIgb3BhY2l0eT0iLjk1Ii8+PC9nPjxjaXJjbGUgY3g9IjgxMiIgY3k9Ijg2MCIgcj0iMjUiIGZpbGw9IiNBODcxMkEiLz48Y2lyY2xlIGN4PSI4MTIiIGN5PSI4NjAiIHI9IjI1IiBmaWxsPSJub25lIiBzdHJva2U9IiM3RTUyMTkiIHN0cm9rZS13aWR0aD0iMS41IiBvcGFjaXR5PSIuNiIvPjxnIHRyYW5zZm9ybT0icm90YXRlKDAuMCA4MTIgODYwKSI+PGVsbGlwc2UgY3g9IjgyNS4wIiBjeT0iODYwIiByeD0iNi4wIiByeT0iNS4wIiBmaWxsPSIjRTdDNTgzIiBvcGFjaXR5PSIuOSIvPjwvZz48ZyB0cmFuc2Zvcm09InJvdGF0ZSg0MC4wIDgxMiA4NjApIj48ZWxsaXBzZSBjeD0iODI1LjAiIGN5PSI4NjAiIHJ4PSI2LjAiIHJ5PSI1LjAiIGZpbGw9IiNFN0M1ODMiIG9wYWNpdHk9Ii45Ii8+PC9nPjxnIHRyYW5zZm9ybT0icm90YXRlKDgwLjAgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4MjUuMCIgY3k9Ijg2MCIgcng9IjYuMCIgcnk9IjUuMCIgZmlsbD0iI0U3QzU4MyIgb3BhY2l0eT0iLjkiLz48L2c+PGcgdHJhbnNmb3JtPSJyb3RhdGUoMTIwLjAgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4MjUuMCIgY3k9Ijg2MCIgcng9IjYuMCIgcnk9IjUuMCIgZmlsbD0iI0U3QzU4MyIgb3BhY2l0eT0iLjkiLz48L2c+PGcgdHJhbnNmb3JtPSJyb3RhdGUoMTYwLjAgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4MjUuMCIgY3k9Ijg2MCIgcng9IjYuMCIgcnk9IjUuMCIgZmlsbD0iI0U3QzU4MyIgb3BhY2l0eT0iLjkiLz48L2c+PGcgdHJhbnNmb3JtPSJyb3RhdGUoMjAwLjAgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4MjUuMCIgY3k9Ijg2MCIgcng9IjYuMCIgcnk9IjUuMCIgZmlsbD0iI0U3QzU4MyIgb3BhY2l0eT0iLjkiLz48L2c+PGcgdHJhbnNmb3JtPSJyb3RhdGUoMjQwLjAgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4MjUuMCIgY3k9Ijg2MCIgcng9IjYuMCIgcnk9IjUuMCIgZmlsbD0iI0U3QzU4MyIgb3BhY2l0eT0iLjkiLz48L2c+PGcgdHJhbnNmb3JtPSJyb3RhdGUoMjgwLjAgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4MjUuMCIgY3k9Ijg2MCIgcng9IjYuMCIgcnk9IjUuMCIgZmlsbD0iI0U3QzU4MyIgb3BhY2l0eT0iLjkiLz48L2c+PGcgdHJhbnNmb3JtPSJyb3RhdGUoMzIwLjAgODEyIDg2MCkiPjxlbGxpcHNlIGN4PSI4MjUuMCIgY3k9Ijg2MCIgcng9IjYuMCIgcnk9IjUuMCIgZmlsbD0iI0U3QzU4MyIgb3BhY2l0eT0iLjkiLz48L2c+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI3MCAxOTApIHNjYWxlKDEuNCkiPjxyZWN0IHg9IjE1MiIgeT0iMjYiIHdpZHRoPSI5NiIgaGVpZ2h0PSI4OCIgcng9IjgiIGZpbGw9InVybCgjY2FwKSIvPgo8ZyBzdHJva2U9IiNGNUYxRTYiIHN0cm9rZS13aWR0aD0iMS40IiBvcGFjaXR5PSIuMTQiPgo8cGF0aCBkPSJNMTY4IDM0djcyTTE4MCAzNHY3Mk0xOTIgMzR2NzJNMjA0IDM0djcyTTIxNiAzNHY3Mk0yMjggMzR2NzIiLz4KPC9nPgo8cmVjdCB4PSIxNjAiIHk9IjM0IiB3aWR0aD0iMTIiIGhlaWdodD0iNzIiIHJ4PSI2IiBmaWxsPSIjRjVGMUU2IiBvcGFjaXR5PSIuMTYiIGZpbHRlcj0idXJsKCNibHVyMykiLz4KPHJlY3QgeD0iMTQ1IiB5PSIxMDYiIHdpZHRoPSIxMTAiIGhlaWdodD0iMjQiIHJ4PSI2IiBmaWxsPSJ1cmwoI2NhcCkiLz4KPHJlY3QgeD0iMTQ1IiB5PSIxMDYiIHdpZHRoPSIxMTAiIGhlaWdodD0iMjQiIHJ4PSI2IiBmaWxsPSIjMDgxNTBGIiBvcGFjaXR5PSIuMjgiLz4KPHJlY3QgeD0iMTU2IiB5PSIxMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxNiIgcng9IjUiIGZpbGw9IiNGNUYxRTYiIG9wYWNpdHk9Ii4xNCIvPgo8cGF0aCBkPSJNMTc1IDEyOGg1MHYzOGMwIDEwIDQgMTUgMTIgMjEgNDAgMzAgNTUgNTUgNTUgOTJ2MTY4YTE0IDE0IDAgMCAxLTE0IDE0SDEyMmExNCAxNCAwIDAgMS0xNC0xNFYyNzljMC0zNyAxNS02MiA1NS05MiA4LTYgMTItMTEgMTItMjF6IiBmaWxsPSJ1cmwoI2dsYXNzKSIvPgo8cGF0aCBkPSJNMTc1IDEyOGg1MHYzOGMwIDEwIDQgMTUgMTIgMjEgNDAgMzAgNTUgNTUgNTUgOTJ2MTY4YTE0IDE0IDAgMCAxLTE0IDE0SDEyMmExNCAxNCAwIDAgMS0xNC0xNFYyNzljMC0zNyAxNS02MiA1NS05MiA4LTYgMTItMTEgMTItMjF6IiBmaWxsPSJub25lIiBzdHJva2U9IiMzMzIwMEIiIHN0cm9rZS13aWR0aD0iMS42IiBvcGFjaXR5PSIuNSIvPgo8cmVjdCB4PSIxMjYiIHk9IjIwNiIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIyNCIgcng9IjEwIiBmaWxsPSIjRjhFRkQ5IiBvcGFjaXR5PSIuMjIiIGZpbHRlcj0idXJsKCNibHVyNikiLz4KPHJlY3QgeD0iMjY4IiB5PSIyMTIiIHdpZHRoPSIxNiIgaGVpZ2h0PSIyMTQiIHJ4PSI4IiBmaWxsPSIjMjQxNTA1IiBvcGFjaXR5PSIuMjYiIGZpbHRlcj0idXJsKCNibHVyNikiLz4KPGVsbGlwc2UgY3g9IjIwMCIgY3k9IjQ1MiIgcng9Ijc2IiByeT0iMTIiIGZpbGw9IiMyQTE5MDciIG9wYWNpdHk9Ii4zIiBmaWx0ZXI9InVybCgjYmx1cjMpIi8+CjxyZWN0IHg9IjEyNCIgeT0iMjUwIiB3aWR0aD0iMTUyIiBoZWlnaHQ9IjE3MCIgcng9IjkiIGZpbGw9InVybCgjbGFiZWwpIi8+CjxyZWN0IHg9IjEyNCIgeT0iMjUwIiB3aWR0aD0iMTUyIiBoZWlnaHQ9IjE3MCIgcng9IjkiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0I4ODkzQiIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIuNDUiLz4KPHRleHQgeD0iMjAwIiB5PSIzMDgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLCdJb3dhbiBPbGQgU3R5bGUnLFBhbGF0aW5vLHNlcmlmIiBmb250LXNpemU9IjQzIiBmaWxsPSIjMTIzMTI0Ij5BbG9yYTwvdGV4dD4KPHJlY3QgeD0iMTcwIiB5PSIzMjIiIHdpZHRoPSI2MCIgaGVpZ2h0PSIxIiBmaWxsPSIjQjg4OTNCIiBvcGFjaXR5PSIuNyIvPgo8dGV4dCB4PSIyMDAiIHk9IjM0OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidIZWx2ZXRpY2EgTmV1ZScsSGVsdmV0aWNhLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTAiIGxldHRlci1zcGFjaW5nPSIzLjIiIGZpbGw9IiMzRDZCNTQiPktSw4RVVEVSQVVTWlVHPC90ZXh0Pgo8dGV4dCB4PSIyMDAiIHk9IjM2OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IidIZWx2ZXRpY2EgTmV1ZScsSGVsdmV0aWNhLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNy42IiBsZXR0ZXItc3BhY2luZz0iMS45IiBmaWxsPSIjNkI3QTZGIj5GTMOcU1NJRyDCtyBWSUVSIFBGTEFOWkVOPC90ZXh0Pgo8dGV4dCB4PSIyMDAiIHk9IjQwMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsJ0lvd2FuIE9sZCBTdHlsZScsUGFsYXRpbm8sc2VyaWYiIGZvbnQtc3R5bGU9Iml0YWxpYyIgZm9udC1zaXplPSIyMSIgZmlsbD0iIzEyMzEyNCI+NjAgbWw8L3RleHQ+PC9nPjxnIG9wYWNpdHk9Ii41NSI+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOTAyIDI3Mikgcm90YXRlKC0zNCkiPjxlbGxpcHNlIGN4PSIwIiBjeT0iMCIgcng9IjY0IiByeT0iMjEiIGZpbGw9IiM5QUFGOEUiLz48ZWxsaXBzZSBjeD0iMCIgY3k9IjAiIHJ4PSI2NCIgcnk9IjIxIiBmaWxsPSJub25lIiBzdHJva2U9IiM2QjgwNjQiIHN0cm9rZS13aWR0aD0iMS42IiBvcGFjaXR5PSIuNTUiLz48cGF0aCBkPSJNLTYwIDBINjAiIHN0cm9rZT0iIzZCODA2NCIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii41Ii8+PHBhdGggZD0iTS0yOCAtNiAtNiAwTS0yOCA2IC02IDBNMzIgLTcgNyAwTTMyIDcgNyAwIiBzdHJva2U9IiM2QjgwNjQiIHN0cm9rZS13aWR0aD0iMS4yIiBvcGFjaXR5PSIuMzUiIGZpbGw9Im5vbmUiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoOTUyIDM0NCkgcm90YXRlKDIyKSI+PGVsbGlwc2UgY3g9IjAiIGN5PSIwIiByeD0iNTIiIHJ5PSIxNyIgZmlsbD0iIzhGQTY4NCIvPjxlbGxpcHNlIGN4PSIwIiBjeT0iMCIgcng9IjUyIiByeT0iMTciIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzVGNzQ1OCIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii41NSIvPjxwYXRoIGQ9Ik0tNDggMEg0OCIgc3Ryb2tlPSIjNUY3NDU4IiBzdHJva2Utd2lkdGg9IjEuNiIgb3BhY2l0eT0iLjUiLz48cGF0aCBkPSJNLTIzIC02IC01IDBNLTIzIDYgLTUgME0yNiAtNyA2IDBNMjYgNyA2IDAiIHN0cm9rZT0iIzVGNzQ1OCIgc3Ryb2tlLXdpZHRoPSIxLjIiIG9wYWNpdHk9Ii4zNSIgZmlsbD0ibm9uZSIvPjwvZz48cGF0aCBkPSJNODU4IDIzMEM5MDQgMjc4IDkzMiAzMTQgOTcyIDM3MCIgc3Ryb2tlPSIjNkI4MDY0IiBzdHJva2Utd2lkdGg9IjIuNCIgZmlsbD0ibm9uZSIgb3BhY2l0eT0iLjUiLz48L2c+PHJlY3Qgd2lkdGg9IjExMDAiIGhlaWdodD0iMTEwMCIgZmlsbD0idXJsKCN2aWcpIi8+PC9zdmc+" alt="Alora Flasche auf einer Marmorfläche, daneben Salbeiblätter und eine Ringelblume" width="1100" height="1100" loading="lazy">
+      <div class="scene-cap">60 ml · Pipettenflasche aus Braunglas · reicht für rund zwei Monate</div>
+    </div>
+  </div>
+</section>
+
+<section class="mech" id="mech">
+  <div class="mech-inner wrap">
+    <div class="mech-stage">
+      <div class="mech-col">
+        <div class="mech-head">
+          <p class="eyebrow rev">Der verstopfte Abfluss</p>
+          <h2 class="display split" style="margin-top:18px">Dein Lymphsystem hat <span class="ital">keine Pumpe.</span></h2>
+          <p class="rev">Das Blut bewegt das Herz. Die Lymphe bewegt nur, was du tust.</p>
+        </div>
+        <div class="mech-steps">
+          <article class="mstep" data-step="0">
+            <p class="mstep-k"><span>01</span> Der Stau</p>
+            <h3 class="display">Alles steht.</h3>
+            <p>Langes Sitzen, langes Stehen, Wärme, Hormone, ein Flug. Die Lymphe bewegt sich langsamer, Flüssigkeit bleibt im Gewebe liegen — morgens sichtbar im Gesicht, abends an den Knöcheln.</p>
+          </article>
+          <article class="mstep" data-step="1">
+            <p class="mstep-k"><span>02</span> Der Impuls</p>
+            <h3 class="display">Zehn Tropfen.</h3>
+            <p>Löwenzahn, Rotklee, Labkraut und Klettenwurzel — vier Pflanzen aus der überlieferten europäischen Kräuterkunde, als flüssiger Auszug unter die Zunge.</p>
+          </article>
+          <article class="mstep" data-step="2">
+            <p class="mstep-k"><span>03</span> Das Ritual</p>
+            <h3 class="display">Morgens und abends.</h3>
+            <p>Zehn Sekunden, zweimal am Tag. Kein Protokoll, keine Kapseln, keine Kompressionsstrümpfe. Eine Flasche reicht für rund zwei Monate.</p>
+          </article>
+        </div>
+      </div>
+      <div class="mech-vis" id="mechVis">
+        <svg viewBox="0 0 400 400" role="img" aria-label="Illustration: Lymphgefäße, in denen sich Stau löst und Flüssigkeit wieder fließt">
+          <defs>
+            <linearGradient id="goldgrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F0DCA8"/>
+              <stop offset="55%" stop-color="#D9B978"/>
+              <stop offset="100%" stop-color="#B8893B"/>
+            </linearGradient>
+          </defs>
+          <!-- plate -->
+          <circle class="plate" cx="200" cy="200" r="176"/>
+          <circle class="plate plate-2" cx="200" cy="200" r="164"/>
+          <!-- vessel network (base → sludge → gold flow, same geometry) -->
+          <g id="vessels">
+            <path class="vessel-base" d="M200 368C200 322 174 300 160 264C146 226 160 192 184 166C200 148 202 128 202 104"/>
+            <path class="vessel-base" d="M188 206C224 196 258 208 280 186C298 166 300 142 292 120"/>
+            <path class="vessel-base" d="M170 252C140 252 112 264 96 244C82 226 84 200 94 180"/>
+            <path class="vessel-base" d="M176 306C208 306 240 316 260 300"/>
+            <path class="vessel-base" d="M192 152C168 140 142 142 124 126"/>
+          </g>
+          <g id="sludge">
+            <path class="vessel-sludge" d="M200 368C200 322 174 300 160 264C146 226 160 192 184 166C200 148 202 128 202 104"/>
+            <path class="vessel-sludge" d="M188 206C224 196 258 208 280 186C298 166 300 142 292 120"/>
+            <path class="vessel-sludge" d="M170 252C140 252 112 264 96 244C82 226 84 200 94 180"/>
+            <path class="vessel-sludge" d="M176 306C208 306 240 316 260 300"/>
+            <path class="vessel-sludge" d="M192 152C168 140 142 142 124 126"/>
+          </g>
+          <g id="flow">
+            <path class="vessel-flow" id="fp1" d="M200 368C200 322 174 300 160 264C146 226 160 192 184 166C200 148 202 128 202 104"/>
+            <path class="vessel-flow" id="fp2" d="M188 206C224 196 258 208 280 186C298 166 300 142 292 120"/>
+            <path class="vessel-flow" id="fp3" d="M170 252C140 252 112 264 96 244C82 226 84 200 94 180"/>
+            <path class="vessel-flow" id="fp4" d="M176 306C208 306 240 316 260 300"/>
+            <path class="vessel-flow" id="fp5" d="M192 152C168 140 142 142 124 126"/>
+          </g>
+          <!-- lymph nodes along the network -->
+          <g id="nodes">
+            <circle class="lnode" cx="188" cy="206" r="6"/>
+            <circle class="lnode" cx="170" cy="252" r="5.4"/>
+            <circle class="lnode" cx="176" cy="306" r="5"/>
+            <circle class="lnode" cx="192" cy="152" r="5"/>
+            <circle class="lnode sm" cx="292" cy="120" r="4"/>
+            <circle class="lnode sm" cx="94" cy="180" r="4"/>
+            <circle class="lnode sm" cx="260" cy="300" r="3.6"/>
+            <circle class="lnode sm" cx="124" cy="126" r="3.6"/>
+          </g>
+          <!-- collarbone junction: blocked, then clears -->
+          <g id="blockNode">
+            <circle class="node" cx="202" cy="104" r="18"/>
+            <path d="M193 104h18M202 95v18" stroke="rgba(245,241,230,.45)" stroke-width="1.6" stroke-linecap="round"/>
+          </g>
+          <circle id="clearNode" cx="202" cy="104" r="10" fill="url(#goldgrad)" opacity="0"/>
+          <line class="tick" x1="202" y1="66" x2="202" y2="82"/>
+          <text class="node-lbl" x="202" y="56" text-anchor="middle">Schlüsselbein</text>
+          <g id="sparks" opacity="0">
+            <circle class="spark" cx="184" cy="166" r="3"/>
+            <circle class="spark" cx="240" cy="198" r="2.4"/>
+            <circle class="spark" cx="132" cy="256" r="2.6"/>
+            <circle class="spark" cx="286" cy="146" r="2.2"/>
+            <circle class="spark" cx="106" cy="204" r="2.8"/>
+            <circle class="spark" cx="222" cy="308" r="2.4"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bot" id="botanicals">
+  <div class="wrap">
+    <div class="bot-head">
+      <p class="eyebrow rev">Die Rezeptur</p>
+      <h2 class="display split" style="color:var(--green-deep)">Vier Pflanzen. <span class="ital">Mehr ist nicht drin.</span></h2>
+      <p class="lead rev">Kein Alkohol, keine Aromen, keine Füllstoffe, keine Konservierungsmittel. Was auf dem Etikett steht, ist in der Flasche.</p>
+    </div>
+    <div class="bot-grid">
+      <article class="bot-card rev">
+        <svg class="bot-art" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M32 60V26"/><circle cx="32" cy="18" r="9"/>
+          <path d="M32 4v10M32 22v10M18 18h10M36 18h10M22 8l8 8M42 8l-8 8M22 28l8-8M42 28l-8-8"/>
+          <path d="M32 44c-11 0-18-6-19-16 11-2 18 4 19 16Z"/>
+          <path d="M32 52c9 0 15-5 16-13-9-2-15 3-16 13Z"/>
+        </svg>
+        <div><h3>Löwenzahn</h3><em class="bot-lat">Taraxacum officinale</em></div>
+        <p>Die Wurzel wird in der europäischen Kräuterkunde seit Jahrhunderten verwendet. Sie gibt dem Auszug seine leicht herbe Note.</p>
+      </article>
+      <article class="bot-card rev">
+        <svg class="bot-art" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M32 60V32"/>
+          <circle cx="32" cy="20" r="11"/>
+          <path d="M23 14c4-3 14-3 18 0M22 20h20M23 26c4 3 14 3 18 0"/>
+          <path d="M32 44c-9 0-14-5-15-13 9-2 14 3 15 13Z"/>
+          <path d="M32 50c8 0 13-4 14-11-8-2-13 3-14 11Z"/>
+        </svg>
+        <div><h3>Rotklee</h3><em class="bot-lat">Trifolium pratense</em></div>
+        <p>Die Blüte des Wiesenklees. Traditionell auf europäischen Wiesen gesammelt und als Aufguss verwendet.</p>
+      </article>
+      <article class="bot-card rev">
+        <svg class="bot-art" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M32 60V8"/>
+          <g><path d="M32 46h-16M32 46h16M32 34h-14M32 34h14M32 22h-12M32 22h12"/>
+          <circle cx="14" cy="46" r="2.5"/><circle cx="50" cy="46" r="2.5"/>
+          <circle cx="16" cy="34" r="2.5"/><circle cx="48" cy="34" r="2.5"/>
+          <circle cx="18" cy="22" r="2.5"/><circle cx="46" cy="22" r="2.5"/></g>
+          <circle cx="32" cy="10" r="3"/>
+        </svg>
+        <div><h3>Labkraut</h3><em class="bot-lat">Galium aparine</em></div>
+        <p>Auch Klettenlabkraut genannt — das Kraut, das an der Kleidung haften bleibt. Ein Klassiker der überlieferten Frühjahrskräuter.</p>
+      </article>
+      <article class="bot-card rev">
+        <svg class="bot-art" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+          <path d="M32 8v22M32 30c-3 8-4 18-2 26M32 30c3 8 5 17 4 26"/>
+          <path d="M26 56c-2-10-1-19 2-26M38 56c1-10 0-19-3-26"/>
+          <circle cx="32" cy="18" r="8"/>
+          <path d="M32 10v16M24 18h16M26 12l12 12M38 12L26 24"/>
+          <path d="M20 34c4 2 8 2 12 0M44 34c-4 2-8 2-12 0"/>
+        </svg>
+        <div><h3>Klettenwurzel</h3><em class="bot-lat">Arctium lappa</em></div>
+        <p>Die Wurzel der Großen Klette. In Japan als Gemüse bekannt, in Europa als traditionelles Kraut.</p>
+      </article>
+    </div>
+    <p class="bot-note rev">Zutaten: Wasser, Glycerin (pflanzlich), Auszüge aus Löwenzahnwurzel, Rotkleeblüte, Labkraut und Klettenwurzel. Nahrungsergänzungsmittel sind kein Ersatz für eine ausgewogene und abwechslungsreiche Ernährung und eine gesunde Lebensweise. Außerhalb der Reichweite von kleinen Kindern aufbewahren. Die angegebene empfohlene Tagesdosis darf nicht überschritten werden.</p>
+  </div>
+</section>
+
+<section class="ritual" id="ritual">
+  <div class="wrap rit-grid">
+    <div>
+      <p class="eyebrow rev">Das Ritual</p>
+      <h2 class="display split" style="margin-top:22px;color:var(--green-deep)">Zehn Sekunden. <span class="ital">Zweimal am Tag.</span></h2>
+      <div class="rit-steps">
+        <div class="rit-step rev"><span class="rit-num">1</span><div><h3>Schütteln</h3><p>Kurz aufschütteln — natürliche Pflanzenauszüge setzen sich ab. Das gehört dazu.</p></div></div>
+        <div class="rit-step rev"><span class="rit-num">2</span><div><h3>Zehn Tropfen unter die Zunge</h3><p>Morgens nach dem Aufstehen und abends vor dem Schlafengehen. Direkt oder in ein Glas Wasser.</p></div></div>
+        <div class="rit-step rev"><span class="rit-num">3</span><div><h3>Dreißig Sekunden warten</h3><p>Kurz einwirken lassen, dann schlucken. Danach am besten ein großes Glas Wasser.</p></div></div>
+      </div>
+      <p class="small rev" style="margin-top:26px">Empfohlene Tagesdosis: 2 × 10 Tropfen (ca. 1 ml). Eine Flasche à 60 ml reicht für rund 60 Tage.</p>
+    </div>
+    <div class="rit-vis">
+      <div class="rit-dial" aria-hidden="true"></div>
+      <img class="bottle" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNTAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCI+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdsYXNzIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMCI+CjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzRFMzMxNSIvPjxzdG9wIG9mZnNldD0iLjEzIiBzdG9wLWNvbG9yPSIjOEU2MDI3Ii8+PHN0b3Agb2Zmc2V0PSIuMzQiIHN0b3AtY29sb3I9IiNDNzlBNEUiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjQjc4QTNFIi8+PHN0b3Agb2Zmc2V0PSIuNzQiIHN0b3AtY29sb3I9IiM3QjUyMjIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0MDI5MEYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJjYXAiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIwIj4KPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDgxNTBGIi8+PHN0b3Agb2Zmc2V0PSIuMjYiIHN0b3AtY29sb3I9IiMxRjREM0EiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjMkU2QTRGIi8+PHN0b3Agb2Zmc2V0PSIuNzgiIHN0b3AtY29sb3I9IiMxNzNBMkIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwODE1MEYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJsYWJlbCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNERkQ3QzEiLz48c3RvcCBvZmZzZXQ9Ii4zMiIgc3RvcC1jb2xvcj0iI0Y3RjNFOCIvPjxzdG9wIG9mZnNldD0iLjciIHN0b3AtY29sb3I9IiNGMkVDREMiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNEOENGQjYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iYmx1cjYiIHg9Ii00MCUiIHk9Ii00MCUiIHdpZHRoPSIxODAlIiBoZWlnaHQ9IjE4MCUiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjYiLz48L2ZpbHRlcj4KPGZpbHRlciBpZD0iYmx1cjMiIHg9Ii00MCUiIHk9Ii00MCUiIHdpZHRoPSIxODAlIiBoZWlnaHQ9IjE4MCUiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjMiLz48L2ZpbHRlcj4KPC9kZWZzPgo8Zz4KPHJlY3QgeD0iMTUyIiB5PSIyNiIgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijg4IiByeD0iOCIgZmlsbD0idXJsKCNjYXApIi8+CjxnIHN0cm9rZT0iI0Y1RjFFNiIgc3Ryb2tlLXdpZHRoPSIxLjQiIG9wYWNpdHk9Ii4xNCI+CjxwYXRoIGQ9Ik0xNjggMzR2NzJNMTgwIDM0djcyTTE5MiAzNHY3Mk0yMDQgMzR2NzJNMjE2IDM0djcyTTIyOCAzNHY3MiIvPgo8L2c+CjxyZWN0IHg9IjE2MCIgeT0iMzQiIHdpZHRoPSIxMiIgaGVpZ2h0PSI3MiIgcng9IjYiIGZpbGw9IiNGNUYxRTYiIG9wYWNpdHk9Ii4xNiIgZmlsdGVyPSJ1cmwoI2JsdXIzKSIvPgo8cmVjdCB4PSIxNDUiIHk9IjEwNiIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyNCIgcng9IjYiIGZpbGw9InVybCgjY2FwKSIvPgo8cmVjdCB4PSIxNDUiIHk9IjEwNiIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyNCIgcng9IjYiIGZpbGw9IiMwODE1MEYiIG9wYWNpdHk9Ii4yOCIvPgo8cmVjdCB4PSIxNTYiIHk9IjExMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjE2IiByeD0iNSIgZmlsbD0iI0Y1RjFFNiIgb3BhY2l0eT0iLjE0Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI4aDUwdjM4YzAgMTAgNCAxNSAxMiAyMSA0MCAzMCA1NSA1NSA1NSA5MnYxNjhhMTQgMTQgMCAwIDEtMTQgMTRIMTIyYTE0IDE0IDAgMCAxLTE0LTE0VjI3OWMwLTM3IDE1LTYyIDU1LTkyIDgtNiAxMi0xMSAxMi0yMXoiIGZpbGw9InVybCgjZ2xhc3MpIi8+CjxwYXRoIGQ9Ik0xNzUgMTI4aDUwdjM4YzAgMTAgNCAxNSAxMiAyMSA0MCAzMCA1NSA1NSA1NSA5MnYxNjhhMTQgMTQgMCAwIDEtMTQgMTRIMTIyYTE0IDE0IDAgMCAxLTE0LTE0VjI3OWMwLTM3IDE1LTYyIDU1LTkyIDgtNiAxMi0xMSAxMi0yMXoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzMzMjAwQiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii41Ii8+CjxyZWN0IHg9IjEyNiIgeT0iMjA2IiB3aWR0aD0iMjAiIGhlaWdodD0iMjI0IiByeD0iMTAiIGZpbGw9IiNGOEVGRDkiIG9wYWNpdHk9Ii4yMiIgZmlsdGVyPSJ1cmwoI2JsdXI2KSIvPgo8cmVjdCB4PSIyNjgiIHk9IjIxMiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjIxNCIgcng9IjgiIGZpbGw9IiMyNDE1MDUiIG9wYWNpdHk9Ii4yNiIgZmlsdGVyPSJ1cmwoI2JsdXI2KSIvPgo8ZWxsaXBzZSBjeD0iMjAwIiBjeT0iNDUyIiByeD0iNzYiIHJ5PSIxMiIgZmlsbD0iIzJBMTkwNyIgb3BhY2l0eT0iLjMiIGZpbHRlcj0idXJsKCNibHVyMykiLz4KPHJlY3QgeD0iMTI0IiB5PSIyNTAiIHdpZHRoPSIxNTIiIGhlaWdodD0iMTcwIiByeD0iOSIgZmlsbD0idXJsKCNsYWJlbCkiLz4KPHJlY3QgeD0iMTI0IiB5PSIyNTAiIHdpZHRoPSIxNTIiIGhlaWdodD0iMTcwIiByeD0iOSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQjg4OTNCIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9Ii40NSIvPgo8dGV4dCB4PSIyMDAiIHk9IjMwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsJ0lvd2FuIE9sZCBTdHlsZScsUGFsYXRpbm8sc2VyaWYiIGZvbnQtc2l6ZT0iNDMiIGZpbGw9IiMxMjMxMjQiPkFsb3JhPC90ZXh0Pgo8cmVjdCB4PSIxNzAiIHk9IjMyMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjEiIGZpbGw9IiNCODg5M0IiIG9wYWNpdHk9Ii43Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iJ0hlbHZldGljYSBOZXVlJyxIZWx2ZXRpY2EsQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjMuMiIgZmlsbD0iIzNENkI1NCI+S1LDhFVURVJBVVNaVUc8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMzY4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iJ0hlbHZldGljYSBOZXVlJyxIZWx2ZXRpY2EsQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI3LjYiIGxldHRlci1zcGFjaW5nPSIxLjkiIGZpbGw9IiM2QjdBNkYiPkZMw5xTU0lHIMK3IFZJRVIgUEZMQU5aRU48L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwnSW93YW4gT2xkIFN0eWxlJyxQYWxhdGlubyxzZXJpZiIgZm9udC1zdHlsZT0iaXRhbGljIiBmb250LXNpemU9IjIxIiBmaWxsPSIjMTIzMTI0Ij42MCBtbDwvdGV4dD4KPC9nPgo8L3N2Zz4K" alt="Alora Pipettenflasche" width="416" height="520" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<section class="cmp">
+  <div class="wrap">
+    <p class="eyebrow rev">Der Vergleich</p>
+    <h2 class="display split">Warum <span class="ital">flüssig?</span></h2>
+    <div class="cmp-scroll rev">
+      <table>
+        <thead>
+          <tr><th scope="col"></th><th scope="col" class="hi">Alora Tropfen</th><th scope="col">Kapseln</th><th scope="col">Kräutertee</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Einnahme</th>
+            <td class="hi"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Unter die Zunge, 10 Sekunden</span></td>
+            <td>Schlucken, mit Wasser</td><td>Aufbrühen, 8 Min. ziehen lassen</td></tr>
+          <tr><th scope="row">Dosierung</th>
+            <td class="hi"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Tropfengenau anpassbar</span></td>
+            <td>Feste Dosis pro Kapsel</td><td>Schwankend</td></tr>
+          <tr><th scope="row">Zusatzstoffe</th>
+            <td class="hi"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Keine</span></td>
+            <td>Hülle, Trennmittel, Füllstoffe</td><td>Keine</td></tr>
+          <tr><th scope="row">Aufwand pro Tag</th>
+            <td class="hi"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>20 Sekunden</span></td>
+            <td>1 Minute</td><td>15–20 Minuten</td></tr>
+          <tr><th scope="row">Unterwegs</th>
+            <td class="hi"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Passt in jede Tasche</span></td>
+            <td>Ja</td><td>Nein</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="rev-sec" id="reviews">
+  <div class="wrap">
+    <div class="rev-head">
+      <div>
+        <p class="eyebrow rev">Bewertungen</p>
+        <h2 class="display split" style="margin-top:20px;color:var(--green-deep)">Was unsere <span class="ital">Kundinnen</span> sagen</h2>
+      </div>
+    </div>
+    <!-- ================================================================
+         JUDGE.ME / LOOX MOUNT POINT
+         Ersetze den Block unten durch das Widget-Snippet deiner
+         Bewertungs-App. Bei Judge.me in Shopify:
+             {{ '{% render "judgeme_widgets", widget_type: "judgeme_review_widget" %}' }}
+         Solange keine echten Bewertungen vorliegen, bleibt der
+         Empty-State stehen — er ist bewusst als solcher gestaltet.
+         ================================================================ -->
+    <div class="rev-empty rev" id="reviewMount">
+      <div class="rev-stars" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+      </div>
+      <h3>Noch keine Bewertungen</h3>
+      <p>Alora ist gerade erst gestartet. Wenn du das Ritual ausprobiert hast, freuen wir uns über deine ehrliche Rückmeldung — du wärst die Erste.</p>
+      <a href="produkt.html" class="btn btn-primary">Alora ausprobieren</a>
+      <p class="rev-mount-note">Alle Bewertungen stammen von verifizierten Käuferinnen und Käufern. Wir prüfen jede Bestellnummer vor der Veröffentlichung und löschen keine negativen Bewertungen.</p>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap faq-grid">
+    <div>
+      <p class="eyebrow rev">Häufige Fragen</p>
+      <h2 class="display split" style="margin-top:20px;color:var(--green-deep)">Gut zu <span class="ital">wissen.</span></h2>
+      <p class="small rev" style="margin-top:22px;max-width:34ch">Deine Frage ist nicht dabei? Schreib uns — wir antworten innerhalb von 24 Stunden.</p>
+    </div>
+    <div class="acc rev">
+      <div class="acc-item"><button class="acc-q" aria-expanded="false">Wie nehme ich Alora ein?<span class="acc-ico" aria-hidden="true"></span></button><div class="acc-a"><p>Zweimal täglich zehn Tropfen unter die Zunge — morgens nach dem Aufstehen und abends vor dem Schlafengehen. Kurz einwirken lassen, dann schlucken. Wenn dir der Geschmack zu herb ist, kannst du die Tropfen auch in ein Glas Wasser oder Tee geben. Vor Gebrauch bitte schütteln.</p></div></div>
+      <div class="acc-item"><button class="acc-q" aria-expanded="false">Wie lange reicht eine Flasche?<span class="acc-ico" aria-hidden="true"></span></button><div class="acc-a"><p>Eine Flasche enthält 60 ml. Bei der empfohlenen Tagesdosis von 2 × 10 Tropfen (etwa 1 ml pro Tag) reicht sie für rund 60 Tage.</p></div></div>
+      <div class="acc-item"><button class="acc-q" aria-expanded="false">Was ist drin — und was nicht?<span class="acc-ico" aria-hidden="true"></span></button><div class="acc-a"><p>Wasser, pflanzliches Glycerin und Auszüge aus Löwenzahnwurzel, Rotkleeblüte, Labkraut und Klettenwurzel. Kein Alkohol, keine Aromen, keine Farbstoffe, keine Konservierungsmittel, keine Füllstoffe. Vegan und glutenfrei.</p></div></div>
+      <div class="acc-item"><button class="acc-q" aria-expanded="false">Ist Alora für mich geeignet?<span class="acc-ico" aria-hidden="true"></span></button><div class="acc-a"><p>Alora ist ein Nahrungsergänzungsmittel für Erwachsene. Nicht geeignet während Schwangerschaft und Stillzeit sowie bei bekannter Allergie gegen Korbblütler (Löwenzahn, Klette) oder Leguminosen (Rotklee). Wenn du Medikamente einnimmst oder dich in ärztlicher Behandlung befindest, sprich die Einnahme bitte vorher mit deiner Ärztin oder deinem Arzt ab.</p></div></div>
+      <div class="acc-item"><button class="acc-q" aria-expanded="false">Wie schnell kommt meine Bestellung?<span class="acc-ico" aria-hidden="true"></span></button><div class="acc-a"><p>Versand aus Deutschland mit DHL, in der Regel innerhalb von 1–2 Werktagen nach Bestelleingang. Ab 49 € Bestellwert versenden wir versandkostenfrei.</p></div></div>
+      <div class="acc-item"><button class="acc-q" aria-expanded="false">Was, wenn es mir nicht gefällt?<span class="acc-ico" aria-hidden="true"></span></button><div class="acc-a"><p>Du hast 60 Tage Zeit. Schreib uns einfach eine E-Mail und wir erstatten dir den Kaufpreis — auch bei geöffneter Flasche, ohne Rücksendung.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap cta-inner">
+    <div>
+      <p class="eyebrow rev">Alora Kräuterauszug</p>
+      <h2 class="display split">Fang heute <span class="ital">an.</span></h2>
+      <p class="lead rev">60 ml flüssiger Kräuterauszug. Reicht für rund zwei Monate. Versandkostenfrei ab 49 €, 60 Tage Rückgaberecht.</p>
+      <div class="price-row rev">
+        <span class="price">29,90 €</span>
+        <span class="price-old">39,90 €</span>
+        <span class="price-save">Spare 25 %</span>
+      </div>
+      <p class="grundpreis rev">Grundpreis: 49,83 € / 100 ml · inkl. MwSt., zzgl. <a href="#" style="text-decoration:underline">Versandkosten</a></p>
+      <a href="produkt.html" class="btn btn-primary rev">In den Warenkorb</a>
+      <p class="hinweis rev"><b>Hinweis:</b> Alora ist ein Nahrungsergänzungsmittel und kein Arzneimittel. Bei anhaltenden oder plötzlich auftretenden Schwellungen, insbesondere an Beinen, Knöcheln oder im Gesicht, wende dich bitte an deine Ärztin oder deinen Arzt — dahinter können behandlungsbedürftige Ursachen stehen.</p>
+    </div>
+    <div class="cta-vis">
+      <img class="bottle" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNTAwIiB3aWR0aD0iNDAwIiBoZWlnaHQ9IjUwMCI+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImdsYXNzIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMCI+CjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzRFMzMxNSIvPjxzdG9wIG9mZnNldD0iLjEzIiBzdG9wLWNvbG9yPSIjOEU2MDI3Ii8+PHN0b3Agb2Zmc2V0PSIuMzQiIHN0b3AtY29sb3I9IiNDNzlBNEUiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjQjc4QTNFIi8+PHN0b3Agb2Zmc2V0PSIuNzQiIHN0b3AtY29sb3I9IiM3QjUyMjIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0MDI5MEYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJjYXAiIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIwIj4KPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDgxNTBGIi8+PHN0b3Agb2Zmc2V0PSIuMjYiIHN0b3AtY29sb3I9IiMxRjREM0EiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjMkU2QTRGIi8+PHN0b3Agb2Zmc2V0PSIuNzgiIHN0b3AtY29sb3I9IiMxNzNBMkIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwODE1MEYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGxpbmVhckdyYWRpZW50IGlkPSJsYWJlbCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjAiPgo8c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNERkQ3QzEiLz48c3RvcCBvZmZzZXQ9Ii4zMiIgc3RvcC1jb2xvcj0iI0Y3RjNFOCIvPjxzdG9wIG9mZnNldD0iLjciIHN0b3AtY29sb3I9IiNGMkVDREMiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNEOENGQjYiLz4KPC9saW5lYXJHcmFkaWVudD4KPGZpbHRlciBpZD0iYmx1cjYiIHg9Ii00MCUiIHk9Ii00MCUiIHdpZHRoPSIxODAlIiBoZWlnaHQ9IjE4MCUiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjYiLz48L2ZpbHRlcj4KPGZpbHRlciBpZD0iYmx1cjMiIHg9Ii00MCUiIHk9Ii00MCUiIHdpZHRoPSIxODAlIiBoZWlnaHQ9IjE4MCUiPjxmZUdhdXNzaWFuQmx1ciBzdGREZXZpYXRpb249IjMiLz48L2ZpbHRlcj4KPC9kZWZzPgo8Zz4KPHJlY3QgeD0iMTUyIiB5PSIyNiIgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijg4IiByeD0iOCIgZmlsbD0idXJsKCNjYXApIi8+CjxnIHN0cm9rZT0iI0Y1RjFFNiIgc3Ryb2tlLXdpZHRoPSIxLjQiIG9wYWNpdHk9Ii4xNCI+CjxwYXRoIGQ9Ik0xNjggMzR2NzJNMTgwIDM0djcyTTE5MiAzNHY3Mk0yMDQgMzR2NzJNMjE2IDM0djcyTTIyOCAzNHY3MiIvPgo8L2c+CjxyZWN0IHg9IjE2MCIgeT0iMzQiIHdpZHRoPSIxMiIgaGVpZ2h0PSI3MiIgcng9IjYiIGZpbGw9IiNGNUYxRTYiIG9wYWNpdHk9Ii4xNiIgZmlsdGVyPSJ1cmwoI2JsdXIzKSIvPgo8cmVjdCB4PSIxNDUiIHk9IjEwNiIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyNCIgcng9IjYiIGZpbGw9InVybCgjY2FwKSIvPgo8cmVjdCB4PSIxNDUiIHk9IjEwNiIgd2lkdGg9IjExMCIgaGVpZ2h0PSIyNCIgcng9IjYiIGZpbGw9IiMwODE1MEYiIG9wYWNpdHk9Ii4yOCIvPgo8cmVjdCB4PSIxNTYiIHk9IjExMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjE2IiByeD0iNSIgZmlsbD0iI0Y1RjFFNiIgb3BhY2l0eT0iLjE0Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI4aDUwdjM4YzAgMTAgNCAxNSAxMiAyMSA0MCAzMCA1NSA1NSA1NSA5MnYxNjhhMTQgMTQgMCAwIDEtMTQgMTRIMTIyYTE0IDE0IDAgMCAxLTE0LTE0VjI3OWMwLTM3IDE1LTYyIDU1LTkyIDgtNiAxMi0xMSAxMi0yMXoiIGZpbGw9InVybCgjZ2xhc3MpIi8+CjxwYXRoIGQ9Ik0xNzUgMTI4aDUwdjM4YzAgMTAgNCAxNSAxMiAyMSA0MCAzMCA1NSA1NSA1NSA5MnYxNjhhMTQgMTQgMCAwIDEtMTQgMTRIMTIyYTE0IDE0IDAgMCAxLTE0LTE0VjI3OWMwLTM3IDE1LTYyIDU1LTkyIDgtNiAxMi0xMSAxMi0yMXoiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzMzMjAwQiIgc3Ryb2tlLXdpZHRoPSIxLjYiIG9wYWNpdHk9Ii41Ii8+CjxyZWN0IHg9IjEyNiIgeT0iMjA2IiB3aWR0aD0iMjAiIGhlaWdodD0iMjI0IiByeD0iMTAiIGZpbGw9IiNGOEVGRDkiIG9wYWNpdHk9Ii4yMiIgZmlsdGVyPSJ1cmwoI2JsdXI2KSIvPgo8cmVjdCB4PSIyNjgiIHk9IjIxMiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjIxNCIgcng9IjgiIGZpbGw9IiMyNDE1MDUiIG9wYWNpdHk9Ii4yNiIgZmlsdGVyPSJ1cmwoI2JsdXI2KSIvPgo8ZWxsaXBzZSBjeD0iMjAwIiBjeT0iNDUyIiByeD0iNzYiIHJ5PSIxMiIgZmlsbD0iIzJBMTkwNyIgb3BhY2l0eT0iLjMiIGZpbHRlcj0idXJsKCNibHVyMykiLz4KPHJlY3QgeD0iMTI0IiB5PSIyNTAiIHdpZHRoPSIxNTIiIGhlaWdodD0iMTcwIiByeD0iOSIgZmlsbD0idXJsKCNsYWJlbCkiLz4KPHJlY3QgeD0iMTI0IiB5PSIyNTAiIHdpZHRoPSIxNTIiIGhlaWdodD0iMTcwIiByeD0iOSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjQjg4OTNCIiBzdHJva2Utd2lkdGg9IjEiIG9wYWNpdHk9Ii40NSIvPgo8dGV4dCB4PSIyMDAiIHk9IjMwOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Ikdlb3JnaWEsJ0lvd2FuIE9sZCBTdHlsZScsUGFsYXRpbm8sc2VyaWYiIGZvbnQtc2l6ZT0iNDMiIGZpbGw9IiMxMjMxMjQiPkFsb3JhPC90ZXh0Pgo8cmVjdCB4PSIxNzAiIHk9IjMyMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjEiIGZpbGw9IiNCODg5M0IiIG9wYWNpdHk9Ii43Ii8+Cjx0ZXh0IHg9IjIwMCIgeT0iMzQ4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iJ0hlbHZldGljYSBOZXVlJyxIZWx2ZXRpY2EsQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMCIgbGV0dGVyLXNwYWNpbmc9IjMuMiIgZmlsbD0iIzNENkI1NCI+S1LDhFVURVJBVVNaVUc8L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iMzY4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iJ0hlbHZldGljYSBOZXVlJyxIZWx2ZXRpY2EsQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI3LjYiIGxldHRlci1zcGFjaW5nPSIxLjkiIGZpbGw9IiM2QjdBNkYiPkZMw5xTU0lHIMK3IFZJRVIgUEZMQU5aRU48L3RleHQ+Cjx0ZXh0IHg9IjIwMCIgeT0iNDAyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iR2VvcmdpYSwnSW93YW4gT2xkIFN0eWxlJyxQYWxhdGlubyxzZXJpZiIgZm9udC1zdHlsZT0iaXRhbGljIiBmb250LXNpemU9IjIxIiBmaWxsPSIjMTIzMTI0Ij42MCBtbDwvdGV4dD4KPC9nPgo8L3N2Zz4K" alt="Alora Flasche, 60 ml" width="416" height="520" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="f-top">
+      <div>
+        <div class="f-brand">Alora</div>
+        <p>Flüssige Kräuterauszüge aus vier Pflanzen. Abgefüllt und laborgeprüft in Deutschland.</p>
+      </div>
+      <div class="f-col"><h4>Produkt</h4><ul><li><a href="produkt.html">Alora Kräuterauszug</a></li><li><a href="#botanicals">Inhaltsstoffe</a></li><li><a href="#ritual">Anwendung</a></li><li><a href="#faq">FAQ</a></li></ul></div>
+      <div class="f-col"><h4>Service</h4><ul><li><a href="#">Versand &amp; Lieferung</a></li><li><a href="#">Rückgabe</a></li><li><a href="#">Kontakt</a></li><li><a href="#">Bestellung verfolgen</a></li></ul></div>
+      <div class="f-col"><h4>Rechtliches</h4><ul><li><a href="#">Impressum</a></li><li><a href="#">Datenschutz</a></li><li><a href="#">AGB</a></li><li><a href="#">Widerrufsbelehrung</a></li></ul></div>
+    </div>
+    <div class="f-bot">
+      <span>© 2026 Alora. Alle Rechte vorbehalten.</span>
+      <span>Alle Preise inkl. gesetzlicher MwSt., zzgl. Versandkosten.</span>
+    </div>
+    <p class="f-legal">Nahrungsergänzungsmittel sind kein Ersatz für eine ausgewogene und abwechslungsreiche Ernährung und eine gesunde Lebensweise. Die angegebene empfohlene Tagesdosis darf nicht überschritten werden. Außerhalb der Reichweite von kleinen Kindern aufbewahren. Nicht geeignet für Schwangere und Stillende.</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(function(){
+  'use strict';
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- 1. split headings into words → chars ----------
+     Each word is an inline-block with nowrap so a line can only break
+     between words, never inside one. */
+  function splitTitles(){
+    document.querySelectorAll('.split').forEach(function(el){
+      if(el.dataset.split) return;
+      el.dataset.split = '1';
+      var i = 0;
+      function emitText(text, dest){
+        text.split(/(\s+)/).forEach(function(tok){
+          if(!tok) return;
+          if(/^\s+$/.test(tok)){ dest.appendChild(document.createTextNode(' ')); return; }
+          var word = document.createElement('span');
+          word.className = 'word';
+          for(var k=0;k<tok.length;k++){
+            var c = document.createElement('span');
+            c.className = 'char';
+            c.style.transitionDelay = (i*0.028).toFixed(3) + 's';
+            c.textContent = tok[k];
+            word.appendChild(c);
+            i++;
+          }
+          dest.appendChild(word);
+        });
+      }
+      function walk(src, dest){
+        Array.prototype.slice.call(src.childNodes).forEach(function(n){
+          if(n.nodeType === 3){ emitText(n.textContent, dest); }
+          else if(n.nodeName === 'BR'){ dest.appendChild(document.createElement('br')); }
+          else if(n.nodeType === 1){
+            var clone = document.createElement('span');
+            clone.className = n.className;
+            walk(n, clone);
+            dest.appendChild(clone);
+          }
+        });
+      }
+      var frag = document.createDocumentFragment();
+      var holder = document.createElement('span');
+      walk(el, holder);
+      while(holder.firstChild) frag.appendChild(holder.firstChild);
+      el.innerHTML = '';
+      el.appendChild(frag);
+    });
+  }
+  splitTitles();
+
+  /* ---------- 2. reveal on scroll ---------- */
+  document.querySelectorAll('.bot-card').forEach(function(el, i){ el.style.setProperty('--i', i); });
+
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold:0, rootMargin:'0px 0px -10% 0px'});
+
+  var revealables = document.querySelectorAll('.rev, .split, .scene-frame');
+  revealables.forEach(function(el){ io.observe(el); });
+
+  // safety net: anything already on screen at load reveals immediately,
+  // and nothing stays hidden if an observer callback is missed
+  function sweep(){
+    revealables.forEach(function(el){
+      if(el.classList.contains('in')) return;
+      var r = el.getBoundingClientRect();
+      // no `r.bottom > 0` guard: an element scrolled clean past must still reveal
+      if(r.top < window.innerHeight * 0.92){ el.classList.add('in'); }
+    });
+  }
+  sweep();
+  window.addEventListener('scroll', sweep, {passive:true});
+  window.addEventListener('load', sweep);
+
+  /* ---------- 3. sticky header ---------- */
+  var hdr = document.getElementById('hdr');
+  function onScroll(){ hdr.classList.toggle('stuck', window.scrollY > 24); }
+  onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+
+  /* ---------- 4. announcement rotator ---------- */
+  var ann = document.getElementById('ann'), ai = 0, aN = ann.children.length;
+  setInterval(function(){
+    ai = (ai + 1) % aN;
+    ann.style.transition = 'transform .7s cubic-bezier(.22,1,.36,1)';
+    ann.style.transform = 'translateY(-' + (ai*38) + 'px)';
+  }, 3800);
+
+  /* ---------- 5. FAQ accordion ---------- */
+  document.querySelectorAll('.acc-q').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var item = btn.parentElement, panel = item.querySelector('.acc-a'), open = item.classList.contains('open');
+      item.parentElement.querySelectorAll('.acc-item.open').forEach(function(o){
+        o.classList.remove('open');
+        o.querySelector('.acc-a').style.maxHeight = '0px';
+        o.querySelector('.acc-q').setAttribute('aria-expanded','false');
+      });
+      if(!open){
+        item.classList.add('open');
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+        btn.setAttribute('aria-expanded','true');
+      }
+    });
+  });
+
+  // With no GSAP (blocked CDN) or reduced motion there is no scrub to light the
+  // steps, so reveal all three before bailing out.
+  if(reduce || !window.gsap){
+    document.querySelectorAll('.mstep').forEach(function(s){ s.classList.add('on'); });
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ---------- 6. hero bottle float + parallax ---------- */
+  var hb = document.getElementById('heroBottle');
+  if(hb){
+    gsap.to(hb, {y:-16, duration:4.2, ease:'sine.inOut', yoyo:true, repeat:-1});
+    gsap.to(hb, {
+      yPercent:12, rotate:2.5, ease:'none',
+      scrollTrigger:{trigger:'.hero', start:'top top', end:'bottom top', scrub:1.1}
+    });
+  }
+  gsap.utils.toArray('.leaf-art').forEach(function(el, i){
+    gsap.to(el, {
+      yPercent: i % 2 ? -22 : 18, rotate: i % 2 ? 6 : -6, ease:'none',
+      scrollTrigger:{trigger:'.hero', start:'top top', end:'bottom top', scrub:1.4}
+    });
+  });
+  gsap.to('.hero-bg-word', {
+    xPercent:-8, ease:'none',
+    scrollTrigger:{trigger:'.hero', start:'top top', end:'bottom top', scrub:1.6}
+  });
+
+  /* ---------- 7. mechanism: scrubbed vessel animation ---------- */
+  var flows = ['#fp1','#fp2','#fp3','#fp4','#fp5'].map(function(s){ return document.querySelector(s); }).filter(Boolean);
+  flows.forEach(function(p){
+    var L = p.getTotalLength();
+    p.style.strokeDasharray = L; p.style.strokeDashoffset = L;
+  });
+
+  // Pin only where the layout actually fits one screen; below that the
+  // section scrolls normally and the same timeline is scrubbed without a pin.
+  var canPin = window.matchMedia('(min-width:940px) and (min-height:700px)').matches;
+
+  var mechTl = gsap.timeline({
+    scrollTrigger:{
+      trigger:'.mech',
+      start: canPin ? 'top top' : 'top 75%',
+      end:   canPin ? '+=180%'  : 'bottom bottom',
+      pin:   canPin ? '.mech-inner' : false,
+      scrub:.9, anticipatePin:1, invalidateOnRefresh:true,
+      onUpdate:function(self){
+        if(!canPin) return;   // mobile shows all three steps at full contrast
+        var idx = self.progress < .34 ? 0 : (self.progress < .70 ? 1 : 2);
+        document.querySelectorAll('.mstep').forEach(function(s){
+          s.classList.toggle('on', +s.dataset.step === idx);
+        });
+      }
+    }
+  });
+  mechTl
+    .to('#blockNode', {scale:1.18, transformOrigin:'202px 104px', duration:.6, ease:'power1.inOut'}, 0)
+    .to('#sludge', {opacity:.18, duration:1.6, ease:'power1.inOut'}, .55)
+    .to(flows, {strokeDashoffset:0, duration:1.9, ease:'power1.inOut', stagger:.14}, .6)
+    .to('#blockNode', {scale:0, opacity:0, transformOrigin:'202px 104px', duration:.5, ease:'back.in(2)'}, 1.05)
+    .to('#clearNode', {opacity:1, duration:.4}, 1.3)
+    .to('#nodes .lnode', {fill:'#C9A257', duration:.8, stagger:.06}, 1.2)
+    .to('#sparks', {opacity:1, duration:.5}, 1.5)
+    .to('#sparks circle', {y:-14, opacity:.25, duration:1.1, stagger:.08, ease:'sine.out'}, 1.7);
+
+  document.querySelector('.mstep[data-step="0"]').classList.add('on');
+
+  /* ---------- 8. section bottles drift ---------- */
+  gsap.utils.toArray('.rit-vis .bottle, .cta-vis .bottle').forEach(function(el){
+    gsap.fromTo(el, {yPercent:8}, {
+      yPercent:-8, ease:'none',
+      scrollTrigger:{trigger:el, start:'top bottom', end:'bottom top', scrub:1.2}
+    });
+  });
+
+  /* ---------- 9. table rows ---------- */
+  gsap.from('.cmp tbody tr', {
+    y:20, opacity:0, duration:.7, stagger:.09, ease:'power2.out',
+    scrollTrigger:{trigger:'.cmp table', start:'top 80%', once:true}
+  });
+
+})();
+</script>
+</body>
+</html>
