@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMW — Ads, die wirklich performen.</title>
+<meta name="description" content="AMW ist eine Performance-Marketing-Agentur für Meta Ads. Ein Kanal, voll ausgereizt: Statics, Videos, UGC, Kampagnenstruktur und Tracking aus einer Hand.">
+<meta property="og:title" content="AMW — Ads, die wirklich performen.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800;900&family=Archivo+Expanded:wght@700;800;900&family=Chivo:wght@300;400;700&display=swap" rel="stylesheet">
+<!-- Google Fonts has no family named "Archivo Expanded"; the link above silently drops it and
+     serves Archivo at font-stretch 100%. This second link adds Archivo's wdth axis (62–125) so
+     the display face can be set at its widest width, as the type direction requires. -->
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,400..900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<style>
+:root {
+    --black:      #0B0B0D;
+    --ash:        #17171B;   /* raised surface */
+    --amber:      #EFB03C;
+    --amber-deep: #A6741F;
+    --cream:      #F4F0E8;
+    --muted:      rgba(244, 240, 232, 0.58);
+    --line:       rgba(244, 240, 232, 0.14);
+
+    --font-display: 'Archivo Expanded', 'Archivo', sans-serif;
+    --font-body:    'Chivo', system-ui, sans-serif;
+
+    --gutter: clamp(1.25rem, 4vw, 4rem);
+    --ease:   cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: auto; }  /* Lenis handles smoothing */
+
+body {
+    background: var(--black);
+    color: var(--cream);
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+}
+
+/* Display type — one scale, used at four steps */
+.d1 { font-family: var(--font-display); font-weight: 900; font-size: clamp(3.5rem, 13vw, 15rem); line-height: 0.82; letter-spacing: -0.03em; }
+.d2 { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.5rem, 7vw, 6.5rem);  line-height: 0.88; letter-spacing: -0.02em; }
+.d3 { font-family: var(--font-display); font-weight: 800; font-size: clamp(1.5rem, 3vw, 2.75rem); line-height: 1.0;  letter-spacing: -0.01em; }
+
+/* Archivo carries the width on its wdth axis; 125% is the widest instance. */
+.d1, .d2, .d3 { font-stretch: 125%; }
+
+p  { max-width: 62ch; color: var(--muted); }
+a  { color: inherit; text-decoration: none; }
+
+:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition-duration: 0.01ms !important; }
+}
+
+/* --- shared utilities ------------------------------------------------- */
+
+/* --muted composites to #928F8C on --black: 6.16:1, and 5.60:1 on --ash.
+   Both clear the 4.5:1 floor, so it is used as specified with no lift. */
+
+.sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+img, video { display: block; max-width: 100%; height: auto; }
+
+section[id] { scroll-margin-top: 5.5rem; }
+
+/* Fit-to-column display sizing. Every display heading sits in an inline-size
+   container so it can never exceed its column at any viewport width. */
+.fit { container-type: inline-size; }
+
+/* The one entrance animation on the page: a per-line mask wipe. */
+.wipe .line {
+    display: block;
+    overflow: hidden;
+    padding: 0.14em 0.06em 0.18em;
+    margin: -0.14em -0.06em -0.18em;
+}
+.wipe .line-in { display: block; }
+.js-motion .wipe .line-in { transform: translateY(115%); will-change: transform; }
+
+/* Buttons — one amber pill, one bordered pill. */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px;
+    padding: 0.75rem 1.5rem;
+    border-radius: 100px;
+    border: 1px solid transparent;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 300ms var(--ease), color 300ms var(--ease), border-color 300ms var(--ease);
+}
+.btn--amber { background: var(--amber); color: var(--black); }
+.btn--amber:hover { background: var(--cream); }
+.btn--line { background: transparent; color: var(--cream); border-color: var(--line); }
+.btn--line:hover { border-color: var(--cream); }
+
+/* --- 0. Intro --------------------------------------------------------- */
+
+.intro {
+    position: fixed; inset: 0; z-index: 900;
+    display: grid; place-items: center;
+    background: var(--black);
+    pointer-events: none;
+    animation: introOut 700ms var(--ease) 900ms forwards;
+}
+.intro__inner { display: grid; justify-items: center; gap: 1.25rem; padding: 0 var(--gutter); }
+.intro__mark { letter-spacing: -0.02em; }
+.intro__rule {
+    display: block; width: 100%; height: 2px;
+    background: var(--amber);
+    transform: scaleX(0); transform-origin: left center;
+    animation: introRule 900ms var(--ease) forwards;
+}
+@keyframes introRule { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes introOut {
+    from { clip-path: inset(0 0 0 0); }
+    to   { clip-path: inset(0 0 100% 0); visibility: hidden; }
+}
+.intro.is-skipped { display: none; }
+@media (prefers-reduced-motion: reduce) { .intro { display: none; } }
+
+/* --- 1. Header -------------------------------------------------------- */
+
+.hdr {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem var(--gutter);
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition: background-color 300ms var(--ease), border-color 300ms var(--ease);
+}
+.hdr.is-scrolled {
+    background: rgba(11, 11, 13, 0.72);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    border-bottom-color: var(--line);
+}
+.hdr__mark {
+    justify-self: start;
+    font-family: var(--font-display); font-stretch: 125%; font-weight: 800;
+    font-size: 1.25rem; letter-spacing: 0.02em; line-height: 1;
+    display: inline-flex; align-items: center; min-height: 44px;
+}
+.hdr__nav { display: flex; align-items: center; gap: 0.5rem; }
+.hdr__nav a {
+    display: inline-flex; align-items: center; min-height: 44px;
+    padding: 0 0.25rem;
+    font-size: 0.875rem; color: var(--muted);
+    transition: color 300ms var(--ease);
+}
+.hdr__nav a:hover { color: var(--cream); }
+.hdr__sep { color: var(--line); font-size: 0.875rem; }
+.hdr__cta { justify-self: end; }
+.hdr__burger {
+    justify-self: end;
+    display: none;
+    width: 44px; height: 44px;
+    align-items: center; justify-content: center;
+    background: transparent; border: 0; color: var(--cream); cursor: pointer;
+}
+
+.menu {
+    position: fixed; inset: 0; z-index: 190;
+    display: grid; align-content: center; justify-items: start;
+    gap: 0.5rem;
+    padding: 6rem var(--gutter) var(--gutter);
+    background: var(--black);
+}
+.menu[hidden] { display: none; }
+.menu a {
+    display: inline-flex; align-items: center; min-height: 56px;
+    color: var(--cream);
+}
+.menu .btn { margin-top: 1.5rem; }
+
+/* --- 2. Hero ---------------------------------------------------------- */
+
+.hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 100svh;
+    display: grid; place-items: center;
+    padding: 8rem var(--gutter) 5rem;
+}
+
+.wall {
+    position: absolute; inset: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+    padding: 0 1.25rem;
+    opacity: 0.4;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgb(0,0,0) 16%, rgb(0,0,0) 84%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgb(0,0,0) 16%, rgb(0,0,0) 84%, rgba(0,0,0,0) 100%);
+}
+.wall__col { overflow: hidden; }
+.wall__run { display: block; will-change: transform; }
+.wall__run img {
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    margin-bottom: 1.25rem;
+    border-radius: 6px;
+    object-fit: cover;
+    filter: saturate(0.85);
+}
+/* Three drift cycles, none a multiple of another, so the columns never sync.
+   Column C runs three tiles instead of four and is given its own speed so the
+   shorter loop does not read as a shorter loop. */
+.wall__col--a .wall__run { animation: driftUp   72s linear infinite; }
+.wall__col--b .wall__run { animation: driftDown 84s linear infinite; }
+.wall__col--c .wall__run { animation: driftUp   63s linear infinite; }
+@keyframes driftUp   { from { transform: translate3d(0, 0, 0); }      to { transform: translate3d(0, -50%, 0); } }
+@keyframes driftDown { from { transform: translate3d(0, -50%, 0); }   to { transform: translate3d(0, 0, 0); } }
+
+.hero__inner {
+    position: relative; z-index: 10;
+    display: grid; justify-items: center; gap: 2rem;
+    text-align: center;
+    width: 100%;
+}
+.hero__title { font-size: min(clamp(3.5rem, 13vw, 15rem), 9.6cqw); }   /* 'Ads, die wirklich' = 10.15em */
+.hero__lead {
+    font-size: 1.125rem; color: var(--cream); max-width: 46ch;
+    margin: -0.75rem auto 0;
+}
+.hero__note { font-size: 0.8125rem; color: var(--muted); margin-top: -1.25rem; }
+
+/* --- 3. Kanal --------------------------------------------------------- */
+
+.kanal { padding: 12rem var(--gutter); }
+.kanal__wrap { max-width: 1100px; }
+.kanal__top { display: grid; gap: clamp(2rem, 4vw, 4rem); }
+.kanal h2 { font-size: min(clamp(2.5rem, 7vw, 6.5rem), 10.7cqw); }   /* 'Voll ausgereizt.' = 9.09em */
+.kanal__lead { color: var(--muted); }
+
+.figures {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: clamp(4rem, 8vw, 7rem);
+}
+.figure { padding: 0 clamp(1rem, 2vw, 2rem); }
+.figure + .figure { border-left: 1px solid var(--line); }
+.figure:first-child { padding-left: 0; }
+.figure__num { color: var(--amber); font-size: min(clamp(1.5rem, 3vw, 2.75rem), 13cqw); }   /* '2–4 Wochen' = 7.43em */
+.figure__label { display: block; margin-top: 0.75rem; font-size: 0.8125rem; color: var(--muted); }
+
+/* --- 4. Leistungen ---------------------------------------------------- */
+
+.leistungen { padding: 8rem var(--gutter); }
+.leistungen h2 { font-size: min(clamp(2.5rem, 7vw, 6.5rem), 9.8cqw); }   /* 'inhouse machen' = 9.88em */
+.services { margin-top: clamp(3rem, 6vw, 5rem); list-style: none; }
+.service {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    padding: 2.5rem var(--gutter);
+    margin-inline: calc(var(--gutter) * -1);
+    border-top: 1px solid var(--line);
+    background-color: transparent;
+    transition: background-color 300ms var(--ease);
+}
+.service:hover { background-color: var(--ash); }
+.service__name {
+    flex: 0 1 auto;
+    font-size: min(clamp(1.5rem, 3vw, 2.75rem), 8cqw);   /* 'Kampagnenstruktur' = 12.18em, unbreakable */
+    transition: transform 300ms var(--ease);
+}
+.service:hover .service__name { transform: translateX(12px); }
+.service__desc { flex: 0 1 44ch; max-width: 44ch; color: var(--muted); text-align: right; }
+
+/* --- 5. Arbeiten ------------------------------------------------------ */
+
+.works {
+    --tile-w: clamp(240px, 26vw, 400px);
+    position: relative;
+    padding: 6rem 0;
+}
+.works__viewport { overflow: hidden; }
+.works__track {
+    display: flex; align-items: flex-end; gap: 1.25rem;
+    padding-inline: var(--gutter);
+    list-style: none;
+    width: max-content;
+}
+.work { width: var(--tile-w); flex: 0 0 auto; }
+.work__media {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--ash);
+}
+.work--video .work__media { aspect-ratio: 9 / 16; }
+.work__cap {
+    display: flex; align-items: baseline; gap: 0.5rem;
+    margin-top: 0.875rem;
+}
+.work__client { font-size: 0.875rem; color: var(--cream); }
+.work__dot { color: var(--line); font-size: 0.875rem; }
+.work__result { font-size: 0.8125rem; color: var(--amber); }
+.work__pause {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; margin-top: 0.5rem;
+    border: 1px solid var(--line); border-radius: 100px;
+    background: transparent; color: var(--cream); cursor: pointer;
+    transition: border-color 300ms var(--ease);
+}
+.work__pause:hover { border-color: var(--cream); }
+.work__pause .ico-play { display: none; }
+.work__pause[aria-pressed="true"] .ico-play { display: block; }
+.work__pause[aria-pressed="true"] .ico-pause { display: none; }
+
+@media (min-width: 900px) {
+    /* Keep the 9:16 video tile inside the pinned viewport on short screens. */
+    .works { --tile-w: max(240px, min(clamp(240px, 26vw, 400px), calc((100svh - 15rem) * 0.5625))); }
+    .works { min-height: 100svh; display: grid; align-content: center; padding: 0; }
+}
+@media (max-width: 899.98px) {
+    .works__viewport {
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .works__viewport::-webkit-scrollbar { display: none; }
+    .work { scroll-snap-align: center; }
+}
+
+/* --- 6. Prozess ------------------------------------------------------- */
+
+.prozess { padding: 8rem var(--gutter); }
+.steps { list-style: none; max-width: 1100px; }
+.step {
+    display: grid;
+    grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+    gap: clamp(1.5rem, 5vw, 5rem);
+    align-items: start;
+    padding: clamp(3rem, 6vw, 5rem) 0;
+    border-top: 1px solid var(--line);
+}
+.step__num {
+    font-size: min(clamp(2.5rem, 7vw, 6.5rem), 100cqw);
+    opacity: 0.25;
+    color: var(--cream);
+    transition: opacity 500ms var(--ease), color 500ms var(--ease);
+}
+.step.is-active .step__num { opacity: 1; color: var(--amber); }
+.step__title { }
+.step__desc { margin-top: 1rem; color: var(--muted); }
+
+/* --- 7. Skalierung ---------------------------------------------------- */
+
+.skalierung { position: relative; }
+.scale__stage {
+    position: relative;
+    min-height: 100svh;
+    display: grid; place-items: center;
+    padding: 7rem var(--gutter);
+    overflow: hidden;
+    isolation: isolate;
+}
+.scale__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 720px;
+}
+.scale__tile {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    border-radius: 6px;
+    object-fit: cover;
+    filter: saturate(0.85);
+}
+.scale__readout {
+    position: relative;
+    display: grid; justify-items: center; gap: 1.5rem;
+    text-align: center;
+    margin-top: 2.5rem;
+    pointer-events: none;
+}
+.scale__count {
+    color: var(--amber);
+    mix-blend-mode: difference;
+    font-size: min(clamp(3.5rem, 13vw, 15rem), 40cqw);   /* '14×' = 2.24em */
+}
+.scale__line { color: var(--cream); max-width: none; }
+
+/* The pinned, dividing state — desktop with motion allowed. */
+.scale--live { height: 300vh; }
+.scale--live .scale__stage {
+    position: sticky; top: 0; height: 100svh; min-height: 0;
+    display: block; padding: 0;
+}
+.scale--live .scale__grid {
+    position: absolute; inset: 0;
+    display: block; max-width: none; width: 100%; height: 100%;
+}
+.scale--live .scale__tile {
+    position: absolute; top: 50%; left: 50%;
+    width: clamp(200px, 22vw, 320px);
+    margin: 0;
+    transform: translate3d(-50%, -50%, 0);
+    will-change: transform, opacity;
+}
+.scale--live .scale__readout {
+    position: absolute; inset: 0;
+    align-content: center;
+    padding: 0 var(--gutter);
+    margin: 0;
+}
+
+/* --- 8. Preise -------------------------------------------------------- */
+
+.preise { padding: 8rem var(--gutter); }
+.preise__grid {
+    display: grid; gap: clamp(3rem, 6vw, 5rem);
+    align-items: start;
+    max-width: 1200px; margin: 0 auto;
+}
+.preise h2 { font-size: min(clamp(2.5rem, 7vw, 6.5rem), 12.9cqw); }   /* 'Konditionen,' = 7.51em */
+.terms { list-style: none; margin-top: clamp(2.5rem, 5vw, 4rem); }
+.terms li { padding: 1.25rem 0; font-size: 1.125rem; }
+.terms li + li { border-top: 1px solid var(--amber); }
+
+.panel {
+    background: var(--ash);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 2.5rem;
+}
+.panel__label { font-size: 0.875rem; color: var(--muted); letter-spacing: 0.02em; }
+/* PREIS_MONAT is not decided — the figure slot stays empty and reserves its line. */
+.panel__figure { color: var(--cream); margin-top: 0.75rem; min-height: 1em; font-size: min(clamp(2.5rem, 7vw, 6.5rem), 20cqw); }
+.panel__setup { margin-top: 0.75rem; color: var(--muted); font-size: 0.9375rem; }
+.panel__list { list-style: none; margin: 2rem 0; display: grid; gap: 0.875rem; }
+.panel__list li { display: flex; align-items: flex-start; gap: 0.75rem; font-size: 0.9375rem; color: var(--cream); }
+.tick { flex: 0 0 auto; color: var(--amber); margin-top: 0.125rem; }
+.panel .btn { width: 100%; }
+
+/* --- 9. Vergleich ----------------------------------------------------- */
+
+.vergleich { padding: 8rem var(--gutter); }
+.cmp { width: 100%; max-width: 1100px; margin: 0 auto; border-collapse: collapse; text-align: left; }
+.cmp th, .cmp td { padding: 1.5rem 1rem; vertical-align: top; }
+.cmp thead th { font-size: 0.875rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.cmp__amw { color: var(--amber); }
+.cmp__other { color: var(--muted); }
+.cmp tbody tr { border-top: 1px solid var(--line); }
+.cmp tbody th { font-weight: 400; font-size: 0.9375rem; color: var(--muted); width: 22%; }
+.cmp tbody td { font-size: 1rem; }
+.cmp tbody td:first-of-type { color: var(--cream); }
+.cmp tbody td:last-of-type { color: var(--muted); }
+.cmp th:first-child, .cmp td:first-child { padding-left: 0; }
+.cmp th:last-child,  .cmp td:last-child  { padding-right: 0; }
+
+/* --- 10. Stimmen ------------------------------------------------------ */
+
+.stimmen { padding: 10rem var(--gutter); text-align: center; }
+.stimmen blockquote { display: grid; justify-items: center; gap: 2rem; }
+.stimmen__quote { color: var(--cream); max-width: 24ch; }
+.stimmen__by { font-size: 0.875rem; color: var(--muted); font-style: normal; }
+
+/* --- 11. FAQ ---------------------------------------------------------- */
+
+.faq { padding: 8rem var(--gutter); }
+.faq__list { max-width: 800px; margin: 0 auto; }
+.faq__item { border-top: 1px solid var(--line); }
+.faq__item:last-child { border-bottom: 1px solid var(--line); }
+.faq__q { margin: 0; font-size: inherit; font-weight: inherit; }
+.faq__btn {
+    width: 100%; min-height: 44px;
+    display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+    padding: 1.75rem 0;
+    background: transparent; border: 0; color: var(--cream); cursor: pointer;
+    font-family: var(--font-body); font-size: 1.125rem; font-weight: 700; line-height: 1.35;
+    text-align: left;
+}
+.faq__btn .plus { flex: 0 0 auto; color: var(--amber); transition: transform 300ms var(--ease); }
+.faq__btn[aria-expanded="true"] .plus { transform: rotate(45deg); }
+.faq__panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 400ms var(--ease); }
+.faq__item.is-open .faq__panel { grid-template-rows: 1fr; }
+.faq__panel > div { overflow: hidden; min-height: 0; }
+.faq__panel p { padding-bottom: 1.75rem; max-width: 68ch; }
+
+/* --- 12. Kontakt ------------------------------------------------------ */
+
+.kontakt { padding: 12rem var(--gutter); text-align: center; }
+.kontakt__inner { display: grid; justify-items: center; gap: 2rem; }
+.kontakt h2 { font-size: min(clamp(3.5rem, 13vw, 15rem), 14.8cqw); }   /* 'Reden wir.' = 6.54em */
+.kontakt__lead { color: var(--muted); max-width: 48ch; }
+.kontakt__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+
+/* --- 13. Footer ------------------------------------------------------- */
+
+.foot { padding: 3rem var(--gutter); border-top: 1px solid var(--line); }
+.foot__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem; }
+.foot__brand { display: flex; align-items: baseline; gap: 1rem; }
+.foot__mark { font-family: var(--font-display); font-stretch: 125%; font-weight: 800; font-size: 1.25rem; letter-spacing: 0.02em; }
+.foot__site { font-size: 0.875rem; color: var(--muted); }
+.foot__links { display: flex; gap: 1rem; }
+.foot__links a {
+    display: inline-flex; align-items: center; min-height: 44px;
+    padding: 0 0.25rem; font-size: 0.875rem; color: var(--muted);
+    transition: color 300ms var(--ease);
+}
+.foot__links a:hover { color: var(--cream); }
+.foot__legal { margin-top: 2rem; font-size: 0.75rem; color: var(--muted); }
+
+/* --- Responsive ------------------------------------------------------- */
+
+@media (max-width: 639.98px) {
+    .wall { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .wall__col--c { display: none; }
+
+    .figures { grid-template-columns: minmax(0, 1fr); }
+    .figure { padding: 1.75rem 0; }
+    .figure:first-child { padding-top: 0; }
+    .figure + .figure { border-left: 0; border-top: 1px solid var(--line); }
+
+    .kontakt__actions { flex-direction: column; align-items: stretch; width: 100%; }
+    .kontakt__actions .btn { width: 100%; }
+}
+
+@media (max-width: 899.98px) {
+    .kanal, .kontakt { padding: 7rem var(--gutter); }
+    .leistungen, .prozess, .preise, .vergleich, .faq { padding: 6rem var(--gutter); }
+    .stimmen { padding: 7rem var(--gutter); }
+
+    .hdr__nav { display: none; }
+    .hdr__cta { display: none; }
+    .hdr__burger { display: inline-flex; }
+
+    .service { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.875rem; }
+    .service__desc { text-align: left; flex-basis: auto; }
+
+    .step { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+
+    .cmp thead { display: none; }
+    .cmp, .cmp tbody, .cmp tr, .cmp th, .cmp td { display: block; width: auto; }
+    .cmp tbody tr { padding: 1.5rem 0; }
+    .cmp tbody th { width: auto; padding: 0 0 0.75rem; font-size: 0.8125rem; letter-spacing: 0.04em; text-transform: uppercase; }
+    .cmp tbody td { padding: 0.25rem 0; }
+    .cmp tbody td:first-of-type::before { content: 'AMW'; display: block; font-size: 0.75rem; color: var(--amber); margin-bottom: 0.25rem; }
+    .cmp tbody td:last-of-type::before { content: 'Typische Agentur'; display: block; font-size: 0.75rem; color: var(--muted); margin: 0.75rem 0 0.25rem; }
+}
+
+@media (min-width: 900px) {
+    .kanal__top { grid-template-columns: minmax(0, 1fr) minmax(0, 34ch); align-items: end; }
+    .preise__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: clamp(2.5rem, 4vw, 5rem); }
+    .steps { margin: 0 auto; }
+    .step { grid-template-columns: minmax(0, 7rem) minmax(0, 1fr); }
+}
+
+@media (min-width: 1200px) {
+    .kanal__top { grid-template-columns: minmax(0, 1fr) minmax(0, 36ch); }
+    .preise__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 440px); gap: clamp(4rem, 6vw, 7rem); }
+    .step { grid-template-columns: minmax(0, 9rem) minmax(0, 1fr); }
+}
+
+/* --- Reduced motion: final state, no pins, no drift -------------------- */
+
+.no-motion .wall__run { animation: none; }
+.no-motion .wipe .line-in { transform: none; }
+.no-motion .step__num { opacity: 1; color: var(--amber); }
+</style>
+</head>
+<body>
+
+<!-- 0. Intro -->
+<div class="intro" id="intro" aria-hidden="true">
+    <div class="intro__inner">
+        <span class="intro__mark d1">AMW</span>
+        <span class="intro__rule"></span>
+    </div>
+</div>
+
+<!-- 1. Header -->
+<header class="hdr" id="hdr">
+    <a class="hdr__mark" href="#hero">AMW</a>
+    <nav class="hdr__nav" aria-label="Hauptnavigation">
+        <a href="#leistungen">Leistungen</a>
+        <span class="hdr__sep" aria-hidden="true">·</span>
+        <a href="#arbeiten">Arbeiten</a>
+        <span class="hdr__sep" aria-hidden="true">·</span>
+        <a href="#prozess">Prozess</a>
+        <span class="hdr__sep" aria-hidden="true">·</span>
+        <a href="#preise">Preise</a>
+    </nav>
+    <a class="btn btn--amber hdr__cta" href="#kontakt">Gespräch buchen</a>
+    <button class="hdr__burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menü">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 7h18"/><path d="M3 17h18"/></svg>
+    </button>
+</header>
+
+<div class="menu" id="menu" hidden>
+    <nav aria-label="Menü">
+        <a class="d3" href="#leistungen">Leistungen</a>
+        <a class="d3" href="#arbeiten">Arbeiten</a>
+        <a class="d3" href="#prozess">Prozess</a>
+        <a class="d3" href="#preise">Preise</a>
+    </nav>
+    <a class="btn btn--amber" href="#kontakt">Gespräch buchen</a>
+</div>
+
+<main>
+
+<!-- 2. Hero -->
+<section id="hero" class="hero" aria-labelledby="hero-h">
+    <div class="wall" aria-hidden="true">
+        <div class="wall__col wall__col--a">
+            <div class="wall__run">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_211422_2ca29e08-2137-4c01-af6e-24f62f7fe35c.png" alt="" width="1080" height="1920" decoding="async" loading="eager" fetchpriority="high">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_212252_216dc766-795c-424a-89fe-94b9add770dd.png" alt="" width="1080" height="1920" decoding="async" loading="eager" fetchpriority="high">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_212545_aa622cd5-41e6-4a6d-831a-9ed083dc3935.png" alt="" width="1080" height="1920" decoding="async" loading="eager" fetchpriority="high">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_213238_80ca5be2-1ccb-4c9f-af5a-ea425d19396f.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_211422_2ca29e08-2137-4c01-af6e-24f62f7fe35c.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_212252_216dc766-795c-424a-89fe-94b9add770dd.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_212545_aa622cd5-41e6-4a6d-831a-9ed083dc3935.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_213238_80ca5be2-1ccb-4c9f-af5a-ea425d19396f.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+            </div>
+        </div>
+        <div class="wall__col wall__col--b">
+            <div class="wall__run">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260901_150457_61462f18-f43b-4b63-93d1-0001a3a7fd94.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_215313_15d67a48-a8fa-4617-bfa0-74d0348df48c.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_215458_b1c26456-56ba-459b-b0c9-f9b51772a946.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_220316_c011a7ba-7632-4552-ab8b-5a5bd33ad783.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260901_150457_61462f18-f43b-4b63-93d1-0001a3a7fd94.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_215313_15d67a48-a8fa-4617-bfa0-74d0348df48c.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_215458_b1c26456-56ba-459b-b0c9-f9b51772a946.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_220316_c011a7ba-7632-4552-ab8b-5a5bd33ad783.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+            </div>
+        </div>
+        <div class="wall__col wall__col--c">
+            <div class="wall__run">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_220513_d1eaeb32-365b-4dc0-8f52-d7f02d6afb03.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260901_150249_966c6f1d-9595-4ab8-b0cb-9844feafc348.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_221342_035f2523-42b0-4f6e-8005-d5840b8b7c08.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_220513_d1eaeb32-365b-4dc0-8f52-d7f02d6afb03.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260901_150249_966c6f1d-9595-4ab8-b0cb-9844feafc348.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+                <img src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_221342_035f2523-42b0-4f6e-8005-d5840b8b7c08.png" alt="" width="1080" height="1920" decoding="async" loading="lazy">
+            </div>
+        </div>
+    </div>
+
+    <div class="hero__inner">
+        <div class="fit" style="width: 100%;">
+            <h1 class="d1 hero__title wipe" id="hero-h">
+                <span class="line"><span class="line-in">Ads, die wirklich</span></span>
+                <span class="line"><span class="line-in">performen.</span></span>
+            </h1>
+        </div>
+        <p class="hero__lead">Wir bauen und skalieren Meta Ads für E-Commerce-Shops. Keine Setup-Gebühr, keine Mindestlaufzeit.</p>
+        <a class="btn btn--amber" href="#kontakt">Gespräch buchen</a>
+        <p class="hero__note">Antwort in der Regel innerhalb von 24 Stunden</p>
+    </div>
+</section>
+
+<!-- 3. Kanal -->
+<section id="kanal" class="kanal" aria-labelledby="kanal-h">
+    <div class="kanal__wrap">
+        <div class="kanal__top">
+            <div class="fit">
+                <h2 class="d2 wipe" id="kanal-h">
+                    <span class="line"><span class="line-in">Ein Kanal.</span></span>
+                    <span class="line"><span class="line-in">Voll ausgereizt.</span></span>
+                </h2>
+            </div>
+            <p class="kanal__lead">Die meisten Agenturen verteilen dein Budget auf fünf Plattformen und beherrschen keine davon richtig. Wir machen ausschließlich Meta — und holen daraus mehr heraus, als ein Multi-Channel-Setup je könnte.</p>
+        </div>
+
+        <div class="figures">
+            <div class="figure fit">
+                <span class="d3 figure__num">2–4 Wochen</span>
+                <span class="figure__label">Erste Signale</span>
+            </div>
+            <div class="figure fit">
+                <span class="d3 figure__num">30–90 Tage</span>
+                <span class="figure__label">Stabile Ergebnisse</span>
+            </div>
+            <div class="figure fit">
+                <span class="d3 figure__num">0 €</span>
+                <span class="figure__label">Setup-Gebühr</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Leistungen -->
+<section id="leistungen" class="leistungen" aria-labelledby="leistungen-h">
+    <div class="fit">
+        <h2 class="d2 wipe" id="leistungen-h">
+            <span class="line"><span class="line-in">Was wir</span></span>
+            <span class="line"><span class="line-in">inhouse machen</span></span>
+        </h2>
+    </div>
+    <ul class="services">
+        <li class="service fit">
+            <h3 class="d3 service__name">Statics</h3>
+            <p class="service__desc">Bildanzeigen in 4:5 und 1:1, gebaut für den Feed — nicht aus dem Katalog recycelt.</p>
+        </li>
+        <li class="service fit">
+            <h3 class="d3 service__name">Videos</h3>
+            <p class="service__desc">Kurze Spots mit Hook in den ersten drei Sekunden, geschnitten für Ton aus.</p>
+        </li>
+        <li class="service fit">
+            <h3 class="d3 service__name">UGC</h3>
+            <p class="service__desc">Creator-Content und KI-generierte UGC-Formate, die nicht nach Werbung aussehen.</p>
+        </li>
+        <li class="service fit">
+            <h3 class="d3 service__name">Kampagnenstruktur</h3>
+            <p class="service__desc">Sauber getrennte Test- und Skalierungskampagnen statt einem gewachsenen Chaos.</p>
+        </li>
+        <li class="service fit">
+            <h3 class="d3 service__name">Tracking &amp; Setup</h3>
+            <p class="service__desc">Pixel, Conversions API und Events — einmal richtig aufgesetzt, danach verlässlich.</p>
+        </li>
+    </ul>
+</section>
+
+<!-- 5. Arbeiten -->
+<section id="arbeiten" class="works" aria-labelledby="arbeiten-h">
+    <h2 class="sr-only" id="arbeiten-h">Arbeiten</h2>
+    <div class="works__viewport" id="worksViewport">
+        <ul class="works__track" id="worksTrack">
+            <li class="work">
+                <figure>
+                    <img class="work__media" src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_222409_5aaa8b95-b737-43ec-b609-5ff38c1e35d8.png" alt="Anzeigenmotiv für NORDVIT" width="1080" height="1350" loading="lazy" decoding="async">
+                    <figcaption class="work__cap">
+                        <span class="work__client">NORDVIT</span>
+                        <span class="work__dot" aria-hidden="true">·</span>
+                        <span class="work__result">ROAS 3,4</span>
+                    </figcaption>
+                </figure>
+            </li>
+            <li class="work">
+                <figure>
+                    <img class="work__media" src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_222613_b5b8a8a7-70c0-41a5-aa2a-ea0ca31dd3e4.png" alt="Anzeigenmotiv für TAGDOSIS" width="1080" height="1350" loading="lazy" decoding="async">
+                    <figcaption class="work__cap">
+                        <span class="work__client">TAGDOSIS</span>
+                        <span class="work__dot" aria-hidden="true">·</span>
+                        <span class="work__result">CPA −38 %</span>
+                    </figcaption>
+                </figure>
+            </li>
+            <li class="work">
+                <figure>
+                    <img class="work__media" src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_222827_d809d9fc-bf72-4295-b8bd-5a65fc0c038e.png" alt="Anzeigenmotiv für VITAKERN" width="1080" height="1350" loading="lazy" decoding="async">
+                    <figcaption class="work__cap">
+                        <span class="work__client">VITAKERN</span>
+                        <span class="work__dot" aria-hidden="true">·</span>
+                        <span class="work__result">ROAS 2,9</span>
+                    </figcaption>
+                </figure>
+            </li>
+            <li class="work">
+                <figure>
+                    <img class="work__media" src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_223112_72b3af69-1718-45dc-aa77-a45a5c60f331.png" alt="Anzeigenmotiv für LUMEA" width="1080" height="1350" loading="lazy" decoding="async">
+                    <figcaption class="work__cap">
+                        <span class="work__client">LUMEA</span>
+                        <span class="work__dot" aria-hidden="true">·</span>
+                        <span class="work__result">ROAS 4,1</span>
+                    </figcaption>
+                </figure>
+            </li>
+            <li class="work work--video">
+                <figure>
+                    <video class="work__media" id="workVideo" src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_225642_e5f3855c-507e-4012-99e6-fc2a415e427a.mp4" width="1080" height="1920" muted playsinline loop autoplay preload="metadata"></video>
+                    <figcaption class="work__cap">
+                        <button class="work__pause" id="workVideoToggle" type="button" aria-pressed="false" aria-controls="workVideo" aria-label="Video pausieren">
+                            <svg class="ico-pause" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14"/><path d="M15 5v14"/></svg>
+                            <svg class="ico-play" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" stroke="none" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg>
+                        </button>
+                    </figcaption>
+                </figure>
+            </li>
+            <li class="work">
+                <figure>
+                    <img class="work__media" src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_223431_bca1f269-a319-4695-8340-bb51f3303461.png" alt="Anzeigenmotiv für SEIDEN" width="1080" height="1350" loading="lazy" decoding="async">
+                    <figcaption class="work__cap">
+                        <span class="work__client">SEIDEN</span>
+                        <span class="work__dot" aria-hidden="true">·</span>
+                        <span class="work__result">CPA −44 %</span>
+                    </figcaption>
+                </figure>
+            </li>
+            <li class="work">
+                <figure>
+                    <img class="work__media" src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_223724_cb1340a2-b1ed-4a75-a8a0-fea08459d641.png" alt="Anzeigenmotiv für ASTRALIN" width="1080" height="1350" loading="lazy" decoding="async">
+                    <figcaption class="work__cap">
+                        <span class="work__client">ASTRALIN</span>
+                        <span class="work__dot" aria-hidden="true">·</span>
+                        <span class="work__result">ROAS 3,7</span>
+                    </figcaption>
+                </figure>
+            </li>
+            <li class="work">
+                <figure>
+                    <img class="work__media" src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_224012_0956a4d2-d5b3-4e66-88cb-23274d86e5fe.png" alt="Anzeigenmotiv für HAUTWERK" width="1080" height="1350" loading="lazy" decoding="async">
+                    <figcaption class="work__cap">
+                        <span class="work__client">HAUTWERK</span>
+                        <span class="work__dot" aria-hidden="true">·</span>
+                        <span class="work__result">ROAS 3,2</span>
+                    </figcaption>
+                </figure>
+            </li>
+            <li class="work">
+                <figure>
+                    <img class="work__media" src="https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/hf_20260830_224032_f5750105-e1af-44c6-913c-baeea935843b.png" alt="Anzeigenmotiv für REINHAUT" width="1080" height="1350" loading="lazy" decoding="async">
+                    <figcaption class="work__cap">
+                        <span class="work__client">REINHAUT</span>
+                        <span class="work__dot" aria-hidden="true">·</span>
+                        <span class="work__result">CPA −31 %</span>
+                    </figcaption>
+                </figure>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<!-- 6. Prozess -->
+<section id="prozess" class="prozess" aria-labelledby="prozess-h">
+    <h2 class="sr-only" id="prozess-h">Prozess</h2>
+    <ol class="steps" id="steps">
+        <li class="step">
+            <span class="d2 step__num fit" aria-hidden="true">1</span>
+            <div>
+                <h3 class="d3 step__title">Analyse &amp; Strategie</h3>
+                <p class="step__desc">Wir sehen uns Konto, Zahlen und Produkte an und legen fest, was zuerst getestet wird.</p>
+            </div>
+        </li>
+        <li class="step">
+            <span class="d2 step__num fit" aria-hidden="true">2</span>
+            <div>
+                <h3 class="d3 step__title">Kreation &amp; Setup</h3>
+                <p class="step__desc">Creatives, Kampagnenstruktur und Tracking werden aufgebaut.</p>
+            </div>
+        </li>
+        <li class="step">
+            <span class="d2 step__num fit" aria-hidden="true">3</span>
+            <div>
+                <h3 class="d3 step__title">Launch &amp; Testing</h3>
+                <p class="step__desc">Wir starten breit, messen sauber und sortieren aus, was nicht trägt.</p>
+            </div>
+        </li>
+        <li class="step">
+            <span class="d2 step__num fit" aria-hidden="true">4</span>
+            <div>
+                <h3 class="d3 step__title">Skalierung</h3>
+                <p class="step__desc">Was funktioniert, bekommt Budget. Der Rest wird ersetzt.</p>
+            </div>
+        </li>
+    </ol>
+</section>
+
+<!-- 7. Skalierung -->
+<section id="skalierung" class="skalierung" aria-label="Skalierung">
+    <div class="scale__stage fit">
+        <div class="scale__grid" id="scaleGrid"></div>
+        <div class="scale__readout">
+            <span class="d1 scale__count" id="scaleCount">14×</span>
+            <p class="d3 scale__line">Ein Creative, das funktioniert.<br>Dann vierzehn.</p>
+        </div>
+    </div>
+</section>
+
+<!-- 8. Preise -->
+<section id="preise" class="preise" aria-labelledby="preise-h">
+    <div class="preise__grid">
+        <div>
+            <div class="fit">
+                <h2 class="d2 wipe" id="preise-h">
+                    <span class="line"><span class="line-in">Konditionen,</span></span>
+                    <span class="line"><span class="line-in">die fair sind</span></span>
+                </h2>
+            </div>
+            <ul class="terms">
+                <li>Keine Setup-Gebühr</li>
+                <li>Keine Mindestlaufzeit</li>
+                <li>Monatlich kündbar</li>
+            </ul>
+        </div>
+
+        <div class="panel fit">
+            <span class="panel__label">Monatliche Betreuung</span>
+            <!-- PREIS_MONAT — not decided yet; slot intentionally empty. -->
+            <p class="d2 panel__figure" id="preisMonat"></p>
+            <!-- PREIS_SETUP — not decided yet; slot intentionally empty. -->
+            <p class="panel__setup">Setup: <span id="preisSetup"></span></p>
+            <ul class="panel__list">
+                <li><svg class="tick" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6"/></svg><span>Statics</span></li>
+                <li><svg class="tick" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6"/></svg><span>Videos</span></li>
+                <li><svg class="tick" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6"/></svg><span>UGC</span></li>
+                <li><svg class="tick" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6"/></svg><span>Kampagnenstruktur</span></li>
+                <li><svg class="tick" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6"/></svg><span>Tracking &amp; Setup</span></li>
+            </ul>
+            <a class="btn btn--amber" href="#kontakt">Gespräch buchen</a>
+        </div>
+    </div>
+</section>
+
+<!-- 9. Vergleich -->
+<section id="vergleich" class="vergleich" aria-label="Vergleich">
+    <table class="cmp">
+        <thead>
+            <tr>
+                <th scope="col"><span class="sr-only">Kriterium</span></th>
+                <th scope="col" class="cmp__amw">AMW</th>
+                <th scope="col" class="cmp__other">Typische Agentur</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><th scope="row">Kanäle</th><td>Nur Meta, dafür vollständig</td><td>Fünf Plattformen, keine richtig</td></tr>
+            <tr><th scope="row">Creatives</th><td>Inhouse produziert</td><td>Vom Kunden geliefert</td></tr>
+            <tr><th scope="row">Laufzeit</th><td>Monatlich kündbar</td><td>6–12 Monate Bindung</td></tr>
+            <tr><th scope="row">Setup-Gebühr</th><td>Keine</td><td>1.000 € aufwärts</td></tr>
+            <tr><th scope="row">Reporting</th><td>Zahlen, die Entscheidungen auslösen</td><td>PDF am Monatsende</td></tr>
+            <tr><th scope="row">Ansprechpartner</th><td>Direkt, ohne Zwischenebene</td><td>Wechselnder Junior</td></tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- 10. Stimmen -->
+<section id="stimmen" class="stimmen" aria-label="Stimmen">
+    <blockquote>
+        <p class="d3 stimmen__quote">„Umsatz in drei Monaten mehr als verdreifacht."</p>
+        <cite class="stimmen__by">Lena Krause, NOVAWEAR</cite>
+    </blockquote>
+</section>
+
+<!-- 11. FAQ -->
+<section id="faq" class="faq" aria-label="FAQ">
+    <div class="faq__list" id="faqList">
+        <div class="faq__item">
+            <h2 class="faq__q">
+                <button class="faq__btn" type="button" id="faq-b1" aria-expanded="false" aria-controls="faq-p1">
+                    <span>Wie schnell sehe ich Ergebnisse?</span>
+                    <svg class="plus" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </button>
+            </h2>
+            <div class="faq__panel" id="faq-p1" role="region" aria-labelledby="faq-b1">
+                <div><p>Erste Signale meist in zwei bis vier Wochen. Stabile, planbare Ergebnisse in 30 bis 90 Tagen — abhängig von Budget, Produkt und Ausgangslage.</p></div>
+            </div>
+        </div>
+        <div class="faq__item">
+            <h2 class="faq__q">
+                <button class="faq__btn" type="button" id="faq-b2" aria-expanded="false" aria-controls="faq-p2">
+                    <span>Braucht ihr eigene Creatives von mir?</span>
+                    <svg class="plus" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </button>
+            </h2>
+            <div class="faq__panel" id="faq-p2" role="region" aria-labelledby="faq-b2">
+                <div><p>Nein. Statics, Videos und UGC produzieren wir inhouse. Vorhandenes Material nutzen wir, wenn es trägt.</p></div>
+            </div>
+        </div>
+        <div class="faq__item">
+            <h2 class="faq__q">
+                <button class="faq__btn" type="button" id="faq-b3" aria-expanded="false" aria-controls="faq-p3">
+                    <span>Gibt es eine Mindestlaufzeit?</span>
+                    <svg class="plus" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </button>
+            </h2>
+            <div class="faq__panel" id="faq-p3" role="region" aria-labelledby="faq-b3">
+                <div><p>Nein. Monatlich kündbar, keine Setup-Gebühr.</p></div>
+            </div>
+        </div>
+        <div class="faq__item">
+            <h2 class="faq__q">
+                <button class="faq__btn" type="button" id="faq-b4" aria-expanded="false" aria-controls="faq-p4">
+                    <span>Für welche Shops lohnt sich das?</span>
+                    <svg class="plus" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </button>
+            </h2>
+            <div class="faq__panel" id="faq-p4" role="region" aria-labelledby="faq-b4">
+                <div><p>Für E-Commerce-Shops, die bereits verkaufen und den nächsten Schritt gehen wollen. Ohne laufende Verkäufe fehlt die Datenbasis.</p></div>
+            </div>
+        </div>
+        <div class="faq__item">
+            <h2 class="faq__q">
+                <button class="faq__btn" type="button" id="faq-b5" aria-expanded="false" aria-controls="faq-p5">
+                    <span>Warum nur Meta?</span>
+                    <svg class="plus" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </button>
+            </h2>
+            <div class="faq__panel" id="faq-p5" role="region" aria-labelledby="faq-b5">
+                <div><p>Weil ein Kanal, den wir vollständig beherrschen, mehr bringt als fünf, die wir nur bedienen.</p></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 12. Kontakt -->
+<section id="kontakt" class="kontakt" aria-labelledby="kontakt-h">
+    <div class="kontakt__inner">
+        <div class="fit" style="width: 100%;">
+            <h2 class="d1 wipe" id="kontakt-h">
+                <span class="line"><span class="line-in">Reden wir.</span></span>
+            </h2>
+        </div>
+        <p class="kontakt__lead">Kurzes Gespräch, ehrliche Einschätzung. Wenn wir nicht passen, sagen wir das.</p>
+        <div class="kontakt__actions">
+            <a class="btn btn--amber" href="#kontakt">Gespräch buchen</a>
+            <a class="btn btn--line" href="https://wa.me/15562753949" target="_blank" rel="noopener">Auf WhatsApp schreiben</a>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- 13. Footer -->
+<footer class="foot">
+    <div class="foot__row">
+        <div class="foot__brand">
+            <span class="foot__mark">AMW</span>
+            <span class="foot__site">amwagence.de</span>
+        </div>
+        <nav class="foot__links" aria-label="Rechtliches">
+            <a href="#impressum">Impressum</a>
+            <a href="#datenschutz">Datenschutz</a>
+        </nav>
+    </div>
+    <p class="foot__legal">© 2026 AMW</p>
+</footer>
+
+<script>
+(function () {
+    'use strict';
+
+    /* ------------------------------------------------------------------
+       Fixed constants. Every asset reference on the page resolves here.
+       ------------------------------------------------------------------ */
+
+    var ASSET_BASE = 'https://d8j0ntlcm91z4.cloudfront.net/user_3Gjdvzzq6qIpNzCmrguGBWnvtSP/';
+
+    var CREATIVE_01 = 'hf_20260830_211422_2ca29e08-2137-4c01-af6e-24f62f7fe35c.png';
+
+    /* SCALE_CREATIVE has not been generated yet. CREATIVE_01 — the NORDVIT jar on
+       charcoal — stands in because it reads correctly at thumbnail size. Swap this
+       one line when the real asset lands. */
+    var SCALE_CREATIVE = CREATIVE_01;
+
+    /* Not decided yet. Leave empty: the panel renders the label and an empty slot. */
+    var PREIS_MONAT = '';
+    var PREIS_SETUP = '';
+
+    var SCALE_TILE_COUNT = 12;
+    var SCALE_COUNT_STEPS = [1, 2, 4, 12, 14];
+
+    var root = document.documentElement;
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var hasGsap = !!(window.gsap && window.ScrollTrigger);
+
+    if (!reduced && hasGsap) { root.classList.add('js-motion'); }
+    else { root.classList.add('no-motion'); }
+
+    /* ------------------------------------------------------------------
+       0. Intro — once per session, never under reduced motion.
+       ------------------------------------------------------------------ */
+
+    var intro = document.getElementById('intro');
+    var introRan = false;
+    try {
+        if (reduced || sessionStorage.getItem('amw.intro') === '1') {
+            intro.classList.add('is-skipped');
+        } else {
+            sessionStorage.setItem('amw.intro', '1');
+            introRan = true;
+        }
+    } catch (e) {
+        introRan = !reduced;   /* storage blocked — play it, harmlessly, every time */
+    }
+
+    /* ------------------------------------------------------------------
+       Price slots — filled only when a figure actually exists.
+       ------------------------------------------------------------------ */
+
+    if (PREIS_MONAT) { document.getElementById('preisMonat').textContent = PREIS_MONAT; }
+    if (PREIS_SETUP) { document.getElementById('preisSetup').textContent = PREIS_SETUP; }
+
+    /* ------------------------------------------------------------------
+       1. Header — background appears past 40px; overlay menu under 900px.
+       ------------------------------------------------------------------ */
+
+    var hdr = document.getElementById('hdr');
+    function onScrollState() { hdr.classList.toggle('is-scrolled', window.scrollY > 40); }
+    onScrollState();
+    window.addEventListener('scroll', onScrollState, { passive: true });
+
+    var burger = document.getElementById('burger');
+    var menu = document.getElementById('menu');
+    function setMenu(open) {
+        menu.hidden = !open;
+        burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.body.style.overflow = open ? 'hidden' : '';
+        if (lenis) { open ? lenis.stop() : lenis.start(); }
+    }
+    burger.addEventListener('click', function () {
+        setMenu(burger.getAttribute('aria-expanded') !== 'true');
+    });
+    menu.addEventListener('click', function (e) {
+        if (e.target.closest('a')) { setMenu(false); }
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !menu.hidden) { setMenu(false); burger.focus(); }
+    });
+    window.matchMedia('(min-width: 900px)').addEventListener('change', function (e) {
+        if (e.matches && !menu.hidden) { setMenu(false); }
+    });
+
+    /* ------------------------------------------------------------------
+       FAQ — grid-template-rows 0fr -> 1fr, never height:auto.
+       ------------------------------------------------------------------ */
+
+    Array.prototype.forEach.call(document.querySelectorAll('.faq__btn'), function (btn) {
+        btn.addEventListener('click', function () {
+            var open = btn.getAttribute('aria-expanded') === 'true';
+            btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+            btn.closest('.faq__item').classList.toggle('is-open', !open);
+        });
+    });
+
+    /* ------------------------------------------------------------------
+       Portfolio video — visible pause control, no autoplay when reduced.
+       ------------------------------------------------------------------ */
+
+    var video = document.getElementById('workVideo');
+    var videoToggle = document.getElementById('workVideoToggle');
+    function paintToggle(paused) {
+        videoToggle.setAttribute('aria-pressed', paused ? 'true' : 'false');
+        videoToggle.setAttribute('aria-label', paused ? 'Video abspielen' : 'Video pausieren');
+    }
+    if (reduced) { video.autoplay = false; video.pause(); }
+    paintToggle(reduced);
+    videoToggle.addEventListener('click', function () {
+        if (video.paused) { video.play(); paintToggle(false); }
+        else { video.pause(); paintToggle(true); }
+    });
+    video.addEventListener('play',  function () { paintToggle(false); });
+    video.addEventListener('pause', function () { paintToggle(true); });
+
+    /* ------------------------------------------------------------------
+       7. Skalierung — build the twelve tiles from the single constant.
+       Static 3x4 grid by default; the pinned sequence upgrades it below.
+       ------------------------------------------------------------------ */
+
+    var scaleGrid = document.getElementById('scaleGrid');
+    var scaleTiles = [];
+    for (var i = 0; i < SCALE_TILE_COUNT; i++) {
+        var t = document.createElement('img');
+        t.className = 'scale__tile';
+        t.src = ASSET_BASE + SCALE_CREATIVE;
+        t.alt = '';
+        t.width = 1080; t.height = 1350;
+        t.loading = 'lazy';
+        t.decoding = 'async';
+        scaleGrid.appendChild(t);
+        scaleTiles.push(t);
+    }
+
+    var scaleCount = document.getElementById('scaleCount');
+
+    /* ------------------------------------------------------------------
+       Motion. Everything below is skipped entirely under reduced motion,
+       which leaves every section in its final state.
+       ------------------------------------------------------------------ */
+
+    var lenis = null;
+    if (reduced || !hasGsap) { return; }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    if (window.Lenis) {
+        lenis = new Lenis({ lerp: 0.1 });
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add(function (time) { lenis.raf(time * 1000); });
+        gsap.ticker.lagSmoothing(0);
+
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest('a[href^="#"]');
+            if (!a) { return; }
+            var id = a.getAttribute('href');
+            if (id.length < 2) { return; }
+            var target = document.querySelector(id);
+            if (!target) { return; }
+            e.preventDefault();
+            lenis.scrollTo(target, { offset: -80 });
+        });
+    }
+
+    var EASE = 'power4.out';   /* closest built-in to cubic-bezier(0.22, 1, 0.36, 1) */
+
+    /* --- Hero entrance ------------------------------------------------- */
+
+    var heroTitle = document.querySelector('.hero__title');
+    var heroDelay = introRan ? 1.5 : 0.15;
+
+    gsap.fromTo(heroTitle.querySelectorAll('.line-in'),
+        { y: 0, yPercent: 115 },
+        { y: 0, yPercent: 0, duration: 0.8, ease: EASE, stagger: 0.09, delay: heroDelay });
+
+    gsap.from('.hero__lead, .hero .btn, .hero__note',
+        { opacity: 0, duration: 0.8, ease: EASE, stagger: 0.06, delay: heroDelay + 0.4 });
+
+    /* --- Section headings: the same wipe, once, at top 80% -------------- */
+
+    Array.prototype.forEach.call(document.querySelectorAll('.wipe'), function (h) {
+        if (h === heroTitle) { return; }
+        gsap.fromTo(h.querySelectorAll('.line-in'),
+            { y: 0, yPercent: 115 },
+            {
+                y: 0, yPercent: 0, duration: 0.8, ease: EASE, stagger: 0.09,
+                scrollTrigger: { trigger: h, start: 'top 80%', once: true }
+            });
+    });
+
+    /* --- 6. Prozess: one amber number at a time ------------------------- */
+
+    Array.prototype.forEach.call(document.querySelectorAll('.step'), function (step) {
+        ScrollTrigger.create({
+            trigger: step,
+            start: 'top center',
+            end: 'bottom center',
+            toggleClass: { targets: step, className: 'is-active' }
+        });
+    });
+
+    var mm = gsap.matchMedia();
+
+    /* --- 5. Arbeiten: pinned horizontal track (desktop only) ------------ */
+
+    mm.add('(min-width: 900px)', function () {
+        var track = document.getElementById('worksTrack');
+        var distance = function () {
+            return Math.max(0, track.scrollWidth - window.innerWidth);
+        };
+        gsap.to(track, {
+            x: function () { return -distance(); },
+            ease: 'none',
+            scrollTrigger: {
+                trigger: '#arbeiten',
+                start: 'top top',
+                end: '+=150%',
+                pin: true,
+                scrub: 1,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+                refreshPriority: 1
+            }
+        });
+    });
+
+    /* --- 7. Skalierung: one creative divides into twelve ---------------- */
+
+    mm.add('(min-width: 900px)', function () {
+        var section = document.getElementById('skalierung');
+        var stage = section.querySelector('.scale__stage');
+
+        section.classList.add('scale--live');
+
+        /* Layouts, as fractions of the stage box, measured from its centre.
+           Scale falls as the count rises; nothing animates width or height. */
+        var L2  = { s: 0.90, p: [[-0.135, 0], [0.135, 0]] };
+        var L4  = { s: 0.78, p: [[-0.17, -0.21], [0.17, -0.21], [-0.17, 0.21], [0.17, 0.21]] };
+
+        var COLS = [-0.345, -0.115, 0.115, 0.345];
+        var ROWS = [-0.29, 0.02, 0.33];
+        /* Tiles 0–3 keep their quadrant; the eight newcomers fill the gaps. */
+        var SLOTS = [[0, 0], [3, 0], [0, 2], [3, 2],
+                     [1, 0], [2, 0], [0, 1], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2]];
+        /* Fixed jitter — the grid is loose, not mechanical. */
+        var JITTER = [[0.012, -0.018], [-0.010, 0.014], [0.008, 0.020], [-0.014, -0.012],
+                      [-0.006, 0.016], [0.014, -0.010], [0.010, 0.018], [-0.012, -0.016],
+                      [0.006, 0.012], [-0.008, -0.014], [0.012, 0.010], [-0.010, -0.018]];
+        var L12 = {
+            s: 0.55,
+            p: SLOTS.map(function (slot, n) {
+                return [COLS[slot[0]] + JITTER[n][0], ROWS[slot[1]] + JITTER[n][1]];
+            })
+        };
+
+        var W = function () { return stage.clientWidth; };
+        var H = function () { return stage.clientHeight; };
+        var X = function (layout, n) { return function () { return layout.p[n][0] * W(); }; };
+        var Y = function (layout, n) { return function () { return layout.p[n][1] * H(); }; };
+
+        gsap.set(scaleTiles, { xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 1, opacity: 0 });
+        gsap.set(scaleTiles[0], { opacity: 1 });
+
+        var counter = { v: 1 };
+        var paint = function () { scaleCount.textContent = Math.round(counter.v) + '×'; };
+        paint();
+
+        var tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: section,
+                start: 'top top',
+                end: 'bottom bottom',
+                scrub: 1,
+                invalidateOnRefresh: true
+            }
+        });
+
+        var SPRING = 'back.out(1.4)';
+        var n, parent;
+
+        /* 0.25 — one becomes two. */
+        for (n = 0; n < 2; n++) {
+            if (n === 0) {
+                tl.to(scaleTiles[n], { x: X(L2, n), y: Y(L2, n), scale: L2.s, ease: EASE, duration: 0.12 }, 0.18);
+            } else {
+                tl.fromTo(scaleTiles[n],
+                    { x: 0, y: 0, scale: 1, opacity: 0 },
+                    { x: X(L2, n), y: Y(L2, n), scale: L2.s, opacity: 1, ease: SPRING, duration: 0.12 }, 0.18);
+            }
+        }
+
+        /* 0.5 — two become four; each newcomer springs out of its parent. */
+        for (n = 0; n < 4; n++) {
+            if (n < 2) {
+                tl.to(scaleTiles[n], { x: X(L4, n), y: Y(L4, n), scale: L4.s, ease: EASE, duration: 0.12 }, 0.44);
+            } else {
+                parent = n - 2;
+                tl.fromTo(scaleTiles[n],
+                    { x: X(L2, parent), y: Y(L2, parent), scale: L2.s, opacity: 0 },
+                    { x: X(L4, n), y: Y(L4, n), scale: L4.s, opacity: 1, ease: SPRING, duration: 0.12 }, 0.44);
+            }
+        }
+
+        /* 0.8 — four become twelve, out into the loose grid. */
+        for (n = 0; n < 12; n++) {
+            if (n < 4) {
+                tl.to(scaleTiles[n], { x: X(L12, n), y: Y(L12, n), scale: L12.s, ease: EASE, duration: 0.18 }, 0.72);
+            } else {
+                parent = n % 4;
+                tl.fromTo(scaleTiles[n],
+                    { x: X(L4, parent), y: Y(L4, parent), scale: L4.s, opacity: 0 },
+                    { x: X(L12, n), y: Y(L12, n), scale: L12.s, opacity: 1, ease: SPRING, duration: 0.18 }, 0.72);
+            }
+        }
+
+        /* The counter climbs in step with the division: 1 -> 2 -> 4 -> 12 -> 14. */
+        tl.to(counter, { v: SCALE_COUNT_STEPS[1], ease: 'none', duration: 0.12, onUpdate: paint }, 0.18)
+          .to(counter, { v: SCALE_COUNT_STEPS[2], ease: 'none', duration: 0.12, onUpdate: paint }, 0.44)
+          .to(counter, { v: SCALE_COUNT_STEPS[3], ease: 'none', duration: 0.18, onUpdate: paint }, 0.72)
+          .to(counter, { v: SCALE_COUNT_STEPS[4], ease: 'none', duration: 0.10, onUpdate: paint }, 0.90);
+
+        return function () {
+            section.classList.remove('scale--live');
+            gsap.set(scaleTiles, { clearProps: 'all' });
+            counter.v = SCALE_COUNT_STEPS[4];
+            paint();
+        };
+    });
+
+    /* Images settle late; re-measure the pins once they have. */
+    window.addEventListener('load', function () { ScrollTrigger.refresh(); });
+}());
+</script>
+
+</body>
+</html>
