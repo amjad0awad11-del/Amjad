@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AMW — Meta Ads Agentur für planbares Wachstum</title>
+  <meta name="description" content="AMW ist die Performance-Marketing-Agentur für Meta Ads. Wir entwickeln datengetriebene Werbekampagnen auf Instagram und Facebook, die messbar mehr Umsatz bringen." />
+  <meta name="theme-color" content="#050506" />
+  <meta property="og:title" content="AMW — Meta Ads Agentur" />
+  <meta property="og:description" content="Datengetriebene Meta Ads, die wirklich performen. Mehr Leads, mehr Umsatz, planbares Wachstum." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://amwagence.de/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css?v=100" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' font-family='sans-serif' font-weight='bold' fill='%23c7ccd6'%3EA%3C/text%3E%3C/svg%3E" />
+  <script>document.documentElement.classList.add("js");</script>
+
+  <!-- Consent-Management & Meta Pixel (lädt erst nach Einwilligung) -->
+  <script src="assets/js/consent.js?v=4" defer></script>
+
+  <!-- 3D engine (Three.js) — nur geladen, wenn das Gerät es trägt -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <style>
+  /* Meta-Ads-Fokusblock — bewusst inline, damit ein alter CSS-Cache
+     diese Sektion nicht ungestylt darstellt. Nutzt Tokens aus app.css. */
+  .ma { display: flex; flex-direction: column; gap: 20px; }
+  .ma__hero {
+    position: relative; overflow: hidden; isolation: isolate; padding: 40px;
+    border: 1px solid var(--line-strong); border-radius: var(--radius-lg);
+    background: linear-gradient(160deg, rgba(199,204,214,.08), rgba(34,211,238,.04) 55%, transparent), var(--surface);
+    backdrop-filter: blur(10px);
+  }
+  .ma__glow {
+    position: absolute; inset: -40% 45% 40% -20%;
+    background: radial-gradient(circle, rgba(199,204,214,.22), transparent 68%);
+    filter: blur(60px); pointer-events: none; z-index: -1;
+  }
+  .ma__head { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+  .ma__icon {
+    flex: none; width: 56px; height: 56px; display: grid; place-items: center;
+    border-radius: 16px; color: #060608;
+    background: var(--grad); box-shadow: 0 12px 30px rgba(0,0,0,.5);
+  }
+  .ma__icon svg { width: 28px; height: 28px; }
+  .ma__title { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 3.4vw, 34px); letter-spacing: -.02em; line-height: 1.1; }
+  .ma__sub { display: block; margin-top: 2px; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--cyan); }
+  .ma__lead { margin: 0 0 26px; max-width: 62ch; font-size: 17.5px; line-height: 1.7; color: var(--muted); }
+  .ma__formats { padding-top: 22px; border-top: 1px solid var(--line); }
+  .ma__formats-label { display: block; margin-bottom: 14px; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-2); }
+  .ma__chips { display: flex; flex-wrap: wrap; gap: 9px; }
+  .ma__chips li { padding: 8px 15px; border: 1px solid var(--line-strong); border-radius: 999px; background: rgba(255,255,255,.03); font-size: 14px; color: var(--text); font-variant-numeric: tabular-nums; }
+  .ma__pillars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .ma__pillar { padding: 26px 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); transition: border-color .35s, transform .35s var(--ease); }
+  .ma__pillar:hover { border-color: rgba(199,204,214,.4); transform: translateY(-4px); }
+  .ma__num { display: block; margin-bottom: 12px; font-family: var(--font-display); font-size: 13px; letter-spacing: .2em; color: var(--silver-2); }
+  .ma__pillar h4 { margin: 0 0 8px; font-family: var(--font-display); font-weight: 600; font-size: 17px; letter-spacing: -.01em; color: var(--text); }
+  .ma__pillar p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--muted); }
+  @media (max-width: 980px) { .ma__pillars { grid-template-columns: repeat(2, 1fr); } .ma__hero { padding: 32px 26px; } }
+  @media (max-width: 620px) { .ma__pillars { grid-template-columns: 1fr; } .ma__hero { padding: 26px 20px; } .ma__head { gap: 13px; } .ma__icon { width: 46px; height: 46px; } .ma__icon svg { width: 23px; height: 23px; } }
+  </style>
+</head>
+<body class="is-loading">
+  <!-- Preloader -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <span class="preloader__logo">AMW<sup>°</sup></span>
+    <div class="preloader__stage">
+      <span class="preloader__word">AMW</span>
+      <canvas class="preloader__canvas" id="preloaderCanvas"></canvas>
+    </div>
+    <span class="preloader__count" id="preloaderCount">1</span>
+    <div class="preloader__bar"><span></span></div>
+  </div>
+
+  <!-- WebGL scene (chrome panels in deep space) -->
+  <canvas id="gl" class="gl-canvas" aria-hidden="true"></canvas>
+
+  <!-- 2D fallback background (used when WebGL is off) -->
+  <div class="bg-fx" aria-hidden="true">
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow--1"></div>
+    <div class="bg-glow bg-glow--2"></div>
+    <div class="bg-noise"></div>
+  </div>
+
+  <!-- Custom cursor -->
+  <div class="cursor" id="cursor" aria-hidden="true"></div>
+  <div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
+
+  <!-- Scroll progress -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <div class="container header__inner">
+      <a href="#top" class="brand" data-magnetic>
+        <span class="brand__mark">A</span>
+        <span class="brand__word">AMW</span>
+      </a>
+      <nav class="nav" id="nav" aria-label="Hauptnavigation">
+        <a href="#leistungen" class="nav__link">Leistungen</a>
+        <a href="#prozess" class="nav__link">Prozess</a>
+        <a href="#ergebnisse" class="nav__link">Ergebnisse</a>
+        <a href="#arbeiten" class="nav__link">Arbeiten</a>
+        <a href="#showreel" class="nav__link">Showreel</a>
+        <a href="#faq" class="nav__link">FAQ</a>
+      </nav>
+      <a href="#kontakt" class="btn btn--sm btn--primary header__cta" data-magnetic>
+        <span>Erstgespräch sichern</span>
+      </a>
+      <button class="burger" id="burger" aria-label="Menü öffnen" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <nav class="mobile-menu__nav">
+      <a href="#leistungen" class="mobile-menu__link">Leistungen</a>
+      <a href="#prozess" class="mobile-menu__link">Prozess</a>
+      <a href="#ergebnisse" class="mobile-menu__link">Ergebnisse</a>
+      <a href="#arbeiten" class="mobile-menu__link">Arbeiten</a>
+      <a href="#showreel" class="mobile-menu__link">Showreel</a>
+      <a href="#stimmen" class="mobile-menu__link">Stimmen</a>
+      <a href="#faq" class="mobile-menu__link">FAQ</a>
+      <a href="#kontakt" class="btn btn--primary mobile-menu__cta"><span>Erstgespräch sichern</span></a>
+    </nav>
+  </div>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero__inner">
+        <div class="hero__badge reveal" data-reveal>
+          <span class="pulse-dot"></span>
+          Performance-Marketing-Agentur
+        </div>
+        <h1 class="hero__title">
+          <span class="line" data-reveal-word>Ads, die</span>
+          <span class="line" data-reveal-word>wirklich <em class="grad-text">performen.</em></span>
+        </h1>
+        <p class="hero__sub reveal" data-reveal>
+          AMW entwickelt und skaliert datengetriebene Werbekampagnen auf
+          <strong>Meta — Instagram &amp; Facebook</strong> — für mehr Leads, mehr Umsatz
+          und planbares Wachstum. Kreativ gedacht, in Zahlen bewiesen.
+        </p>
+        <div class="hero__cta reveal" data-reveal>
+          <a href="#kontakt" class="btn btn--primary btn--lg" data-magnetic>
+            <span>Kostenloses Erstgespräch</span>
+            <svg viewBox="0 0 24 24" class="btn__arrow" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a href="#ergebnisse" class="btn btn--ghost btn--lg" data-magnetic>
+            <span>Ergebnisse ansehen</span>
+          </a>
+        </div>
+
+        <div class="hero__stats" id="heroStats">
+          <div class="stat reveal" data-reveal>
+            <div class="stat__num"><span data-count="18" data-suffix=" Mio.€">0</span></div>
+            <div class="stat__label">verwaltetes Werbebudget</div>
+          </div>
+          <div class="stat reveal" data-reveal>
+            <div class="stat__num"><span data-count="4.2" data-decimals="1" data-suffix="×">0</span></div>
+            <div class="stat__label">Ø ROAS unserer Kunden</div>
+          </div>
+          <div class="stat reveal" data-reveal>
+            <div class="stat__num"><span data-count="250" data-suffix="+">0</span></div>
+            <div class="stat__label">skalierte Kampagnen</div>
+          </div>
+          <div class="stat reveal" data-reveal>
+            <div class="stat__num"><span data-count="98" data-suffix="%">0</span></div>
+            <div class="stat__label">Kundenzufriedenheit</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero__scroll" aria-hidden="true">
+        <span>Scroll</span>
+        <div class="hero__scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- Trust marquee -->
+    <section class="trust">
+      <p class="trust__label reveal" data-reveal>Vertraut von wachstumsstarken Marken &amp; Startups</p>
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span>NOVAWEAR</span><span>•</span><span>Lumen Studio</span><span>•</span><span>Kraftwerk Nutrition</span><span>•</span><span>Halcyon</span><span>•</span><span>Fjord &amp; Co.</span><span>•</span><span>Vesper</span><span>•</span><span>Atlas Mobility</span><span>•</span><span>Blüte Kosmetik</span><span>•</span>
+          <span>NOVAWEAR</span><span>•</span><span>Lumen Studio</span><span>•</span><span>Kraftwerk Nutrition</span><span>•</span><span>Halcyon</span><span>•</span><span>Fjord &amp; Co.</span><span>•</span><span>Vesper</span><span>•</span><span>Atlas Mobility</span><span>•</span><span>Blüte Kosmetik</span><span>•</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services / Leistungen -->
+    <section class="section" id="leistungen">
+      <div class="container">
+        <div class="section__head">
+          <span class="eyebrow reveal" data-reveal>01 — Leistung</span>
+          <h2 class="section__title reveal" data-reveal>Ein Kanal.<br /><span class="grad-text">Voll ausgereizt.</span></h2>
+          <p class="section__lead reveal" data-reveal>
+            Wir verzetteln uns nicht. Statt fünf Kanäle halbherzig zu bespielen,
+            beherrschen wir einen bis ins Detail — <strong>Meta Ads</strong> auf
+            Instagram und Facebook.
+          </p>
+        </div>
+
+        <div class="ma">
+          <article class="ma__hero reveal" data-reveal>
+            <div class="ma__glow" aria-hidden="true"></div>
+            <div class="ma__head">
+              <span class="ma__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="1.3" fill="currentColor"/></svg>
+              </span>
+              <div>
+                <h3 class="ma__title">Meta Ads</h3>
+                <span class="ma__sub">Instagram &amp; Facebook</span>
+              </div>
+            </div>
+            <p class="ma__lead">
+              Drei Milliarden Menschen scrollen täglich durch Meta. Ihre Kunden sind
+              längst dort — die einzige Frage ist, ob Ihre Anzeige sie stoppt.
+              Genau daran arbeiten wir: an Creatives, die im Feed nicht übersehen
+              werden, und an Kampagnen, die aus Aufmerksamkeit planbaren Umsatz machen.
+            </p>
+            <div class="ma__formats">
+              <span class="ma__formats-label">Bild &amp; Video — in jedem Format, das Meta ausspielt</span>
+              <ul class="ma__chips">
+                <li>Reels 9:16</li><li>Stories 9:16</li><li>Feed 4:5</li>
+                <li>Feed 1:1</li><li>Carousel</li><li>Collection</li>
+              </ul>
+            </div>
+          </article>
+
+          <div class="ma__pillars">
+            <article class="ma__pillar reveal" data-reveal>
+              <span class="ma__num">01</span>
+              <h4>Creative-Produktion</h4>
+              <p>Statics, Videos und UGC im Wochentakt — jedes Motiv in allen
+                 relevanten Seitenverhältnissen, damit keine Platzierung verschenkt wird.</p>
+            </article>
+            <article class="ma__pillar reveal" data-reveal>
+              <span class="ma__num">02</span>
+              <h4>Saubere Kampagnen-Struktur</h4>
+              <p>Korrektes Tracking, klare Zuordnung, nachvollziehbare Zahlen.
+                 Damit jeder investierte Euro sichtbar arbeitet.</p>
+            </article>
+            <article class="ma__pillar reveal" data-reveal>
+              <span class="ma__num">03</span>
+              <h4>Systematisches Testing</h4>
+              <p>Hooks, Angles und Zielgruppen werden getestet, bis die Gewinner
+                 feststehen — datenbasiert statt aus dem Bauch heraus.</p>
+            </article>
+            <article class="ma__pillar reveal" data-reveal>
+              <span class="ma__num">04</span>
+              <h4>Profitable Skalierung</h4>
+              <p>Was funktioniert, skalieren wir kontrolliert nach oben — mit
+                 wöchentlicher Optimierung und transparentem Reporting.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prozess -->
+    <section class="section section--alt" id="prozess">
+      <div class="container">
+        <div class="section__head">
+          <span class="eyebrow reveal" data-reveal>02 — Prozess</span>
+          <h2 class="section__title reveal" data-reveal>In 4 Schritten zu<br /><span class="grad-text">planbarem Wachstum.</span></h2>
+          <p class="section__lead reveal" data-reveal>Kein Blindflug, keine Bauchentscheidungen. Ein klarer, wiederholbarer Prozess, der auf Daten basiert.</p>
+        </div>
+
+        <div class="steps">
+          <div class="steps__line" aria-hidden="true"><span id="stepsProgress"></span></div>
+          <article class="step reveal" data-reveal>
+            <div class="step__num">01</div>
+            <h3 class="step__title">Analyse &amp; Strategie</h3>
+            <p class="step__text">Wir tauchen tief in Marke, Markt &amp; Zahlen ein und bauen eine Roadmap mit klaren KPIs und Umsatzzielen.</p>
+          </article>
+          <article class="step reveal" data-reveal>
+            <div class="step__num">02</div>
+            <h3 class="step__title">Kreation &amp; Setup</h3>
+            <p class="step__text">Tracking, Kampagnen-Architektur und die ersten Creative-Angles — sauber aufgesetzt für maximale Skalierbarkeit.</p>
+          </article>
+          <article class="step reveal" data-reveal>
+            <div class="step__num">03</div>
+            <h3 class="step__title">Launch &amp; Testing</h3>
+            <p class="step__text">Wir testen systematisch Zielgruppen, Hooks &amp; Angebote und finden die Gewinner-Kombinationen datenbasiert.</p>
+          </article>
+          <article class="step reveal" data-reveal>
+            <div class="step__num">04</div>
+            <h3 class="step__title">Skalierung &amp; Optimierung</h3>
+            <p class="step__text">Was funktioniert, skalieren wir profitabel — mit wöchentlicher Optimierung und transparentem Reporting.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ergebnisse / Results -->
+    <section class="section" id="ergebnisse">
+      <div class="container">
+        <div class="section__head">
+          <span class="eyebrow reveal" data-reveal>03 — Ergebnisse</span>
+          <h2 class="section__title reveal" data-reveal>Zahlen, die<br /><span class="grad-text">für sich sprechen.</span></h2>
+          <p class="section__lead reveal" data-reveal>Ausgewählte Ergebnisse aus echten Kundenprojekten. Weil am Ende nur eines zählt: profitables Wachstum.</p>
+        </div>
+
+        <div class="results">
+          <article class="result reveal" data-reveal data-tilt>
+            <div class="result__value"><span data-count="312" data-prefix="+" data-suffix="%">0</span></div>
+            <h3 class="result__title">Umsatz in 90 Tagen</h3>
+            <p class="result__meta">D2C · Fashion &amp; Apparel</p>
+            <div class="result__bar"><span style="--w:92%"></span></div>
+          </article>
+          <article class="result reveal" data-reveal data-tilt>
+            <div class="result__value"><span data-count="5.8" data-decimals="1" data-suffix="×">0</span></div>
+            <h3 class="result__title">Return on Ad Spend</h3>
+            <p class="result__meta">E-Commerce · Beauty</p>
+            <div class="result__bar"><span style="--w:80%"></span></div>
+          </article>
+          <article class="result reveal" data-reveal data-tilt>
+            <div class="result__value"><span data-count="47" data-prefix="−" data-suffix="%">0</span></div>
+            <h3 class="result__title">Cost per Acquisition</h3>
+            <p class="result__meta">Leadgen · B2B SaaS</p>
+            <div class="result__bar"><span style="--w:68%"></span></div>
+          </article>
+          <article class="result reveal" data-reveal data-tilt>
+            <div class="result__value"><span data-count="1.4" data-decimals="1" data-prefix="" data-suffix=" Mio.">0</span></div>
+            <h3 class="result__title">generierte Leads</h3>
+            <p class="result__meta">Performance über 12 Monate</p>
+            <div class="result__bar"><span style="--w:88%"></span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Arbeiten / Gallery -->
+    <section class="section section--alt" id="arbeiten">
+      <div class="container">
+        <div class="section__head">
+          <span class="eyebrow reveal" data-reveal>04 — Arbeiten</span>
+          <h2 class="section__title reveal" data-reveal>Ein Blick in<br /><span class="grad-text">unsere Welt.</span></h2>
+          <p class="section__lead reveal" data-reveal>Ausgewählte Impressionen aus unserer täglichen Arbeit — Momente, Motive und Kreationen aus echten Projekten.</p>
+        </div>
+        <div class="gallery" id="gallery">
+          <button class="tile reveal" data-reveal data-lightbox="0" aria-label="AMBRE Eau de Parfum vergrößern"><img src="assets/img/ambre-parfum.webp" width="1080" height="1920" alt="AMBRE Eau de Parfum – Beauty-Kampagne von AMW in warmem Bernsteinlicht" loading="lazy" /><span class="tile__ring"></span><span class="tile__view" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          <button class="tile reveal" data-reveal data-lightbox="1" aria-label="HOYA HYDRIA vergrößern"><img src="assets/img/hoya-hydria.webp" width="1080" height="1920" alt="HOYA HYDRIA – Hautpflege-Content vor dem Spiegel in kühlem Tageslicht" loading="lazy" /><span class="tile__ring"></span><span class="tile__view" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          <button class="tile reveal" data-reveal data-lightbox="2" aria-label="MELVA Balm vergrößern"><img src="assets/img/melva-balm.webp" width="1080" height="1920" alt="MELVA Balm – Anwendungsmoment im warmen Abendlicht" loading="lazy" /><span class="tile__ring"></span><span class="tile__view" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          <button class="tile reveal" data-reveal data-lightbox="3" aria-label="SERAPHINE Restorative Eye Cream vergrößern"><img src="assets/img/seraphine-eye-cream.webp" width="1080" height="1920" alt="SERAPHINE Restorative Eye Cream – Produktaufnahme auf cremefarbener Seide" loading="lazy" /><span class="tile__ring"></span><span class="tile__view" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          <button class="tile reveal" data-reveal data-lightbox="4" aria-label="AURIVA Cream vergrößern"><img src="assets/img/auriva-cream.webp" width="1080" height="1920" alt="AURIVA Cream – Naturkosmetik-Kampagne mit Minze, Ingwer und Wasserspritzern" loading="lazy" /><span class="tile__ring"></span><span class="tile__view" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          <button class="tile reveal" data-reveal data-lightbox="5" aria-label="LUMIERE Radiance Serum vergrößern"><img src="assets/img/lumiere-serum.webp" width="1080" height="1920" alt="LUMIERE Radiance Serum – Produktaufnahme auf Seide in warmem Tageslicht" loading="lazy" /><span class="tile__ring"></span><span class="tile__view" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          <button class="tile reveal" data-reveal data-lightbox="6" aria-label="VIALA Parfum-Set vergrößern"><img src="assets/img/viala-parfum.webp" width="1080" height="1920" alt="VIALA Parfum-Set – Unboxing-Content mit Probierfläschchen" loading="lazy" /><span class="tile__ring"></span><span class="tile__view" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          <button class="tile reveal" data-reveal data-lightbox="7" aria-label="ARGILE Purifying Clay Mask vergrößern"><img src="assets/img/argile-clay-mask.webp" width="1080" height="1920" alt="ARGILE Purifying Clay Mask – Naturkosmetik-Editorial in Terrakotta-Tönen" loading="lazy" /><span class="tile__ring"></span><span class="tile__view" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          <button class="tile reveal" data-reveal data-lightbox="8" aria-label="Abendliches Pflegeritual vergrößern"><img src="assets/img/wellness-ritual.webp" width="1080" height="1920" alt="Abendliches Pflegeritual – Lifestyle-Aufnahme mit Pflegetiegeln im Schlafzimmer" loading="lazy" /><span class="tile__ring"></span><span class="tile__view" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+          <button class="tile reveal" data-reveal data-lightbox="9" aria-label="BOTANIQUE Body Balm vergrößern"><img src="assets/img/botanique-balm.webp" width="1080" height="1920" alt="BOTANIQUE Nourishing Body Balm – Beauty-Editorial in sanften Sandtönen" loading="lazy" /><span class="tile__ring"></span><span class="tile__view" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Showreel / Videos -->
+    <section class="section" id="showreel">
+      <div class="container">
+        <div class="section__head">
+          <span class="eyebrow reveal" data-reveal>05 — Showreel</span>
+          <h2 class="section__title reveal" data-reveal>Bewegung, die<br /><span class="grad-text">im Kopf bleibt.</span></h2>
+          <p class="section__lead reveal" data-reveal>Sechs Ausschnitte aus unserem Showreel. Zum Abspielen antippen.</p>
+        </div>
+        <div class="reels">
+          <button class="reel reveal" data-reveal data-video-src="assets/video/reel-01.mp4" aria-label="Showreel 1 abspielen">
+            <video class="reel__video" src="assets/video/reel-01.mp4#t=0.1" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            <span class="reel__index">01</span>
+            <span class="reel__play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+          </button>
+          <button class="reel reveal" data-reveal data-video-src="assets/video/reel-02.mp4" aria-label="Showreel 2 abspielen">
+            <video class="reel__video" src="assets/video/reel-02.mp4#t=0.1" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            <span class="reel__index">02</span>
+            <span class="reel__play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+          </button>
+          <button class="reel reveal" data-reveal data-video-src="assets/video/reel-03.mp4" aria-label="Showreel 3 abspielen">
+            <video class="reel__video" src="assets/video/reel-03.mp4#t=0.1" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            <span class="reel__index">03</span>
+            <span class="reel__play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+          </button>
+          <button class="reel reveal" data-reveal data-video-src="assets/video/reel-04.mp4" aria-label="Showreel 4 abspielen">
+            <video class="reel__video" src="assets/video/reel-04.mp4#t=0.1" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            <span class="reel__index">04</span>
+            <span class="reel__play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+          </button>
+          <button class="reel reveal" data-reveal data-video-src="assets/video/reel-05.mp4" aria-label="Showreel 5 abspielen">
+            <video class="reel__video" src="assets/video/reel-05.mp4#t=0.1" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            <span class="reel__index">05</span>
+            <span class="reel__play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+          </button>
+          <button class="reel reveal" data-reveal data-video-src="assets/video/reel-06.mp4" aria-label="Showreel 6 abspielen">
+            <video class="reel__video" src="assets/video/reel-06.mp4#t=0.1" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+            <span class="reel__index">06</span>
+            <span class="reel__play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="section section--alt" id="stimmen">
+      <div class="container">
+        <div class="section__head">
+          <span class="eyebrow reveal" data-reveal>06 — Kundenstimmen</span>
+          <h2 class="section__title reveal" data-reveal>Was unsere Kunden<br /><span class="grad-text">über AMW sagen.</span></h2>
+        </div>
+        <div class="quotes">
+          <figure class="quote reveal" data-reveal>
+            <div class="quote__stars" aria-label="5 von 5 Sternen">★★★★★</div>
+            <blockquote>„AMW hat unsere Ads komplett neu gedacht. Innerhalb von drei Monaten haben wir den Umsatz mehr als verdreifacht — bei besserem ROAS als je zuvor."</blockquote>
+            <figcaption>
+              <span class="quote__avatar">LK</span>
+              <span class="quote__who"><strong>Lena Krause</strong><small>Gründerin · NOVAWEAR</small></span>
+            </figcaption>
+          </figure>
+          <figure class="quote reveal" data-reveal>
+            <div class="quote__stars" aria-label="5 von 5 Sternen">★★★★★</div>
+            <blockquote>„Endlich eine Agentur, die Zahlen versteht und trotzdem kreativ bleibt. Transparent, schnell und ehrlich. Absolute Empfehlung."</blockquote>
+            <figcaption>
+              <span class="quote__avatar">MB</span>
+              <span class="quote__who"><strong>Marco Berger</strong><small>CEO · Kraftwerk Nutrition</small></span>
+            </figcaption>
+          </figure>
+          <figure class="quote reveal" data-reveal>
+            <div class="quote__stars" aria-label="5 von 5 Sternen">★★★★★</div>
+            <blockquote>„Die Creatives von AMW performen einfach. Wir skalieren seit Monaten profitabel und das Reporting ist glasklar. Ein echter Wachstumspartner."</blockquote>
+            <figcaption>
+              <span class="quote__avatar">SV</span>
+              <span class="quote__who"><strong>Sophie Vogel</strong><small>Head of Growth · Lumen Studio</small></span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section class="section about" id="ueber-uns">
+      <div class="container about__inner">
+        <div class="about__text">
+          <span class="eyebrow reveal" data-reveal>07 — Warum AMW</span>
+          <h2 class="section__title reveal" data-reveal>Wir sind kein<br />Dienstleister.<br /><span class="grad-text">Wir sind Ihr Wachstumsteam.</span></h2>
+          <p class="reveal" data-reveal>Klassische Agenturen verkaufen Reichweite. Wir verkaufen Ergebnisse. AMW verbindet datengetriebenes Performance-Marketing mit Creatives, die Menschen wirklich stoppen — und macht Wachstum planbar statt zufällig.</p>
+          <ul class="about__list">
+            <li class="reveal" data-reveal><span class="tick" aria-hidden="true">✓</span> Fokus auf profitablen Umsatz, nicht auf Vanity-Metriken</li>
+            <li class="reveal" data-reveal><span class="tick" aria-hidden="true">✓</span> Transparentes Reporting &amp; echte Ansprechpartner</li>
+            <li class="reveal" data-reveal><span class="tick" aria-hidden="true">✓</span> Kreation &amp; Media aus einer Hand — kein Ping-Pong</li>
+            <li class="reveal" data-reveal><span class="tick" aria-hidden="true">✓</span> Monatlich kündbar. Wir überzeugen durch Leistung.</li>
+          </ul>
+        </div>
+        <div class="about__panel reveal" data-reveal data-tilt>
+          <div class="about__panel-glow"></div>
+          <div class="about__metric">
+            <span class="about__metric-num"><span data-count="30" data-suffix=" Tage">0</span></span>
+            <span class="about__metric-label">bis zu den ersten Ergebnissen</span>
+          </div>
+          <div class="about__divider"></div>
+          <div class="about__mini">
+            <div><strong><span data-count="100" data-suffix="%">0</span></strong><span>datengetrieben</span></div>
+            <div><strong><span data-count="7" data-suffix="+">0</span></strong><span>Jahre Erfahrung</span></div>
+            <div><strong>0€</strong><span>Setup-Gebühr</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section section--alt" id="faq">
+      <div class="container faq__inner">
+        <div class="section__head section__head--left">
+          <span class="eyebrow reveal" data-reveal>08 — FAQ</span>
+          <h2 class="section__title reveal" data-reveal>Häufige<br /><span class="grad-text">Fragen.</span></h2>
+          <p class="section__lead reveal" data-reveal>Sie haben eine andere Frage? Schreiben Sie uns einfach — wir antworten in der Regel innerhalb von 24 Stunden.</p>
+        </div>
+        <div class="faq">
+          <details class="faq__item reveal" data-reveal>
+            <summary>Für wen ist AMW geeignet?</summary>
+            <div class="faq__body"><p>Wir arbeiten mit E-Commerce-Marken, D2C-Brands, Startups und wachstumsorientierten Unternehmen, die planbar skalieren möchten — typischerweise ab einem monatlichen Werbebudget von 3.000 €.</p></div>
+          </details>
+          <details class="faq__item reveal" data-reveal>
+            <summary>Wie schnell sehe ich Ergebnisse?</summary>
+            <div class="faq__body"><p>Erste Signale sehen wir meist innerhalb der ersten 2–4 Wochen. Für stabile, skalierbare Ergebnisse planen wir realistisch mit den ersten 30–90 Tagen — abhängig von Budget, Markt und Angebot.</p></div>
+          </details>
+          <details class="faq__item reveal" data-reveal>
+            <summary>Übernehmt ihr auch die Creatives?</summary>
+            <div class="faq__body"><p>Ja. Kreation und Media laufen bei uns Hand in Hand. Wir produzieren Statics, Videos und UGC-Ads im laufenden Testing — genau die Assets, die Ihre Kampagnen brauchen.</p></div>
+          </details>
+          <details class="faq__item reveal" data-reveal>
+            <summary>Gibt es eine Mindestlaufzeit?</summary>
+            <div class="faq__body"><p>Nein. Wir arbeiten monatlich kündbar. Wir sind überzeugt, dass uns unsere Ergebnisse halten — nicht ein langer Vertrag.</p></div>
+          </details>
+          <details class="faq__item reveal" data-reveal>
+            <summary>Was kostet die Zusammenarbeit?</summary>
+            <div class="faq__body"><p>Das hängt von Umfang und Zielen ab. Im kostenlosen Erstgespräch analysieren wir Ihre Situation und machen ein transparentes, faires Angebot — ohne Setup-Gebühr.</p></div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA / Kontakt -->
+    <section class="section cta" id="kontakt">
+      <div class="container">
+        <div class="cta__card reveal" data-reveal>
+          <div class="cta__glow"></div>
+          <div class="cta__content">
+            <span class="eyebrow">Kostenloses Erstgespräch</span>
+            <h2 class="cta__title">Bereit für Ads,<br />die <span class="grad-text">performen?</span></h2>
+            <p class="cta__text">Erzählen Sie uns kurz von Ihrem Vorhaben. Wir melden uns innerhalb von 24 Stunden mit einer ehrlichen Einschätzung — unverbindlich und ohne Verkaufsdruck.</p>
+            <ul class="cta__perks">
+              <li><span class="tick">✓</span> Unverbindlich &amp; kostenlos</li>
+              <li><span class="tick">✓</span> Antwort in 24 Std.</li>
+              <li><span class="tick">✓</span> Konkrete Potenzial-Analyse</li>
+            </ul>
+            <div class="cta__direct">
+              <span class="cta__direct-label">Lieber direkt schreiben?</span>
+              <a class="btn btn--wa" href="https://wa.me/4915562753949?text=Hallo%20AMW%2C%20ich%20interessiere%20mich%20f%C3%BCr%20ein%20kostenloses%20Erstgespr%C3%A4ch." target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24" aria-hidden="true" class="btn__wa-icon"><path fill="currentColor" d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.14-.14.3-.35.45-.53.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.53.07-.8.38-.28.3-1.05 1.03-1.05 2.5s1.08 2.9 1.23 3.1c.15.2 2.12 3.24 5.14 4.54.72.31 1.28.5 1.71.63.72.23 1.37.2 1.89.12.58-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.13-.27-.2-.57-.35z"/><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.02h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.42a8.19 8.19 0 0 1 2.41 5.83c0 4.54-3.7 8.22-8.24 8.22z"/></svg>
+                <span>WhatsApp: +49 155 62753949</span>
+              </a>
+            </div>
+          </div>
+
+          <form class="form" id="contactForm" novalidate>
+            <div class="field">
+              <input type="text" id="name" name="name" required placeholder=" " autocomplete="name" />
+              <label for="name">Name</label>
+            </div>
+            <div class="field">
+              <input type="email" id="email" name="email" required placeholder=" " autocomplete="email" />
+              <label for="email">E-Mail</label>
+            </div>
+            <div class="field">
+              <input type="text" id="company" name="company" placeholder=" " autocomplete="organization" />
+              <label for="company">Unternehmen (optional)</label>
+            </div>
+            <div class="field field--select">
+              <select id="budget" name="budget" required>
+                <option value="" selected disabled></option>
+                <option>3.000 € – 10.000 € / Monat</option>
+                <option>10.000 € – 25.000 € / Monat</option>
+                <option>25.000 € – 50.000 € / Monat</option>
+                <option>50.000 €+ / Monat</option>
+                <option>Noch unklar</option>
+              </select>
+              <label for="budget">Monatliches Werbebudget</label>
+            </div>
+            <div class="field field--full">
+              <textarea id="message" name="message" rows="3" placeholder=" "></textarea>
+              <label for="message">Worum geht's? (optional)</label>
+            </div>
+            <a id="waSubmit" class="btn btn--primary btn--lg form__submit"
+               href="https://wa.me/4915562753949?text=Hallo%20AMW%2C%20ich%20interessiere%20mich%20f%C3%BCr%20ein%20kostenloses%20Erstgespr%C3%A4ch."
+               target="_blank" rel="noopener noreferrer" data-magnetic>
+              <span>Erstgespräch anfragen</span>
+              <svg viewBox="0 0 24 24" class="btn__arrow" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <p class="form__note">Oder direkt per Mail: <a href="mailto:info@amwagence.de">info@amwagence.de</a></p>
+            <p class="form__note">Mit dem Absenden werden Ihre Angaben an WhatsApp übertragen. Hinweise zur Verarbeitung finden Sie in der <a href="datenschutz.html">Datenschutzerklärung</a>.</p>
+            <p class="form__success" id="formSuccess" hidden>✓ WhatsApp wird geöffnet — bitte dort auf „Senden" tippen.</p>
+            <p class="form__error" id="formError" role="alert" hidden></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__brand">
+        <a href="#top" class="brand brand--footer">
+          <span class="brand__mark">A</span>
+          <span class="brand__word">AMW</span>
+        </a>
+        <p class="footer__tag">Performance Marketing &amp; Social Media Ads.<br />Datengetrieben. Kreativ. Messbar.</p>
+      </div>
+      <nav class="footer__col" aria-label="Seiten">
+        <h4>Agentur</h4>
+        <a href="#leistungen">Leistungen</a>
+        <a href="#prozess">Prozess</a>
+        <a href="#ergebnisse">Ergebnisse</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <nav class="footer__col" aria-label="Rechtliches">
+        <h4>Rechtliches</h4>
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </nav>
+      <div class="footer__col">
+        <h4>Kontakt</h4>
+        <a href="mailto:info@amwagence.de">info@amwagence.de</a>
+        <a href="https://amwagence.de" rel="noopener">amwagence.de</a>
+        <div class="footer__socials">
+          <a href="#" aria-label="Instagram" class="social" data-magnetic><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor"/></svg></a>
+          <a href="#" aria-label="LinkedIn" class="social" data-magnetic><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 10v7M7 7v.01M11 17v-4a2 2 0 0 1 4 0v4M11 10v7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
+          <a href="#" aria-label="TikTok" class="social" data-magnetic><svg viewBox="0 0 24 24"><path d="M9 3v12.5a3.5 3.5 0 1 1-3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M9 3c0 3 2 5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></a>
+        </div>
+      </div>
+    </div>
+    <div class="container footer__bottom">
+      <p>© <span id="year">2026</span> AMW · Alle Rechte vorbehalten.</p>
+      <p class="footer__made"><a href="impressum.html">Impressum</a> · <a href="datenschutz.html">Datenschutz</a></p>
+    </div>
+  </footer>
+
+  <!-- Lightbox (Bilder) -->
+  <div class="lb" id="lightbox" aria-hidden="true" role="dialog" aria-label="Bildansicht">
+    <button class="lb__close" id="lbClose" aria-label="Schließen">&times;</button>
+    <button class="lb__nav lb__prev" id="lbPrev" aria-label="Vorheriges Bild">&#8249;</button>
+    <figure class="lb__stage"><img id="lbImg" src="" alt="" /></figure>
+    <button class="lb__nav lb__next" id="lbNext" aria-label="Nächstes Bild">&#8250;</button>
+    <div class="lb__counter" id="lbCounter"></div>
+  </div>
+
+  <!-- Video-Modal -->
+  <div class="vm" id="videoModal" aria-hidden="true" role="dialog" aria-label="Videoansicht">
+    <button class="lb__close" id="vmClose" aria-label="Schließen">&times;</button>
+    <div class="vm__stage" id="vmStage"></div>
+  </div>
+
+  <!-- Smooth scroll -->
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+
+  <!-- App -->
+  <script type="module" src="js/app.js?v=100"></script>
+
+  <script>
+  /* Formulardaten an den WhatsApp-Link anhängen. Schlägt das fehl,
+     bleibt der Link trotzdem gültig und öffnet WhatsApp. */
+  (function () {
+    var a = document.getElementById("waSubmit");
+    var form = document.getElementById("contactForm");
+    if (!a || !form) return;
+    var NUM = "4915562753949";
+    a.addEventListener("click", function () {
+      try {
+        var v = function (id) {
+          var el = document.getElementById(id);
+          return el && el.value ? el.value.trim() : "";
+        };
+        if (!v("name") && !v("email")) return;
+        var t = ["Neue Anfrage über amwagence.de", ""];
+        if (v("name"))    t.push("Name: " + v("name"));
+        if (v("email"))   t.push("E-Mail: " + v("email"));
+        if (v("company")) t.push("Unternehmen: " + v("company"));
+        if (v("budget"))  t.push("Budget: " + v("budget"));
+        if (v("message")) t.push("", "Nachricht:", v("message"));
+        a.href = "https://wa.me/" + NUM + "?text=" + encodeURIComponent(t.join("\n"));
+        var ok = document.getElementById("formSuccess");
+        if (ok) ok.hidden = false;
+      } catch (e) { /* Link bleibt wie er ist */ }
+    });
+  })();
+  </script>
+</body>
+</html>
