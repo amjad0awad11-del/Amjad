@@ -75,7 +75,9 @@ export function Button({ label, href, variant = "solid", className, onClick }: B
 
   const styles = clsx(
     "gradient-ring-host relative isolate inline-flex min-h-[44px] items-center justify-center",
-    "rounded-[var(--r-pill)] px-7 py-3.5 t-mono transition-colors duration-300",
+    "rounded-[var(--r-pill)] px-7 py-3.5 t-mono transition-[color,background-color,transform] duration-300",
+    // The magnetic wrapper translates a parent span, so scaling here is safe.
+    "motion-safe:hover:scale-105",
     variant === "solid" && "bg-[var(--accent)]",
     variant === "outline" && "border border-[var(--hairline)]",
     className

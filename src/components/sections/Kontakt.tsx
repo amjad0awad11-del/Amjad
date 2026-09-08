@@ -182,7 +182,7 @@ export function Kontakt() {
       aria-labelledby="kontakt-title"
       className="section-y relative overflow-hidden"
     >
-      <BackgroundVideo src={hero.wall[0]} poster={hero.poster} flip overlay={0.72} />
+      <BackgroundVideo src={hero.wall[0]} poster={hero.poster} flip overlay={0.72} fade />
 
       {/* The spotlight used to be the section's own background, which the clip
           would now paint over — it rides above the video instead. */}

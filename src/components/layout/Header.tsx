@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import { gsap, ScrollTrigger, DUR, EASE, registerGsap, prefersReducedMotion } from "@/lib/motion";
+import { useActiveSection } from "@/lib/useActiveSection";
 import { useSmoothScroll } from "@/components/motion/SmoothScrollProvider";
 import { MenuOverlay } from "@/components/layout/MenuOverlay";
 import { Button } from "@/components/ui/Button";
@@ -16,7 +18,9 @@ import { header, a11y } from "@/content/de";
  * drop shadow; scrolling down past 200px hides it and scrolling up brings it
  * back. Colours are inherited from the active theme, so it inverts with the
  * section beneath it. The wordmark carries a slowly travelling accent-gradient
- * ring that turns the other way under the pointer.
+ * ring that turns the other way under the pointer, and grows a little when the
+ * pointer is on it. The link for the section currently under the fold line
+ * lights up and takes a soft pill behind it.
  */
 export function Header() {
   const bar = useRef<HTMLElement>(null);
@@ -25,6 +29,7 @@ export function Header() {
   const { scrollTo } = useSmoothScroll();
   const pathname = usePathname();
   const onHome = pathname === "/";
+  const activeId = useActiveSection();
 
   useEffect(() => {
     registerGsap();
@@ -95,7 +100,7 @@ export function Header() {
           <Link
             href="/"
             aria-label={header.homeLabel}
-            className="gradient-ring-host relative t-h3 rounded-[var(--r-pill)] px-4 py-1 font-bold tracking-[-0.03em]"
+            className="gradient-ring-host relative t-h3 rounded-[var(--r-pill)] px-4 py-1 font-bold tracking-[-0.03em] transition-transform duration-300 hover:scale-110"
             data-cursor="link"
             onClick={(event) => {
               if (!onHome) return;
@@ -108,17 +113,24 @@ export function Header() {
           </Link>
 
           <nav aria-label={a11y.menuLabel} className="hidden items-center gap-8 lg:flex">
-            {header.nav.map((item) => (
-              <a
-                key={item.href}
-                href={linkHref(item.href)}
-                className="t-mono link-underline"
-                data-cursor="link"
-                onClick={(event) => handleAnchor(event, item.href)}
-              >
-                {item.label}
-              </a>
-            ))}
+            {header.nav.map((item) => {
+              const active = onHome && item.href === `#${activeId}`;
+              return (
+                <a
+                  key={item.href}
+                  href={linkHref(item.href)}
+                  aria-current={active ? "true" : undefined}
+                  className={clsx(
+                    "t-mono link-underline rounded-[var(--r-pill)] px-3 py-1.5 transition-colors duration-300",
+                    active ? "bg-[var(--hairline)]" : "t-muted hover:text-[var(--fg)]"
+                  )}
+                  data-cursor="link"
+                  onClick={(event) => handleAnchor(event, item.href)}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-4">

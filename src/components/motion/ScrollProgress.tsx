@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger, EASE, registerGsap } from "@/lib/motion";
+import { useActiveSection } from "@/lib/useActiveSection";
 import { sectionIndex, a11y } from "@/content/de";
 
 /**
@@ -14,7 +15,13 @@ import { sectionIndex, a11y } from "@/content/de";
 export function ScrollProgress({ reduced }: { reduced: boolean }) {
   const bar = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLSpanElement>(null);
-  const [label, setLabel] = useState(sectionIndex[0]?.label ?? "");
+  // Shared with the header's active nav link, so the page only pays for one
+  // set of section triggers.
+  const activeId = useActiveSection();
+  const label =
+    sectionIndex.find((section) => section.id === activeId)?.label ??
+    sectionIndex[0]?.label ??
+    "";
 
   useEffect(() => {
     registerGsap();
@@ -29,25 +36,7 @@ export function ScrollProgress({ reduced }: { reduced: boolean }) {
       onUpdate: (self) => gsap.set(element, { scaleY: self.progress }),
     });
 
-    const triggers = sectionIndex
-      .map(({ id, label: name }) => {
-        const section = document.getElementById(id);
-        if (!section) return null;
-        const set = () => setLabel(name);
-        return ScrollTrigger.create({
-          trigger: section,
-          start: "top 50%",
-          end: "bottom 50%",
-          onEnter: set,
-          onEnterBack: set,
-        });
-      })
-      .filter(Boolean) as ScrollTrigger[];
-
-    return () => {
-      progress.kill();
-      triggers.forEach((trigger) => trigger.kill());
-    };
+    return () => progress.kill();
   }, []);
 
   // Swap the label with a short mask slide rather than a hard cut.
