@@ -9,6 +9,7 @@ import { Prozess } from "@/components/sections/Prozess";
 import { Vergleich } from "@/components/sections/Vergleich";
 import { Preise } from "@/components/sections/Preise";
 import { Stimmen } from "@/components/sections/Stimmen";
+import { Impressionen } from "@/components/sections/Impressionen";
 import { Studio } from "@/components/sections/Studio";
 import { Faq } from "@/components/sections/Faq";
 import { Kontakt } from "@/components/sections/Kontakt";
@@ -31,6 +32,7 @@ export default function Home() {
       <Vergleich />
       <Preise />
       <Stimmen />
+      <Impressionen />
       <Studio />
       <Faq />
       <Kontakt />

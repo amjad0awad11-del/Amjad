@@ -27,6 +27,9 @@ type ButtonProps = {
  *
  * Once the fill is in, the label switches to the background colour — cream on
  * amber only reaches 2.2:1, ink on amber reaches 10.2:1.
+ *
+ * An animated accent-gradient ring lights up around the edge on hover and on
+ * keyboard focus, ported from the reference design's CTA pair.
  */
 export function Button({ label, href, variant = "solid", className, onClick }: ButtonProps) {
   const scope = useRef<HTMLSpanElement>(null);
@@ -71,12 +74,14 @@ export function Button({ label, href, variant = "solid", className, onClick }: B
   };
 
   const styles = clsx(
-    "relative isolate inline-flex min-h-[44px] items-center justify-center overflow-hidden",
+    "gradient-ring-host relative isolate inline-flex min-h-[44px] items-center justify-center",
     "rounded-[var(--r-pill)] px-7 py-3.5 t-mono transition-colors duration-300",
     variant === "solid" && "bg-[var(--accent)]",
     variant === "outline" && "border border-[var(--hairline)]",
     className
   );
+
+  const ring = <span className="gradient-ring" aria-hidden="true" />;
 
   const inner = (
     <span ref={scope} className="contents">
@@ -84,7 +89,7 @@ export function Button({ label, href, variant = "solid", className, onClick }: B
         <span
           data-fill
           aria-hidden="true"
-          className="absolute inset-0 -z-10 origin-bottom"
+          className="absolute inset-0 -z-10 origin-bottom rounded-[var(--r-pill)]"
           style={{ backgroundColor: "var(--accent)", transform: "scaleY(0)" }}
         />
       )}
@@ -118,6 +123,7 @@ export function Button({ label, href, variant = "solid", className, onClick }: B
     return (
       <MagneticButton>
         <button type="button" onClick={onClick} {...handlers}>
+          {ring}
           {inner}
         </button>
       </MagneticButton>
@@ -137,6 +143,7 @@ export function Button({ label, href, variant = "solid", className, onClick }: B
             scrollTo(href);
           }}
         >
+          {ring}
           {inner}
         </a>
       </MagneticButton>
@@ -146,6 +153,7 @@ export function Button({ label, href, variant = "solid", className, onClick }: B
   return (
     <MagneticButton>
       <Link href={href} {...handlers}>
+        {ring}
         {inner}
       </Link>
     </MagneticButton>

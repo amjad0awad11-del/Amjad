@@ -12,9 +12,11 @@ import { header, a11y } from "@/content/de";
 /**
  * A4 — smart header.
  *
- * Transparent at the top; past 80px it gains a blur and a hairline; scrolling
- * down past 200px hides it and scrolling up brings it back. Colours are
- * inherited from the active theme, so it inverts with the section beneath it.
+ * Transparent at the top; past 80px it gains a blur, a hairline and a soft
+ * drop shadow; scrolling down past 200px hides it and scrolling up brings it
+ * back. Colours are inherited from the active theme, so it inverts with the
+ * section beneath it. The wordmark carries a slowly travelling accent-gradient
+ * ring that turns the other way under the pointer.
  */
 export function Header() {
   const bar = useRef<HTMLElement>(null);
@@ -85,6 +87,7 @@ export function Header() {
           backdropFilter: condensed ? "blur(12px)" : "none",
           WebkitBackdropFilter: condensed ? "blur(12px)" : "none",
           borderBottom: `1px solid ${condensed ? "var(--hairline)" : "transparent"}`,
+          boxShadow: condensed ? "0 8px 24px rgba(11, 11, 13, 0.18)" : "none",
           color: "var(--fg)",
         }}
       >
@@ -92,7 +95,7 @@ export function Header() {
           <Link
             href="/"
             aria-label={header.homeLabel}
-            className="t-h3 font-bold tracking-[-0.03em]"
+            className="gradient-ring-host relative t-h3 rounded-[var(--r-pill)] px-4 py-1 font-bold tracking-[-0.03em]"
             data-cursor="link"
             onClick={(event) => {
               if (!onHome) return;
@@ -100,6 +103,7 @@ export function Header() {
               scrollTo("body", 0);
             }}
           >
+            <span className="gradient-ring gradient-ring-always" aria-hidden="true" />
             {header.wordmark}
           </Link>
 

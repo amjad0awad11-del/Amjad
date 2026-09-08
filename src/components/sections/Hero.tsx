@@ -1,10 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { gsap, DUR, EASE, STAGGER, prefersReducedMotion, simpleFade } from "@/lib/motion";
+import {
+  gsap,
+  BLUR_IN,
+  CYCLE,
+  DUR,
+  EASE,
+  STAGGER,
+  prefersReducedMotion,
+  simpleFade,
+} from "@/lib/motion";
 import { useGsap } from "@/lib/useGsap";
 import { useHeroReady } from "@/components/motion/HeroGate";
 import { RevealText } from "@/components/motion/RevealText";
+import { WordCycler } from "@/components/motion/WordCycler";
 import { Glow } from "@/components/motion/Atmosphere";
 import { ShowreelLightbox } from "@/components/motion/ShowreelLightbox";
 import { Button } from "@/components/ui/Button";
@@ -114,8 +124,10 @@ function CreativeWall({ ready }: { ready: boolean }) {
  * S2 — Hero.
  *
  * The headline drives in from oversize word by word (A6), the creative wall
- * settles behind it (A7), and the whole block scales away on scroll. Scroll cue
- * A8, glow A31, showreel trigger A32.
+ * settles behind it (A7), and everything around it sheds a 10px blur on the way
+ * up (`.blur-in`). The role word under the headline swaps on its own clock. The
+ * whole block scales away on scroll. Scroll cue A8, glow A31, showreel trigger
+ * A32.
  */
 export function Hero({ hasShowreel }: { hasShowreel: boolean }) {
   const scope = useRef<HTMLElement>(null);
@@ -139,30 +151,32 @@ export function Hero({ hasShowreel }: { hasShowreel: boolean }) {
 
       const timeline = gsap.timeline();
 
-      timeline.fromTo(
-        eyebrow,
-        { autoAlpha: 0, y: 14 },
-        { autoAlpha: 1, y: 0, duration: DUR.base, ease: EASE.out },
-        0.1
-      );
+      // Everything that is not the headline arrives out of focus and sharpens
+      // as it settles. `clearProps` drops the filter afterwards so the hero
+      // does not sit on a permanent compositing layer.
+      const blurIn = {
+        from: { autoAlpha: 0, y: 20, filter: `blur(${BLUR_IN}px)` },
+        to: {
+          autoAlpha: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: DUR.base,
+          ease: EASE.out,
+          clearProps: "filter",
+        },
+      };
+
+      timeline.fromTo(eyebrow, blurIn.from, blurIn.to, 0.1);
 
       timeline.fromTo(
         tail,
-        { autoAlpha: 0, y: 24 },
-        { autoAlpha: 1, y: 0, duration: DUR.base, ease: EASE.out, stagger: STAGGER.words },
+        blurIn.from,
+        { ...blurIn.to, stagger: STAGGER.blur },
         0.9
       );
 
       if (cue) {
         timeline.fromTo(cue, { autoAlpha: 0 }, { autoAlpha: 1, duration: DUR.fast }, 1.3);
-        gsap.to(cue.querySelector("[data-cue-line]"), {
-          scaleY: 0.35,
-          transformOrigin: "top center",
-          duration: 1.4,
-          ease: EASE.inOut,
-          repeat: -1,
-          yoyo: true,
-        });
         gsap.to(cue, {
           autoAlpha: 0,
           ease: EASE.linear,
@@ -231,7 +245,20 @@ export function Hero({ hasShowreel }: { hasShowreel: boolean }) {
             ))}
           </h1>
 
-          <div className="mt-10 grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+          {/* Body-sized so it groups with the headline rather than competing
+              with it — only the swapping word is emphasised. */}
+          <p data-hero-tail className="t-body mt-4">
+            {hero.roleLine.before}{" "}
+            <WordCycler
+              words={hero.roleLine.roles}
+              interval={CYCLE.role}
+              variant="fade"
+              className="t-accent font-semibold"
+            />{" "}
+            {hero.roleLine.after}
+          </p>
+
+          <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
             <div className="flex flex-col gap-8">
               <p data-hero-tail className="t-body t-muted">
                 {hero.sub}
@@ -266,7 +293,18 @@ export function Hero({ hasShowreel }: { hasShowreel: boolean }) {
           aria-hidden="true"
           className="pointer-events-none absolute bottom-[clamp(28px,6vh,72px)] left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 xl:flex"
         >
-          <span data-cue-line className="block h-10 w-px origin-top" style={{ backgroundColor: "var(--amber)" }} />
+          {/* A short amber segment runs down a static hairline, rather than the
+              whole line pulsing. */}
+          <span
+            data-cue-line
+            className="relative block h-10 w-px overflow-hidden"
+            style={{ backgroundColor: "var(--hairline)" }}
+          >
+            <span
+              className="animate-scroll-down absolute inset-x-0 top-0 block h-1/3"
+              style={{ backgroundColor: "var(--amber)" }}
+            />
+          </span>
           <span className="t-mono t-muted">{hero.scrollCue}</span>
         </div>
       </section>

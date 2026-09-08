@@ -5,6 +5,7 @@ import Link from "next/link";
 import { gsap, EASE, STAGGER, prefersReducedMotion } from "@/lib/motion";
 import { useGsap } from "@/lib/useGsap";
 import { useSmoothScroll } from "@/components/motion/SmoothScrollProvider";
+import { Marquee } from "@/components/motion/Marquee";
 import { SmartLink } from "@/components/ui/SmartLink";
 import { footer } from "@/content/de";
 
@@ -35,8 +36,9 @@ function BerlinClock() {
 }
 
 /**
- * A25 — footer finale: the wordmark rises letter by letter out of its mask,
- * with a live clock and a smooth scroll back to the top.
+ * A25 — footer finale: a claim marquee runs across the top, the wordmark rises
+ * letter by letter out of its mask, and a live clock, an availability dot and a
+ * smooth scroll back to the top sit in between.
  */
 export function Footer({ onHome }: { onHome: boolean }) {
   const scope = useRef<HTMLElement>(null);
@@ -75,6 +77,25 @@ export function Footer({ onHome }: { onHome: boolean }) {
 
   return (
     <footer ref={scope} data-theme="dark" className="relative overflow-hidden">
+      {/* The claim, on a loop. Duplicated so the seam at -100% is invisible;
+          scroll velocity drives its speed and skew like the amber ticker's. */}
+      <div
+        className="border-y py-5"
+        style={{ borderColor: "var(--hairline)" }}
+        aria-hidden="true"
+      >
+        <Marquee duration={40}>
+          {Array.from({ length: 5 }, (_, index) => (
+            <span key={index} className="flex items-center">
+              <span className="t-h2 whitespace-nowrap px-6 uppercase t-muted">
+                {footer.marquee.text}
+              </span>
+              <span className="t-h2 t-muted opacity-50">{footer.marquee.separator}</span>
+            </span>
+          ))}
+        </Marquee>
+      </div>
+
       <div className="wrap pt-[clamp(64px,9vh,140px)]">
         <div className="grid gap-12 border-b pb-14 md:grid-cols-3" style={{ borderColor: "var(--hairline)" }}>
           <div className="flex flex-col gap-3">
@@ -129,7 +150,13 @@ export function Footer({ onHome }: { onHome: boolean }) {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-4 py-6">
-          <p className="t-mono t-muted">{footer.copyright}</p>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <p className="t-mono t-muted">{footer.copyright}</p>
+            <p className="t-mono flex items-center gap-2.5">
+              <span className="status-dot" aria-hidden="true" />
+              {footer.availability}
+            </p>
+          </div>
           <button
             type="button"
             className="t-mono link-underline min-h-[44px]"

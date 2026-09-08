@@ -38,6 +38,19 @@ export const STAGGER = {
   words: 0.06,
   lines: 0.13,
   cards: 0.16,
+  /** The ported design's entrance stagger, used by the `.blur-in` group. */
+  blur: 0.1,
+} as const;
+
+/** Pixels of blur an element sheds on the way in (`.blur-in`). */
+export const BLUR_IN = 10;
+
+/** Milliseconds a rotating word is held before the next one takes over. */
+export const CYCLE = {
+  /** Loading-screen verbs. */
+  fast: 900,
+  /** The hero's role line. */
+  role: 2000,
 } as const;
 
 export const START = {
@@ -49,6 +62,12 @@ export const START = {
 
 /** Breakpoint at which pinning / cursor / hover previews switch on. */
 export const DESKTOP_QUERY = "(min-width: 1024px)";
+
+/**
+ * Wider still. The parallax gallery needs room for two columns of frames *and*
+ * a readable heading between them; below this it falls back to a plain grid.
+ */
+export const WIDE_QUERY = "(min-width: 1280px)";
 
 let registered = false;
 

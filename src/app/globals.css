@@ -11,6 +11,7 @@
   --cream: #f4f0e8;
   --amber: #efb03c;
   --amber-dk: #c98f26;
+  --amber-lt: #f7d391;
   --ash: #6e6e73;
   --line: rgba(244, 240, 232, 0.14);
   --line-dk: rgba(11, 11, 13, 0.12);
@@ -50,6 +51,10 @@
   /* Radii */
   --r-pill: 999px;
   --r-media: 12px;
+
+  /* Accent gradient — the ported design's logo ring, hover borders and
+     progress bars all draw from this one declaration. */
+  --accent-gradient: linear-gradient(90deg, var(--amber-lt) 0%, var(--amber-dk) 100%);
 }
 
 /* Section themes. Applied as data attributes; the morph tweens --bg/--fg. */
@@ -406,6 +411,178 @@
   .is-animating {
     will-change: transform, opacity;
   }
+
+  /* ==========================================================================
+     Accent gradient
+     One declaration behind the loading bar, the logo ring and every hover
+     border. The animated variant needs an oversized background so
+     `gradient-shift` has somewhere to travel.
+     ========================================================================== */
+
+  .accent-gradient {
+    background-image: var(--accent-gradient);
+  }
+
+  /* Hover ring: a gradient sheet just outside the element with its middle
+     masked out, so only a 2px rim paints. Unlike the usual "gradient behind,
+     ground on top" trick this needs no opaque backing, which matters here —
+     the ground under a button changes with every section theme.
+
+     The gradient is stated three times across a 200%-wide sheet so
+     `gradient-shift` can travel without a visible seam. */
+  .gradient-ring {
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    opacity: 0;
+    pointer-events: none;
+    background-image: linear-gradient(
+      90deg,
+      var(--accent) 0%,
+      color-mix(in srgb, var(--accent) 45%, var(--fg)) 50%,
+      var(--accent) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    transition: opacity 0.35s ease;
+  }
+
+  .gradient-ring-host:hover > .gradient-ring,
+  .gradient-ring-host:focus-visible > .gradient-ring,
+  .gradient-ring-host:has(:focus-visible) > .gradient-ring {
+    opacity: 1;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  /* The wordmark's ring is always lit and simply turns the other way when the
+     pointer is on it. */
+  .gradient-ring-always {
+    opacity: 1;
+    animation: gradient-shift 6s ease infinite;
+  }
+
+  .gradient-ring-host:hover > .gradient-ring-always {
+    animation-direction: reverse;
+  }
+
+  /* ==========================================================================
+     Halftone — the dot screen laid over card media
+     ========================================================================== */
+
+  .halftone {
+    background-image: radial-gradient(circle, var(--ink) 1px, transparent 1px);
+    background-size: 4px 4px;
+    opacity: 0.2;
+  }
+
+  /* Same reasoning as .grain: a blend mode promotes every card it sits on into
+     a composited layer, which is worth it on a desktop GPU and not on a phone
+     — there the dots stay a plain overlay. */
+  @media (min-width: 1024px) {
+    .halftone {
+      mix-blend-mode: multiply;
+    }
+  }
+
+  /* ==========================================================================
+     Availability dot — solid centre with a ring pulsing out of it
+     ========================================================================== */
+
+  .status-dot {
+    position: relative;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #3ecf8e;
+  }
+
+  .status-dot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: #3ecf8e;
+    animation: pulse-dot 2s ease-out infinite;
+  }
+
+  /* ==========================================================================
+     Scroll cue — a short highlight travelling down the hairline
+     ========================================================================== */
+
+  .animate-scroll-down {
+    animation: scroll-down 1.5s ease-in-out infinite;
+  }
+
+  /* ==========================================================================
+     Role swap — the cycling word in the hero's sub-line
+     ========================================================================== */
+
+  .animate-role-fade-in {
+    animation: role-fade-in 0.4s ease-out;
+  }
+}
+
+/* ==========================================================================
+   Keyframes
+   Ported from the reference design; the colour values are AMW's own.
+   ========================================================================== */
+
+@keyframes scroll-down {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(200%);
+  }
+}
+
+@keyframes role-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes pulse-dot {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  70%,
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
 }
 
 /* ==========================================================================
@@ -428,6 +605,19 @@
 
   .glow {
     display: none;
+  }
+
+  /* The blanket rule above collapses these to 0.01ms, which parks the scroll
+     cue and the dot's ring at their end frames — off the line and fully
+     transparent. Say so explicitly rather than relying on that side effect. */
+  .animate-scroll-down,
+  .status-dot::after {
+    display: none;
+  }
+
+  .gradient-ring {
+    animation: none;
+    background-position: 0% 50%;
   }
 }
 

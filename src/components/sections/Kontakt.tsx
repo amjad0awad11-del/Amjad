@@ -7,7 +7,8 @@ import { RevealText } from "@/components/motion/RevealText";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { SmartLink } from "@/components/ui/SmartLink";
 import { Glow } from "@/components/motion/Atmosphere";
-import { kontakt } from "@/content/de";
+import { BackgroundVideo } from "@/components/motion/BackgroundVideo";
+import { hero, kontakt } from "@/content/de";
 
 type Errors = Partial<Record<"name" | "email" | "message" | "consent", string>>;
 type Status = "idle" | "sending" | "sent" | "error";
@@ -94,7 +95,13 @@ function Field({
   );
 }
 
-/** S13 — Kontakt. Form micro-interactions (A24), amber spotlight and glow (A31). */
+/**
+ * S14 — Kontakt.
+ *
+ * The hero's opening clip runs again here, upside down and under a heavy ink
+ * wash, so the page closes on the same footage it opened with. Form
+ * micro-interactions (A24), amber spotlight and glow (A31) sit on top of it.
+ */
 export function Kontakt() {
   const scope = useRef<HTMLElement>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -174,14 +181,23 @@ export function Kontakt() {
       data-theme="dark"
       aria-labelledby="kontakt-title"
       className="section-y relative overflow-hidden"
-      style={{
-        backgroundImage:
-          "radial-gradient(600px circle at var(--sx, 70%) var(--sy, 40%), color-mix(in srgb, var(--amber) 9%, transparent), transparent 70%)",
-      }}
     >
+      <BackgroundVideo src={hero.wall[0]} poster={hero.poster} flip overlay={0.72} />
+
+      {/* The spotlight used to be the section's own background, which the clip
+          would now paint over — it rides above the video instead. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(600px circle at var(--sx, 70%) var(--sy, 40%), color-mix(in srgb, var(--amber) 9%, transparent), transparent 70%)",
+        }}
+      />
+
       <Glow className="right-[-10%] top-[20%] h-[50vmax] w-[50vmax]" />
 
-      <div className="wrap grid gap-16 lg:grid-cols-12">
+      <div className="wrap relative z-10 grid gap-16 lg:grid-cols-12">
         <div className="flex flex-col gap-10 lg:col-span-5">
           <SectionHeader label={kontakt.label} title={kontakt.title} titleId="kontakt-title" />
           <RevealText as="p" className="t-body t-muted">

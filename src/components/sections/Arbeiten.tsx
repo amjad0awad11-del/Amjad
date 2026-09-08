@@ -11,10 +11,11 @@ type WorkItem = (typeof arbeiten.items)[number];
 /**
  * A16 — work card.
  *
- * The clip plays whenever the card is in view; hover and keyboard focus lift it
- * and bring the meta line up out of its mask. No poster file exists for these
- * clips, so the frame carries its own ground colour until the first frame
- * paints.
+ * The clip plays whenever the card is in view; hover and keyboard focus lift
+ * it, wash it out behind a blur and float the "Ansehen" pill up over it, with
+ * the meta line rising out of its mask underneath. A halftone dot screen sits
+ * over the clip throughout. No poster file exists for these clips, so the frame
+ * carries its own ground colour until the first frame paints.
  */
 function WorkCard({ item, index }: { item: WorkItem; index: number }) {
   const scope = useRef<HTMLLIElement>(null);
@@ -66,14 +67,27 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
 
     const frame = element.querySelector<HTMLElement>("[data-work-frame]");
     const meta = element.querySelector<HTMLElement>("[data-work-meta]");
+    const wash = element.querySelector<HTMLElement>("[data-work-wash]");
+    const pill = element.querySelector<HTMLElement>("[data-work-pill]");
     gsap.set(meta, { yPercent: 100 });
+    gsap.set([wash, pill].filter(Boolean) as HTMLElement[], { autoAlpha: 0 });
+    gsap.set(pill, { y: 12, scale: 0.96 });
 
     const activate = (on: boolean) => {
       gsap.to(frame, { scale: on ? 1.04 : 1, duration: 0.6, ease: EASE.out });
       gsap.to(meta, { yPercent: on ? 0 : 100, duration: 0.5, ease: EASE.out });
+      gsap.to(wash, { autoAlpha: on ? 1 : 0, duration: 0.45, ease: EASE.out });
+      gsap.to(pill, {
+        autoAlpha: on ? 1 : 0,
+        y: on ? 0 : 12,
+        scale: on ? 1 : 0.96,
+        duration: 0.45,
+        ease: EASE.out,
+      });
     };
 
-    // Touch has no hover, so the meta line simply stays visible.
+    // Touch has no hover, so the meta line simply stays visible and the wash
+    // never runs — there is no pointer to reveal it with.
     if (window.matchMedia("(pointer: coarse)").matches) {
       gsap.set(meta, { yPercent: 0 });
       return;
@@ -91,7 +105,7 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
       element.removeEventListener("pointerleave", leave);
       element.removeEventListener("focusin", enter);
       element.removeEventListener("focusout", leave);
-      gsap.killTweensOf([frame, meta].filter(Boolean) as HTMLElement[]);
+      gsap.killTweensOf([frame, meta, wash, pill].filter(Boolean) as HTMLElement[]);
     };
   }, []);
 
@@ -122,6 +136,30 @@ function WorkCard({ item, index }: { item: WorkItem; index: number }) {
             tabIndex={-1}
           />
         )}
+
+        {/* Dot screen over the clip, and the blurred wash the pill floats on. */}
+        <div className="halftone pointer-events-none absolute inset-0" aria-hidden="true" />
+
+        <div
+          data-work-wash
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 grid place-items-center backdrop-blur-lg"
+          style={{
+            backgroundColor: "color-mix(in srgb, var(--ink) 70%, transparent)",
+            visibility: "hidden",
+          }}
+        >
+          <span
+            data-work-pill
+            className="gradient-ring-host relative inline-flex max-w-[86%] flex-wrap items-center justify-center gap-x-2 gap-y-0 rounded-[var(--r-pill)] px-5 py-2.5 text-center"
+            style={{ backgroundColor: "var(--cream)", color: "var(--ink)" }}
+          >
+            <span className="gradient-ring gradient-ring-always" />
+            <span className="t-mono">{arbeiten.cursorLabel}</span>
+            <span className="t-mono opacity-40">—</span>
+            <span className="t-body font-semibold">{item.client}</span>
+          </span>
+        </div>
 
         <div className="absolute inset-x-0 bottom-0 overflow-hidden">
           <div

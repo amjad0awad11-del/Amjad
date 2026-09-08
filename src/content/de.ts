@@ -57,6 +57,8 @@ export const a11y = {
   sliderGoTo: "Zu Stimme",
   closeLightbox: "Showreel schließen",
   lightboxLabel: "Showreel",
+  closeGallery: "Bild schließen",
+  galleryLabel: "Bildansicht",
   playHint: "Video abspielen",
   decorative: "",
 } as const;
@@ -64,6 +66,10 @@ export const a11y = {
 export const preloader = {
   wordmark: "AMW",
   subline: "Beauty · Skincare · Fragrance",
+  /** Top-left corner label on the loading screen. */
+  topLabel: "Creative Performance Studio",
+  /** Cycles under the wordmark while the counter runs. */
+  words: ["Beauty", "Skincare", "Fragrance"],
   counterLabel: "Ladefortschritt",
 } as const;
 
@@ -108,6 +114,12 @@ export const hero = {
   ctaPrimary: { label: "Per WhatsApp schreiben", href: WHATSAPP_CTA } as NavLink,
   ctaSecondary: { label: "Showreel ansehen", href: "#showreel" } as NavLink,
   badges: ["Keine Setup-Gebühr", "Keine Mindestlaufzeit", "Monatlich kündbar"],
+  /** The word between `before` and `after` swaps on a 2s clock. */
+  roleLine: {
+    before: "Ein",
+    roles: ["Creative", "Performance", "Beauty", "Fragrance"],
+    after: "Studio aus Berlin.",
+  },
   scrollCue: "Scrollen",
   /** The hero wall plays the same creatives shown in the work gallery. */
   wall: [
@@ -449,9 +461,51 @@ export const stimmen = {
   ],
 } as const;
 
+export const impressionen = {
+  id: "impressionen",
+  label: "08 — Impressionen",
+  title: "Zwischen den Kampagnen.",
+  sub: "Setups, Schnittplätze, Texturen — was entsteht, während die Ads laufen.",
+  cta: { label: "Zu den Arbeiten", href: "#arbeiten" } as NavLink,
+  openLabel: "Vergrößern",
+  /** `rotate` is the card's resting tilt in degrees; the scroll adds the rest. */
+  items: [
+    {
+      src: "/images/studio-1.jpg",
+      alt: "Setup für einen Produktdreh im Studio",
+      rotate: -4,
+    },
+    {
+      src: "/images/leistung-1.jpg",
+      alt: "Close-up einer Textur für ein Video-Creative",
+      rotate: 3,
+    },
+    {
+      src: "/images/studio-3.jpg",
+      alt: "Storyboard mit Hook-Varianten an der Wand",
+      rotate: -2,
+    },
+    {
+      src: "/images/leistung-3.jpg",
+      alt: "UGC-Aufnahme im Badezimmer-Look",
+      rotate: 4,
+    },
+    {
+      src: "/images/studio-2.jpg",
+      alt: "Schnittplatz mit Creative-Varianten in der Übersicht",
+      rotate: -3,
+    },
+    {
+      src: "/images/leistung-5.jpg",
+      alt: "Produktshot vor dem Retusche-Durchgang",
+      rotate: 2,
+    },
+  ],
+} as const;
+
 export const studio = {
   id: "studio",
-  label: "08 — Studio",
+  label: "09 — Studio",
   title: "Klein, schnell, spezialisiert.",
   body: "AMW ist ein kompaktes Team aus Strategie, Kreation und Media-Buying — und wir arbeiten ausschließlich mit Beauty-, Skincare- und Fragrance-Marken. Kein Account-Management-Turm, keine Weiterreichung: Die Leute, die deine Ads bauen, sitzen auch in der Auswertung. Wenige Kunden gleichzeitig, weil Testing Aufmerksamkeit braucht, keine Kapazitätsplanung.",
   values: [
@@ -483,7 +537,7 @@ export const studio = {
 
 export const faq = {
   id: "faq",
-  label: "09 — FAQ",
+  label: "10 — FAQ",
   title: "Häufige Fragen.",
   items: [
     {
@@ -527,7 +581,7 @@ export const faq = {
 
 export const kontakt = {
   id: "kontakt",
-  label: "10 — Kontakt",
+  label: "11 — Kontakt",
   title: "Lass uns über deine Ads reden.",
   sub: "Fünfzehn Minuten reichen, um zu sehen, ob wir zueinander passen. Kein Pitch-Deck, kein Verkaufsgespräch.",
   form: {
@@ -570,6 +624,9 @@ export const kontakt = {
 export const footer = {
   wordmark: "AMW",
   tagline: "Creative Performance Studio · Beauty & Fragrance",
+  /** The band that runs across the top of the footer. */
+  marquee: { text: "Creatives, die verkaufen", separator: "✦" },
+  availability: "Verfügbar für neue Projekte",
   navTitle: "Seite",
   nav: [
     { label: "Leistungen", href: "#leistungen" },
@@ -630,6 +687,7 @@ export const sectionIndex: { id: string; label: string }[] = [
   { id: "vergleich", label: "Vergleich" },
   { id: "preise", label: "Preise" },
   { id: "stimmen", label: "Stimmen" },
+  { id: "impressionen", label: "Impressionen" },
   { id: "studio", label: "Studio" },
   { id: "faq", label: "FAQ" },
   { id: "kontakt", label: "Kontakt" },
