@@ -3,13 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { gsap, EASE, clamp } from "@/lib/motion";
 import { useReducedMotion, useMediaQuery } from "@/lib/useReducedMotion";
-import { arbeiten } from "@/content/de";
+import { cursor } from "@/content/de";
 
-type CursorState = "default" | "link" | "media" | "drag" | "hidden";
+type CursorState = "default" | "link" | "drag" | "hidden";
 
 /**
  * A3 — two-part cursor: a dot that tracks the pointer 1:1 and a ring that lags
- * behind it. Elements opt into a state with `data-cursor="link|media|drag|hidden"`.
+ * behind it. Elements opt into a state with `data-cursor="link|drag|hidden"`.
  *
  * Mounted only for fine pointers with motion enabled; touch and reduced-motion
  * users keep the system cursor, and every `data-cursor` element is a real
@@ -56,7 +56,7 @@ export function CustomCursor() {
       gsap.to([dot, ring], { autoAlpha: 0, duration: 0.2, ease: EASE.out });
     };
 
-    // Keyboard users get the same affordance when focus lands on a media card.
+    // Keyboard users get the same affordance when focus lands on a card.
     const onFocus = (event: FocusEvent) => {
       const target = (event.target as HTMLElement | null)?.closest<HTMLElement>("[data-cursor]");
       setState((target?.dataset.cursor as CursorState | undefined) ?? "default");
@@ -84,7 +84,6 @@ export function CustomCursor() {
     const scales: Record<CursorState, number> = {
       default: 1,
       link: 1.8,
-      media: 2.2,
       drag: 2.2,
       hidden: 0,
     };
@@ -95,7 +94,7 @@ export function CustomCursor() {
       ease: EASE.out,
     });
     gsap.to(dot, {
-      scale: state === "media" || state === "drag" || state === "hidden" ? 0 : 1,
+      scale: state === "drag" || state === "hidden" ? 0 : 1,
       duration: 0.3,
       ease: EASE.out,
     });
@@ -103,9 +102,8 @@ export function CustomCursor() {
 
   if (!enabled) return null;
 
-  const label =
-    state === "media" ? arbeiten.cursorLabel : state === "drag" ? arbeiten.dragHint : "";
-  const filled = state === "media" || state === "drag";
+  const label = state === "drag" ? cursor.dragHint : "";
+  const filled = state === "drag";
 
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[150]">

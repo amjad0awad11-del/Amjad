@@ -72,7 +72,6 @@ export const header = {
   homeLabel: "AMW — zur Startseite",
   nav: [
     { label: "Leistungen", href: "#leistungen" },
-    { label: "Arbeiten", href: "#arbeiten" },
     { label: "Prozess", href: "#prozess" },
     { label: "Preise", href: "#preise" },
     { label: "Kontakt", href: "#kontakt" },
@@ -85,7 +84,6 @@ export const menu = {
   title: "Navigation",
   links: [
     { label: "Leistungen", href: "#leistungen" },
-    { label: "Arbeiten", href: "#arbeiten" },
     { label: "Prozess", href: "#prozess" },
     { label: "Preise", href: "#preise" },
     { label: "FAQ", href: "#faq" },
@@ -109,7 +107,7 @@ export const hero = {
   ctaSecondary: { label: "Showreel ansehen", href: "#showreel" } as NavLink,
   badges: ["Keine Setup-Gebühr", "Keine Mindestlaufzeit", "Monatlich kündbar"],
   scrollCue: "Scrollen",
-  /** The hero wall plays the same creatives shown in the work gallery. */
+  /** Four vertical creatives drifting behind the headline. */
   wall: [
     "/media/work-1.mp4",
     "/media/work-2.mp4",
@@ -205,92 +203,14 @@ export const leistungen = {
   ],
 } as const;
 
-export const arbeiten = {
-  id: "arbeiten",
-  label: "03 — Arbeiten",
-  title: "Ausgewählte Creatives.",
-  note: "Ausschnitt aus laufenden Beauty- und Fragrance-Kampagnen. Weitere Beispiele im Erstgespräch.",
-  cursorLabel: "Ansehen",
+/** Labels shown inside the custom cursor ring (A3). */
+export const cursor = {
   dragHint: "Ziehen",
-  items: [
-    {
-      client: "[[KUNDE_1]]",
-      category: "Beauty",
-      type: "Video Ad",
-      year: "2026",
-      media: "/media/work-1.mp4",
-      kind: "video" as const,
-      alt: "Creative-Beispiel: vertikales Video-Ad aus einer Beauty-Kampagne",
-    },
-    {
-      client: "[[KUNDE_2]]",
-      category: "Skincare",
-      type: "Video Ad",
-      year: "2026",
-      media: "/media/work-2.mp4",
-      kind: "video" as const,
-      alt: "Creative-Beispiel: vertikales Video-Ad aus einer Skincare-Kampagne",
-    },
-    {
-      client: "[[KUNDE_3]]",
-      category: "Fragrance",
-      type: "Video Ad",
-      year: "2026",
-      media: "/media/work-3.mp4",
-      kind: "video" as const,
-      alt: "Creative-Beispiel: vertikales Video-Ad aus einer Duft-Kampagne",
-    },
-    {
-      client: "[[KUNDE_4]]",
-      category: "UGC",
-      type: "UGC-Video",
-      year: "2026",
-      media: "/media/work-4.mp4",
-      kind: "video" as const,
-      alt: "Creative-Beispiel: UGC-Video im Creator-Look",
-    },
-    {
-      client: "[[KUNDE_5]]",
-      category: "Beauty",
-      type: "Video Ad",
-      year: "2026",
-      media: "/media/work-5.mp4",
-      kind: "video" as const,
-      alt: "Creative-Beispiel: vertikales Video-Ad aus einer Beauty-Kampagne",
-    },
-    {
-      client: "[[KUNDE_6]]",
-      category: "Skincare",
-      type: "UGC-Video",
-      year: "2026",
-      media: "/media/work-6.mp4",
-      kind: "video" as const,
-      alt: "Creative-Beispiel: UGC-Video aus einer Skincare-Kampagne",
-    },
-    {
-      client: "[[KUNDE_7]]",
-      category: "Fragrance",
-      type: "UGC-Video",
-      year: "2026",
-      media: "/media/work-7.mp4",
-      kind: "video" as const,
-      alt: "Creative-Beispiel: UGC-Video aus einer Duft-Kampagne",
-    },
-    {
-      client: "[[KUNDE_8]]",
-      category: "Beauty",
-      type: "Video Ad",
-      year: "2026",
-      media: "/media/work-8.mp4",
-      kind: "video" as const,
-      alt: "Creative-Beispiel: vertikales Video-Ad aus einer Beauty-Kampagne",
-    },
-  ],
 } as const;
 
 export const prozess = {
   id: "prozess",
-  label: "04 — Prozess",
+  label: "03 — Prozess",
   title: "Vier Schritte. Kein Blindflug.",
   steps: [
     {
@@ -318,7 +238,7 @@ export const prozess = {
 
 export const vergleich = {
   id: "vergleich",
-  label: "05 — Vergleich",
+  label: "04 — Vergleich",
   title: "Warum AMW und nicht die anderen?",
   criterionLabel: "Kriterium",
   columns: ["AMW", "Klassische Agentur", "Freelancer"],
@@ -370,7 +290,7 @@ export const vergleich = {
 
 export const preise = {
   id: "preise",
-  label: "06 — Pakete",
+  label: "05 — Pakete",
   title: "Klare Pakete. Keine Knebelverträge.",
   featuredLabel: "Beliebteste Wahl",
   plans: [
@@ -428,7 +348,7 @@ export const preise = {
 
 export const stimmen = {
   id: "stimmen",
-  label: "07 — Stimmen",
+  label: "06 — Stimmen",
   title: "Was Kundinnen und Kunden sagen.",
   items: [
     {
@@ -451,7 +371,7 @@ export const stimmen = {
 
 export const studio = {
   id: "studio",
-  label: "08 — Studio",
+  label: "07 — Studio",
   title: "Klein, schnell, spezialisiert.",
   body: "AMW ist ein kompaktes Team aus Strategie, Kreation und Media-Buying — und wir arbeiten ausschließlich mit Beauty-, Skincare- und Fragrance-Marken. Kein Account-Management-Turm, keine Weiterreichung: Die Leute, die deine Ads bauen, sitzen auch in der Auswertung. Wenige Kunden gleichzeitig, weil Testing Aufmerksamkeit braucht, keine Kapazitätsplanung.",
   values: [
@@ -483,7 +403,7 @@ export const studio = {
 
 export const faq = {
   id: "faq",
-  label: "09 — FAQ",
+  label: "08 — FAQ",
   title: "Häufige Fragen.",
   items: [
     {
@@ -573,7 +493,6 @@ export const footer = {
   navTitle: "Seite",
   nav: [
     { label: "Leistungen", href: "#leistungen" },
-    { label: "Arbeiten", href: "#arbeiten" },
     { label: "Prozess", href: "#prozess" },
     { label: "Preise", href: "#preise" },
     { label: "FAQ", href: "#faq" },
@@ -625,7 +544,6 @@ export const sectionIndex: { id: string; label: string }[] = [
   { id: "hero", label: "Start" },
   { id: "haltung", label: "Haltung" },
   { id: "leistungen", label: "Leistungen" },
-  { id: "arbeiten", label: "Arbeiten" },
   { id: "prozess", label: "Prozess" },
   { id: "vergleich", label: "Vergleich" },
   { id: "preise", label: "Preise" },
