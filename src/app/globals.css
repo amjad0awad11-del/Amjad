@@ -450,3 +450,19 @@ html.amw-preload .preloader {
 html.amw-preload body {
   overflow: hidden;
 }
+
+/*
+ * The intro clip is 16:9. Landscape viewports crop the little that hangs over
+ * the edge; portrait ones letterbox it against the ink instead, because
+ * cropping a phone's aspect out of 16:9 would leave nothing but the bare
+ * counter — the wordmark, the claim and the progress rail all sit at the edges.
+ */
+.preloader-video {
+  object-fit: cover;
+}
+
+@media (orientation: portrait) {
+  .preloader-video {
+    object-fit: contain;
+  }
+}

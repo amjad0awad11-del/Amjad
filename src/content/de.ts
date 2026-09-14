@@ -62,9 +62,14 @@ export const a11y = {
 } as const;
 
 export const preloader = {
-  wordmark: "AMW",
-  subline: "Beauty · Skincare · Fragrance",
-  counterLabel: "Ladefortschritt",
+  /**
+   * The intro clip carries the whole title card itself — wordmark, claim and the
+   * 1→100 impulse counter are inside the video, so nothing is drawn over it.
+   */
+  video: "/media/preloader.mp4",
+  poster: "/media/preloader-poster.jpg",
+  label: "AMW Intro",
+  skip: "Intro überspringen",
 } as const;
 
 export const header = {

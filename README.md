@@ -73,6 +73,28 @@ typografische Stufe herunter, damit sie ihre Karte nicht sprengen, und Felder
 mit Platzhaltern werden aus dem JSON-LD **weggelassen** statt als Tatsache
 ausgeliefert.
 
+## Intro (A1)
+
+Der erste Bildschirm einer Sitzung ist ein Clip: `public/media/preloader.mp4`.
+Wortmarke, Claim und der Zähler 1→100 stecken im Video selbst — die Überlagerung
+zeichnet nichts darüber. Am Ende teilen sich die beiden Tintenflächen wie bisher
+und geben die Seite frei.
+
+- Läuft nur beim ersten Aufruf pro Sitzung (`sessionStorage`), nie bei
+  `prefers-reduced-motion`.
+- Desktop spielt die vollen acht Sekunden, Handheld mit doppeltem Tempo.
+- `Esc` oder „Intro überspringen“ brechen jederzeit ab.
+- Nichts sperrt den Besucher ein: verweigerter Autoplay, ein nicht dekodierbarer
+  Codec, ein hängender Download oder ein ausbleibendes `ended` führen alle in die
+  Freigabe. Die Zeitgrenze richtet sich nach der tatsächlichen Restlaufzeit.
+- `src` und `poster` werden erst im Effekt gesetzt. Die Überlagerung steckt in
+  jeder Route; ein Element, das die Quelle schon im Markup trägt, würde den Clip
+  auch dann laden, wenn er nie spielt.
+
+Ersetzen heißt: Datei unter demselben Namen ablegen und das Standbild des
+ersten Frames als `public/media/preloader-poster.jpg` daneben — sonst zeigt das
+Poster einen anderen Moment als der Clip beginnt.
+
 ## Bilder und Videos
 
 `npm run placeholders` erzeugt markenkonforme Platzhalterbilder in
@@ -89,6 +111,10 @@ public/media/hero.mp4
 public/media/work-1.mp4 … work-6.mp4
 public/media/leistung-1.mp4 … leistung-5.mp4
 ```
+
+Der Intro-Clip ist davon ausgenommen: `public/media/preloader.mp4` liegt echt im
+Repo und wird ohne Existenzprüfung eingebunden — fällt er aus, übernimmt der
+Fehlerpfad des Preloaders.
 
 Zu ersetzende Bilder: `public/media/hero-poster.jpg`,
 `public/images/work-1…6.jpg`, `leistung-1…5.jpg`, `studio-1…4.jpg`,
@@ -116,6 +142,8 @@ in `src/app/layout.tsx` bleibt unverändert.
 
 - Sichtbarer Fokusring auf jedem Bedienelement, Sprunglink zum Inhalt.
 - Menü und Showreel: Fokusfalle, `Esc`, Fokus kehrt zum Auslöser zurück.
+- Intro: `Esc` und eine sichtbare Schaltfläche überspringen, das Video selbst ist
+  `aria-hidden` — der Zähler ist Zierde, keine Information.
 - Akkordeon mit `aria-expanded`/`aria-controls`, Slider mit Pfeiltasten.
 - Vollständiger `prefers-reduced-motion`-Pfad: kein Lenis, kein Pinning,
   kein Cursor, kein Preloader, stehendes Laufband.
@@ -146,6 +174,9 @@ Lighthouse Desktop, Produktions-Build:
 | SEO | 100 |
 | LCP | 0,7 s |
 | CLS | 0,003 |
+
+Gemessen vor dem Intro-Clip. Der größte Paint ist seither das Poster des Videos
+(44 KB) statt der gesetzten Wortmarke; die Werte sind erneut zu erheben.
 
 Initiales JavaScript: **211 KB gzip**, knapp über dem Ziel von 200 KB. Die
 Aufteilung: React ≈ 70 KB, Next-App-Router-Runtime ≈ 46 KB, die vorgegebene
