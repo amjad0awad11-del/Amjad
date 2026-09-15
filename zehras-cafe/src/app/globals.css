@@ -1,0 +1,610 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   ZEHRA'S BAGUETTE & CAFÉ — Design-Tokens
+   Warm café light: cream grounds, espresso type, toasted-baguette accents and
+   a restrained sage secondary. Every text pairing below is contrast-checked
+   against WCAG 2.2 AA (4.5:1 for body copy, 3:1 for large display text).
+
+   CASCADE LAYERS — read before editing
+   ------------------------------------
+   Tailwind v4 puts its own output in `@layer theme, base, components,
+   utilities`. UNLAYERED css beats every layered rule regardless of
+   specificity, so a bare `a { color: inherit }` here would silently override
+   every `text-*` utility in the project. (It did: the primary buttons rendered
+   with invisible text until this file was layered.)
+
+   Therefore:
+     • element resets      -> @layer base        (utilities win over them)
+     • our own classes     -> @layer components  (utilities win over them)
+     • deliberate global overrides (reduced motion, print) -> unlayered, so
+       they beat utilities on purpose.
+   ========================================================================== */
+
+:root {
+  /* --- Grounds: warm cream / café milk -------------------------------- */
+  --cream: #fbf6ec;        /* page ground */
+  --linen: #f4eadb;        /* alternating section ground */
+  --ceramic: #fffcf7;      /* cards, raised surfaces */
+  --espresso: #3a2a20;     /* headings + primary text — 12.73:1 on cream */
+  --charcoal: #221a15;     /* deepest contrast ground (display card, footer) */
+
+  /* --- Accents --------------------------------------------------------- */
+  /* --caramel hits only 2.81:1 on cream, so on light grounds it is strictly
+     non-text decoration: fills, hairlines, icon glyphs that repeat a visible
+     label. It IS text-safe on the dark grounds (5.65:1 on charcoal). */
+  --caramel: #c8863c;      /* toasted baguette */
+  --caramel-deep: #8f5a23; /* the text-safe caramel — 5.33:1 on cream */
+  --sage: #8fa382;         /* muted pistachio — non-text decoration on light */
+  --sage-deep: #5a6b4e;    /* text-safe sage — 5.34:1 on cream */
+
+  /* --- Derived text tones ---------------------------------------------- */
+  --muted: #6b5344;              /* body secondary — 6.62:1 on cream */
+  --muted-on-linen: #634c3e;     /* same role on the linen ground — 6.70:1 */
+  --on-dark: #f6eee1;            /* type on charcoal/espresso grounds */
+  --muted-on-dark: #c8b6a4;      /* secondary type on dark — 8.71:1 on charcoal */
+  --focus-on-dark: #f3c98a;      /* focus ring on dark — 11.03:1 on charcoal */
+
+  /* --- Hairlines and shadows ------------------------------------------ */
+  --hairline: rgba(58, 42, 32, 0.12);
+  --hairline-strong: rgba(58, 42, 32, 0.2);
+  --hairline-on-dark: rgba(246, 238, 225, 0.16);
+
+  /* Warm-tinted shadows — a neutral grey shadow reads cold and cheap on
+     cream, so every elevation is tinted with the espresso hue. */
+  --shadow-sm: 0 1px 2px rgba(58, 42, 32, 0.05), 0 2px 8px rgba(58, 42, 32, 0.04);
+  --shadow-md: 0 2px 4px rgba(58, 42, 32, 0.05), 0 12px 28px rgba(58, 42, 32, 0.07);
+  --shadow-lg: 0 4px 10px rgba(58, 42, 32, 0.06), 0 28px 60px rgba(58, 42, 32, 0.1);
+
+  /* --- Fluid type scale ------------------------------------------------ */
+  /* The hero claim is three stacked sentences in a side-by-side layout, so it
+     gets its own, tighter scale. Sized so "Mit Liebe serviert." never wraps
+     inside the copy column at any width from 375px up. */
+  --fs-hero: clamp(2.25rem, 3.6vw, 3.4rem);
+  --fs-display: clamp(2.5rem, 7.4vw, 5.75rem);
+  --fs-h2: clamp(1.9rem, 4.4vw, 3.5rem);
+  --fs-h3: clamp(1.2rem, 1.9vw, 1.6rem);
+  --fs-lead: clamp(1.05rem, 1.55vw, 1.3rem);
+  --fs-body: clamp(1rem, 1.1vw, 1.0625rem);
+  --fs-small: 0.875rem;
+  --fs-eyebrow: 0.75rem;
+
+  /* --- Layout ---------------------------------------------------------- */
+  --page-x: clamp(20px, 5vw, 72px);
+  --max-w: 1320px;
+  --max-w-text: 62ch;
+  --section-y: clamp(72px, 10vw, 148px);
+  --header-h: 68px;
+
+  /* --- Radii: refined, never bubbly ----------------------------------- */
+  --r-card: 20px;
+  --r-media: 16px;
+  --r-media-lg: 24px;
+  --r-pill: 999px;
+
+  /* --- Motion ---------------------------------------------------------- */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Expose the tokens to Tailwind so utilities and arbitrary values share one
+   source of truth (Tailwind v4 reads these at build time). */
+@theme inline {
+  --color-cream: var(--cream);
+  --color-linen: var(--linen);
+  --color-ceramic: var(--ceramic);
+  --color-espresso: var(--espresso);
+  --color-charcoal: var(--charcoal);
+  --color-caramel: var(--caramel);
+  --color-caramel-deep: var(--caramel-deep);
+  --color-sage: var(--sage);
+  --color-sage-deep: var(--sage-deep);
+  --color-muted: var(--muted);
+  --color-on-dark: var(--on-dark);
+  --color-muted-on-dark: var(--muted-on-dark);
+
+  --font-display: var(--font-fraunces), "Iowan Old Style", "Palatino Linotype",
+    Palatino, Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --radius-card: var(--r-card);
+  --radius-media: var(--r-media);
+}
+
+/* ==========================================================================
+   @layer base — element defaults. Utilities override everything here.
+   ========================================================================== */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Anchor targets clear the sticky header instead of hiding behind it. */
+    scroll-padding-top: calc(var(--header-h) + 16px);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    background-color: var(--cream);
+    color: var(--espresso);
+    font-family: var(--font-sans);
+    font-size: var(--fs-body);
+    line-height: 1.65;
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    color: var(--espresso);
+    /* Fraunces is a warm, slightly wonky editorial serif — tightening the
+       tracking at display sizes is what makes it read as typeset, not typed. */
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  img,
+  video,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  ul,
+  ol {
+    list-style: none;
+  }
+
+  /* One visible, high-contrast focus ring everywhere, on every ground. */
+  :focus-visible {
+    outline: 3px solid var(--caramel-deep);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* On the dark display card, lightbox and footer the deep caramel would sink
+     into the ground, so the ring flips to a light tone. */
+  .on-dark :focus-visible,
+  .on-dark:focus-visible {
+    outline-color: var(--focus-on-dark);
+  }
+}
+
+/* ==========================================================================
+   @layer components — our own reusable classes.
+   ========================================================================== */
+
+@layer components {
+  /* Skip link: off-screen until focused, then a real, tappable control. */
+  .skip-link {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 200;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: var(--r-pill);
+    background: var(--espresso);
+    color: var(--on-dark);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-160%);
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  /* --- Layout helpers --------------------------------------------------- */
+  .shell {
+    width: 100%;
+    max-width: var(--max-w);
+    margin-inline: auto;
+    padding-inline: var(--page-x);
+  }
+
+  .section {
+    padding-block: var(--section-y);
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    font-family: var(--font-sans);
+    font-size: var(--fs-eyebrow);
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--caramel-deep);
+  }
+
+  /* The small caramel rule that precedes an eyebrow label. */
+  .eyebrow::before {
+    content: "";
+    width: 28px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.55;
+    flex: none;
+  }
+
+  .lead {
+    font-size: var(--fs-lead);
+    line-height: 1.6;
+    color: var(--muted);
+    max-width: var(--max-w-text);
+  }
+
+  /* --- Tactile materials -----------------------------------------------
+     Linen weave and paper grain, both extremely restrained. These are what
+     keep large cream areas from looking like flat #fff. */
+  .material-linen {
+    background-color: var(--linen);
+    background-image: repeating-linear-gradient(
+        90deg,
+        rgba(58, 42, 32, 0.022) 0 1px,
+        transparent 1px 3px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        rgba(58, 42, 32, 0.022) 0 1px,
+        transparent 1px 3px
+      );
+  }
+
+  .material-paper {
+    background-color: var(--ceramic);
+    background-image: radial-gradient(
+      120% 90% at 50% 0%,
+      rgba(200, 134, 60, 0.05) 0%,
+      transparent 60%
+    );
+  }
+
+  /* --- Scroll reveals ---------------------------------------------------
+     Reveal elements are hidden ONLY once the engine has actually mounted and
+     added `.reveal-ready` to <html> (see components/motion/ScrollReveals).
+     This ordering is deliberate: with no JavaScript, a failed chunk, a GSAP
+     load error or reduced motion active, the class is never added and every
+     section renders at full opacity. Content is never hidden by a script that
+     isn't running. The class is added in a layout effect, so it lands before
+     paint. */
+  .reveal-ready [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    will-change: opacity, transform;
+  }
+
+  .reveal-ready [data-reveal][data-reveal-done] {
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+
+  /* ======================================================================
+     HERO — the café display window
+     ----------------------------------------------------------------------
+     The opening animation is driven by GSAP, but the *resting* state lives
+     here so the very first paint is already the cropped, tilted card — no
+     flash of the final layout before the timeline attaches.
+
+     The tilt is gated behind `[data-hero-armed="true"]`, which the hero client
+     component writes onto the node inside a layout effect (i.e. before paint)
+     and only when it is actually going to animate. Consequences:
+       • no JavaScript        -> attribute never set -> flat, final, correct card
+       • GSAP chunk fails     -> same
+       • reduced motion       -> same
+     The guest never gets stuck looking at a half-cropped window.
+     ====================================================================== */
+
+  .hero-inner {
+    /* svh, not vh: on mobile Safari/Chrome the dynamic URL bar makes 100vh
+       taller than the visible area, which would push the buttons below the
+       fold. */
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(18px, 2.6vh, 34px);
+    padding-top: calc(var(--header-h) + clamp(14px, 3.2vh, 40px));
+    padding-bottom: clamp(20px, 4vh, 48px);
+  }
+
+  /* Copy column and display card sit side by side from 900px up, so the
+     three-line serif claim never has to compete with the video for vertical
+     space. */
+  .hero-layout {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    flex-direction: column;
+    gap: clamp(22px, 3.4vh, 40px);
+  }
+
+  .hero-copy {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 1.8vh, 22px);
+    align-items: flex-start;
+  }
+
+  .hero-headline {
+    font-size: var(--fs-hero);
+    line-height: 1.06;
+  }
+
+  /* The 3D context. `perspective` on the parent (rather than a perspective()
+     in the transform) is what makes the card feel like it sits in the room. */
+  .hero-stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+
+  @media (min-width: 900px) {
+    .hero-layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 45%) 1fr;
+      gap: clamp(28px, 3.4vw, 60px);
+      /* stretch, not center: the stage cell needs a definite height for the
+         size containment below to resolve. The copy re-centres itself. */
+      align-items: stretch;
+    }
+
+    .hero-copy {
+      align-self: center;
+    }
+
+    .hero-stage {
+      min-height: 0;
+      perspective: 1400px;
+      perspective-origin: 50% 42%;
+      /* Size containment lets the card be measured against the stage box in
+         BOTH axes, so a true 16:9 always fits instead of overflowing a short
+         viewport. */
+      container-type: size;
+    }
+  }
+
+  /* Warm light pooling behind the card — this, plus the inset ring, is what
+     gives depth. A drop shadow would be clipped away by the clip-path. */
+  .hero-glow {
+    position: absolute;
+    inset: 6% 2% 2%;
+    border-radius: 50%;
+    background: radial-gradient(
+      60% 60% at 50% 55%,
+      rgba(200, 134, 60, 0.42) 0%,
+      rgba(200, 134, 60, 0.15) 45%,
+      transparent 72%
+    );
+    filter: blur(38px);
+    opacity: 0.85;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero-card {
+    position: relative;
+    z-index: 1;
+    /* Mobile: plain responsive 16:9, height derived from the width — no
+       container sizing needed. Desktop overrides this below. */
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    margin: auto;
+    border-radius: var(--r-media-lg);
+    background: var(--charcoal);
+    overflow: hidden;
+    transform-style: preserve-3d;
+    /* Hinging low and slightly right is what reads as a window swinging open
+       rather than a card being scaled. */
+    transform-origin: 50% 78%;
+    /* Inset rings survive clip-path (they paint inside the box), so the
+       ceramic frame and the glass edge stay put through the whole reveal. */
+    box-shadow:
+      inset 0 0 0 1px rgba(246, 238, 225, 0.14),
+      inset 0 0 0 7px rgba(34, 26, 21, 0.55),
+      inset 0 0 44px 12px rgba(34, 26, 21, 0.4);
+  }
+
+  @media (min-width: 900px) {
+    .hero-card {
+      /* min() against both container axes: never wider than the stage, never
+         taller than it either — so the card always fits a short laptop
+         viewport. */
+      width: min(100cqw, calc(100cqh * 16 / 9));
+    }
+  }
+
+  .hero-card video,
+  .hero-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Diagonal sheen across the "glass". Fades out as the window opens. */
+  .hero-glass {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      104deg,
+      rgba(255, 252, 247, 0.26) 0%,
+      rgba(255, 252, 247, 0.07) 22%,
+      transparent 42%,
+      transparent 60%,
+      rgba(255, 252, 247, 0.05) 78%,
+      rgba(255, 252, 247, 0.16) 100%
+    );
+    mix-blend-mode: screen;
+  }
+
+  /* --- Armed resting state ---------------------------------------------
+     Matches the brief's suggested opening values: rotateX 7–12deg,
+     rotateY -4 to -8deg, scale 0.82–0.9, and a narrow, strongly rounded
+     crop. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-card[data-hero-armed="true"] {
+      transform: rotateX(9deg) rotateY(-6deg) scale(0.86);
+      clip-path: inset(13% 19% 13% 19% round 34px);
+      will-change: transform, clip-path;
+    }
+
+    /* Mobile: the brief asks for clarity over theatrics — no rotation, a
+       gentler crop, and the card simply expands into a clean 16:9. */
+    @media (max-width: 899px) {
+      .hero-card[data-hero-armed="true"] {
+        transform: scale(0.93);
+        clip-path: inset(7% 9% 7% 9% round 26px);
+      }
+    }
+  }
+
+  /* The discreet playback toggle. Icon-only, so it carries an aria-label, and
+     it meets the 44px target floor on every breakpoint. */
+  .hero-media-toggle {
+    position: absolute;
+    right: clamp(10px, 1.4vw, 18px);
+    bottom: clamp(10px, 1.4vw, 18px);
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(246, 238, 225, 0.28);
+    border-radius: var(--r-pill);
+    background: rgba(34, 26, 21, 0.58);
+    color: var(--on-dark);
+    backdrop-filter: blur(6px);
+    cursor: pointer;
+    transition: background-color 0.25s var(--ease-out),
+      border-color 0.25s var(--ease-out);
+  }
+
+  .hero-media-toggle:hover,
+  .hero-media-toggle:focus-visible {
+    background: rgba(34, 26, 21, 0.78);
+    border-color: rgba(246, 238, 225, 0.5);
+  }
+
+  /* Reduced-motion play affordance, centred over the poster. */
+  .hero-media-play {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(34, 26, 21, 0.1) 0%,
+      rgba(34, 26, 21, 0.42) 100%
+    );
+    color: var(--on-dark);
+    cursor: pointer;
+  }
+
+  .hero-media-play > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: var(--r-pill);
+    background: rgba(251, 246, 236, 0.95);
+    color: var(--espresso);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Scroll affordance under the hero. Hidden from assistive tech (it is a
+     hint, not content) and it disappears once the opening has played. */
+  .hero-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .hero-hint-rule {
+    display: block;
+    width: 46px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--caramel), transparent);
+  }
+}
+
+/* ==========================================================================
+   Deliberate global overrides — UNLAYERED so they beat utilities.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-ready [data-reveal],
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* A guest printing the page wants the address, not the artwork. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

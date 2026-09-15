@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Favicon: espresso ground, caramel "Z" — the wordmark reduced to one letter. -->
+  <rect width="64" height="64" rx="15" fill="#3A2A20"/>
+  <path d="M20 21h24v6.2L28.6 43H44v6H20v-6.2L35.4 27H20z" fill="#E3A85C"/>
+</svg>
