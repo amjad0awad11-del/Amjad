@@ -182,7 +182,20 @@ img, video { height: auto; }
 /* ---- masthead ---- */
 [data-mast] { display: flex; align-items: center; justify-content: space-between; position: relative; z-index: 30; }
 [data-mast] .logo { height: 1.5rem; width: auto; }
+[data-nav] a, [data-mast-cta] {
+  font-size: var(--type-label); text-transform: uppercase; line-height: 0.9;
+  color: var(--foreground); transition: color var(--duration-fast) var(--ease-entrance);
+}
+[data-nav] a:hover, [data-mast-cta]:hover { color: var(--accent); }
+[data-burger] span { display: block; width: 1.5rem; height: 1px; background: var(--foreground); }
+
+/* Every base state first, then the one breakpoint that overrides it. A media
+   query carries no extra specificity, so a base `display` declared after this
+   block would beat it — which is how the burger and the garage link came out
+   swapped above 1280. */
 [data-nav] { display: none; }
+[data-mast-cta] { display: none; font-weight: 700; }
+[data-burger] { padding: 0.5rem; margin-right: -0.5rem; display: grid; gap: 0.3125rem; }
 @media (min-width: 1280px) {
   /* Pinned to the page's centre line, not between logo and garage link. */
   [data-nav] { display: block; position: absolute; left: 50%; transform: translateX(-50%); }
@@ -190,14 +203,6 @@ img, video { height: auto; }
   [data-mast-cta] { display: inline-flex; }
   [data-burger] { display: none; }
 }
-[data-nav] a, [data-mast-cta] {
-  font-size: var(--type-label); text-transform: uppercase; line-height: 0.9;
-  color: var(--foreground); transition: color var(--duration-fast) var(--ease-entrance);
-}
-[data-mast-cta] { display: none; font-weight: 700; }
-[data-nav] a:hover, [data-mast-cta]:hover { color: var(--accent); }
-[data-burger] { padding: 0.5rem; margin-right: -0.5rem; display: grid; gap: 0.3125rem; }
-[data-burger] span { display: block; width: 1.5rem; height: 1px; background: var(--foreground); }
 
 /* ---- the driver identity ---- */
 [data-hero-body] { display: flex; flex-direction: column; flex: 1; gap: 2rem; }
@@ -555,6 +560,10 @@ html[data-locked] { position: relative; overflow: hidden; height: 100%; }
 [data-rail] {
   position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); z-index: 10;
   width: 1.1111cqw; top: var(--rail-top, 0);
+  /* Decorative, and it crosses the middle of every centre plate — without
+     this it hit-tests above them and the hover dim never fires where a
+     reader is most likely to point. */
+  pointer-events: none;
 }
 @media (max-width: 1023px) { [data-rail] { --rail-top: calc(11.7361cqw + var(--top-pad-extra, 0px)); } }
 @media (max-width: 639px) { [data-rail] { display: none; } }
@@ -782,6 +791,12 @@ html[data-locked] { position: relative; overflow: hidden; height: 100%; }
   font-size: max(max(1.25cqw, var(--type-min, 0px)), var(--copy-min-size, 0px));
 }
 [data-strip] .card .dt { font-size: max(0.9722cqw, var(--type-min, 0px)); letter-spacing: -0.0194cqw; color: var(--foreground-on-dark-muted); }
+/* The frame's card widths were drawn for the English round names; the German
+   ones are longer, and wrapped they made the card tall enough for its own date
+   to land on the marker run at 126. The name overflows its card box instead,
+   centred on it — the pitch between card centres is 159 at its tightest and no
+   name reaches that. */
+[data-strip] .card .nm { white-space: nowrap; }
 [data-strip] .card[data-live] .no, [data-strip] .card[data-live] .dt { color: var(--accent); }
 [data-strip] .mark {
   position: absolute; top: calc(8.75cqw + var(--cal-mark-drop, 0px));
@@ -794,6 +809,10 @@ html[data-locked] { position: relative; overflow: hidden; height: 100%; }
 [data-strip] [data-live-bracket] .bc { width: 0.6944cqw; height: 0.6944cqw; color: var(--accent); }
 @media (max-width: 639px) {
   [data-strip] .link, [data-strip] .mark, [data-strip] [data-live-bracket] { display: none; }
+  /* On the phone the strip is a three-column grid with no marker run beneath
+     it, and the columns are narrower than the names — so there the wrap is
+     free and nowrap would overflow the block. */
+  [data-strip] .card .nm { white-space: normal; }
   [data-strip] {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem 1.25rem;
     padding: 1.5rem 4%; align-content: start;
@@ -1399,6 +1418,10 @@ const clamp01 = (v) => clamp(0, v, 1);
 
 /* A failed asset must be visible, never silent. */
 function failBanner(what) {
+  /* `what` is a key inside the asset bucket, or — for the page's own films
+     and posters — a path of its own. Prefixing the bucket onto the second
+     kind named a URL that was never requested. */
+  const where = /^(https?:|\/|assets\/)/.test(what) ? what : `${ASSET_BASE_URL}/${what}`;
   let bar = document.querySelector("[data-fail]");
   if (!bar) {
     bar = document.createElement("div");
@@ -1408,7 +1431,7 @@ function failBanner(what) {
       + "font:500 13px/1.5 'Space Grotesk',system-ui,sans-serif;padding:10px 16px;text-transform:uppercase";
     document.body.appendChild(bar);
   }
-  bar.textContent = `Asset konnte nicht geladen werden: ${ASSET_BASE_URL}/${what}`;
+  bar.textContent = `Asset konnte nicht geladen werden: ${where}`;
 }
 
 /* ---- the shared ticker ----
@@ -1626,9 +1649,14 @@ for (const { node, api } of revealers) {
   /* Inside a pinned layer the block is exactly one viewport tall and its last
      child sits on the fold, so a negative bottom inset can never be
      satisfied — the element would wait for an arrival that never comes. */
-  const pinned = !!node.closest("[data-pin]");
+  /* Also the footer, not just a pinned layer. It is the last block on the
+     page, so anything anchored to its foot sits inside the last 12% of the
+     document and a negative bottom inset can never be satisfied: the foot
+     row's copyright, button and socials sat at 834 against an inset ending
+     at 792 and stayed invisible however far the page was scrolled. */
+  const atEnd = !!node.closest("[data-pin], [data-footer]");
   const margin = node.dataset.margin ? `0% 0% ${node.dataset.margin}% 0%`
-    : pinned ? "0px" : "0% 0% -12% 0%";
+    : atEnd ? "0px" : "0% 0% -12% 0%";
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) if (e.isIntersecting) { api.play(); io.disconnect(); }
   }, { rootMargin: margin });
