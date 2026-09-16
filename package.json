@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "site": "node scripts/serve-site.mjs",
     "placeholders": "node scripts/placeholders.mjs",
     "qa": "node scripts/qa.mjs"
   },
